@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://jobghw2xatti"]
+
+[ext_resource type="Script" uid="uid://djrcf3yxxru21" path="res://scripts/Main.gd" id="1_elqb8"]
+[ext_resource type="PackedScene" uid="uid://rvush6rmt5hc" path="res://scenes/MainMenu.tscn" id="2_rarhs"]
+[ext_resource type="PackedScene" uid="uid://oyo0xpmfxk62" path="res://scenes/GameView.tscn" id="3_vcsgt"]
+[ext_resource type="PackedScene" uid="uid://djg68vjccjucc" path="res://scenes/GameOver.tscn" id="4_c01mt"]
+
+[node name="Main" type="Control" unique_id=900668806]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_elqb8")
+
+[node name="MainMenu" parent="." unique_id=1600743337 instance=ExtResource("2_rarhs")]
+layout_mode = 1
+
+[node name="GameView" parent="." unique_id=1105955654 instance=ExtResource("3_vcsgt")]
+layout_mode = 1
+
+[node name="GameOver" parent="." unique_id=1760247633 instance=ExtResource("4_c01mt")]
+layout_mode = 1

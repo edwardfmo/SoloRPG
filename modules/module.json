@@ -1,0 +1,25 @@
+{
+  "id": "demo",
+  "start_node": "start",
+  "nodes": {
+	"start": {
+	  "text": "You step on a trap!",
+	  "on_enter": [
+		{
+		  "type": "dnd.damage",
+		  "amount": 3
+		}
+	  ],
+	  "choices": [
+		{
+		  "text": "Continue",
+		  "next": "end"
+		}
+	  ]
+	},
+	"end": {
+	  "text": "You survived.",
+	  "choices": []
+	}
+  }
+}

@@ -1,0 +1,94 @@
+[gd_scene format=3 uid="uid://lrdis40rf1hj"]
+
+[ext_resource type="Script" uid="uid://ch8us7x0jvc5p" path="res://scripts/NodeEditor.gd" id="1_x53ir"]
+
+[node name="NodeEditor" type="Control" unique_id=1289184025 node_paths=PackedStringArray("graph", "id_edit", "text_edit", "image_edit")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_x53ir")
+graph = NodePath("HBoxContainer/GraphEdit")
+id_edit = NodePath("HBoxContainer/Panel/VBoxContainer/HBoxContainer/NodeIDEdit")
+text_edit = NodePath("HBoxContainer/Panel/VBoxContainer/ScrollContainer/NodeTextEdit")
+image_edit = NodePath("HBoxContainer/Panel/VBoxContainer/HBoxContainer2/ImagePathEdit")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=680604682]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GraphEdit" type="GraphEdit" parent="HBoxContainer" unique_id=65334844]
+layout_mode = 2
+size_flags_horizontal = 3
+scroll_offset = Vector2(-574, -40)
+
+[node name="Panel" type="Panel" parent="HBoxContainer" unique_id=924505902]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Panel" unique_id=1360885557]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/Panel/VBoxContainer" unique_id=346346756]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/Panel/VBoxContainer/HBoxContainer" unique_id=4554049]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Node ID"
+
+[node name="NodeIDEdit" type="LineEdit" parent="HBoxContainer/Panel/VBoxContainer/HBoxContainer" unique_id=2102238499]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label2" type="Label" parent="HBoxContainer/Panel/VBoxContainer" unique_id=1717684313]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Text"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/Panel/VBoxContainer" unique_id=1364111251]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="NodeTextEdit" type="TextEdit" parent="HBoxContainer/Panel/VBoxContainer/ScrollContainer" unique_id=698739255]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer/Panel/VBoxContainer" unique_id=2045190866]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/Panel/VBoxContainer/HBoxContainer2" unique_id=1680991568]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Image Path"
+
+[node name="ImagePathEdit" type="LineEdit" parent="HBoxContainer/Panel/VBoxContainer/HBoxContainer2" unique_id=1215525616]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AddChoiceButton" type="Button" parent="HBoxContainer/Panel/VBoxContainer" unique_id=373190785]
+layout_mode = 2
+text = "Add Choice"
+
+[node name="ExportModuleButton" type="Button" parent="HBoxContainer/Panel/VBoxContainer" unique_id=1068253700]
+layout_mode = 2
+text = "Export"
+
+[connection signal="text_changed" from="HBoxContainer/Panel/VBoxContainer/HBoxContainer/NodeIDEdit" to="." method="_on_id_changed"]
+[connection signal="text_changed" from="HBoxContainer/Panel/VBoxContainer/ScrollContainer/NodeTextEdit" to="." method="_on_text_changed"]
+[connection signal="text_changed" from="HBoxContainer/Panel/VBoxContainer/HBoxContainer2/ImagePathEdit" to="." method="_on_image_changed"]
+[connection signal="pressed" from="HBoxContainer/Panel/VBoxContainer/AddChoiceButton" to="." method="_on_add_choice"]
+[connection signal="pressed" from="HBoxContainer/Panel/VBoxContainer/ExportModuleButton" to="." method="_on_export_pressed"]
