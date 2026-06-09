@@ -1,5 +1,22 @@
 {
 	"author": "Edwardfmo",
+	"frames": [
+		{
+			"attached_nodes": [
+				"node",
+				"start"
+			],
+			"offset": [
+				200.0,
+				100.0
+			],
+			"size": [
+				540.0,
+				390.0
+			],
+			"title": "Chapter1"
+		}
+	],
 	"id": "demo",
 	"name": "Demo Module",
 	"nodes": {
@@ -8,24 +25,48 @@
 			"id": "end",
 			"image": "",
 			"offset": [
-				280.0,
-				0.0
+				820.0,
+				-20.0
 			],
 			"on_enter": [],
 			"text": "You survived."
 		},
+		"node": {
+			"choices": [],
+			"id": "node",
+			"image": "",
+			"offset": [
+				500.0,
+				300.0
+			],
+			"on_enter": [],
+			"text": "You survived, but hurt."
+		},
 		"start": {
 			"choices": [
 				{
+					"conditions": [
+						{
+							"type": "dnd.hp_above",
+							"value": 8.0
+						}
+					],
+					"id": "c1",
 					"next": "end",
-					"text": "Continue"
+					"text": "Whatever"
+				},
+				{
+					"conditions": [],
+					"id": "c2",
+					"next": "node",
+					"text": "Ouch"
 				}
 			],
 			"id": "start",
 			"image": "",
 			"offset": [
-				0.0,
-				0.0
+				240.0,
+				140.0
 			],
 			"on_enter": [
 				{
@@ -33,7 +74,7 @@
 					"type": "dnd.damage"
 				}
 			],
-			"text": "You step on a trap!"
+			"text": "You step on a trap!\n\ntook 3 damage."
 		}
 	},
 	"start_node": "start",

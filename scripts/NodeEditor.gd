@@ -8,11 +8,7 @@ signal close_pressed
 @export var module_version_edit: LineEdit
 @export var module_author_edit: LineEdit
 
-@export var id_edit: LineEdit
-@export var text_edit: TextEdit
-@export var image_edit: LineEdit
-@export var node_container: Container
-@export var choices_container: VBoxContainer
+@export var node_inspector: ScrollContainer
 
 @export var save_button: Button
 @export var save_as_button: Button
@@ -26,12 +22,13 @@ var id_map = {}          # id → node
 var selected_node: StoryNode = null
 var _last_export_path: String = ""
 var start_node_gn: GraphNode = null
+var frames = []          # GraphFrame instances
 
 func _ready() -> void:
 	graph.connection_request.connect(_on_connection_request)
 	graph.disconnection_request.connect(_on_disconnection_request)
 	graph.delete_nodes_request.connect(_on_delete_nodes_request)
-	node_container.visible = false
+	node_inspector.visible = false
 	visibility_changed.connect(_on_visibility_changed)
 
 
@@ -62,6 +59,9 @@ func _input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 			create_node_at_mouse()
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_G and event.ctrl_pressed:
+			create_frame_at_mouse()
 
 func create_node_at_mouse():
 	var node = StoryNode.new()
@@ -95,6 +95,11 @@ func create_node_at_mouse():
 			selected_node = node
 			_load_into_inspector(node))
 
+	# Auto-attach to frame if dropped inside one
+	node.dragged.connect(func(_from, _to):
+		_auto_attach_to_frame(node))
+	_auto_attach_to_frame(node)
+
 func _generate_unique_id(base: String) -> String:
 	var id = base
 	var i = 1
@@ -106,17 +111,64 @@ func _generate_unique_id(base: String) -> String:
 	return id
 
 
-func _generate_unique_choice_id(node: StoryNode) -> String:
-	var base = "choice"
-	var id = base
-	var i = 1
-	var existing_ids = []
-	for choice in node.data["choices"]:
-		existing_ids.append(choice.get("id", ""))
-	while id in existing_ids:
-		id = base + "_" + str(i)
-		i += 1
-	return id
+func create_frame_at_mouse():
+	var frame = GraphFrame.new()
+	frame.name = "frame_" + str(frames.size())
+	frame.title = "Group"
+	frame.tint_color_enabled = true
+	frame.autoshrink_enabled = true
+	frame.position_offset = graph.get_local_mouse_position() + graph.scroll_offset
+	frame.custom_minimum_size = Vector2(300, 200)
+	graph.add_child(frame)
+	frames.append(frame)
+	_setup_frame_rename(frame)
+
+
+func _setup_frame_rename(frame: GraphFrame):
+	var titlebar = frame.get_titlebar_hbox()
+	titlebar.gui_input.connect(func(event):
+		if event is InputEventMouseButton and event.double_click:
+			# Find the title label
+			var label: Label = null
+			for child in titlebar.get_children():
+				if child is Label:
+					label = child
+					break
+			if not label:
+				return
+			# Replace label with LineEdit
+			label.visible = false
+			var edit = LineEdit.new()
+			edit.text = frame.title
+			edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			titlebar.add_child(edit)
+			edit.grab_focus()
+			edit.select_all()
+			var _commit = func():
+				frame.title = edit.text
+				label.visible = true
+				edit.queue_free()
+			edit.text_submitted.connect(func(_t): _commit.call())
+			edit.focus_exited.connect(_commit))
+
+
+func _auto_attach_to_frame(node: GraphNode):
+	var node_rect = Rect2(node.position_offset, node.size)
+	var best_frame: GraphFrame = null
+
+	for frame in frames:
+		var frame_rect = Rect2(frame.position_offset, frame.size)
+		if frame_rect.encloses(node_rect):
+			best_frame = frame
+
+	# Detach from current frame if outside
+	var current_frame = graph.get_element_frame(node.name)
+	if current_frame and current_frame != best_frame:
+		graph.detach_graph_element_from_frame(node.name)
+
+	# Attach to new frame
+	if best_frame and graph.get_element_frame(node.name) != best_frame:
+		graph.attach_graph_element_to_frame(node.name, best_frame.name)
 
 
 func _on_node_id_changed(old_id, new_id, node):
@@ -145,119 +197,8 @@ func _update_all_references(old_id: String, new_id: String):
 				choice["next"] = new_id
 
 func _load_into_inspector(node):
-	id_edit.text = node.data["id"]
-	text_edit.text = node.data["text"]
-	image_edit.text = node.data["image"]
-	node_container.visible = true
-	_rebuild_choices_list()
+	node_inspector.load_node(node)
 
-func _on_id_changed(new_text):
-	if selected_node:
-		selected_node.id = new_text
-
-func _on_text_changed():
-	if selected_node:
-		selected_node.data["text"] = text_edit.text
-
-func _on_image_changed(new_text):
-	if selected_node:
-		selected_node.data["image"] = new_text
-
-func _on_add_choice():
-	if not selected_node:
-		return
-
-	var choice_id = _generate_unique_choice_id(selected_node)
-	selected_node.data["choices"].append({
-		"id": choice_id,
-		"text": choice_id,
-		"next": ""
-	})
-
-	selected_node.rebuild_ports()
-	_rebuild_choices_list()
-
-
-func _rebuild_choices_list():
-	# Clear existing
-	for child in choices_container.get_children():
-		child.queue_free()
-
-	if not selected_node:
-		return
-
-	for i in selected_node.data["choices"].size():
-		var choice = selected_node.data["choices"][i]
-		var row = VBoxContainer.new()
-		var idx = i
-
-		# Collapsed header button
-		var next_id = choice.get("next", "")
-		var header_text = choice.get("id", "") + " -> " + (next_id if next_id != "" else "---")
-		var header = Button.new()
-		header.text = header_text
-		header.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		header.flat = true
-		row.add_child(header)
-
-		# Expanded details container (hidden by default)
-		var details = VBoxContainer.new()
-		details.visible = false
-		header.pressed.connect(func():
-			details.visible = not details.visible)
-
-		# Choice ID row
-		var id_row = HBoxContainer.new()
-		var id_label = Label.new()
-		id_label.text = "ID"
-		id_label.add_theme_font_size_override("font_size", 11)
-		var id_field = LineEdit.new()
-		id_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		id_field.text = choice.get("id", "")
-		id_field.text_changed.connect(func(new_text):
-			selected_node.data["choices"][idx]["id"] = new_text
-			var n = selected_node.data["choices"][idx].get("next", "")
-			header.text = new_text + " -> " + (n if n != "" else "---"))
-		id_row.add_child(id_label)
-		id_row.add_child(id_field)
-		details.add_child(id_row)
-
-		# Choice Text row
-		var text_row = HBoxContainer.new()
-		var text_label = Label.new()
-		text_label.text = "Text"
-		text_label.add_theme_font_size_override("font_size", 11)
-		var text_field = LineEdit.new()
-		text_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		text_field.text = choice.get("text", "")
-		text_field.text_changed.connect(func(new_text):
-			selected_node.data["choices"][idx]["text"] = new_text
-			selected_node.rebuild_ports())
-		text_row.add_child(text_label)
-		text_row.add_child(text_field)
-		details.add_child(text_row)
-
-		# Next node row (read-only)
-		var next_row = HBoxContainer.new()
-		var next_label = Label.new()
-		next_label.text = "Next"
-		next_label.add_theme_font_size_override("font_size", 11)
-		var next_field = LineEdit.new()
-		next_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		next_field.text = choice.get("next", "")
-		next_field.editable = false
-		next_row.add_child(next_label)
-		next_row.add_child(next_field)
-		details.add_child(next_row)
-
-		row.add_child(details)
-
-		# Separator
-		var sep = HSeparator.new()
-		row.add_child(sep)
-
-		choices_container.add_child(row)
-	
 func _on_connection_request(from, from_port, to, to_port):
 	# Remove existing connections from this port (max 1 connection per output)
 	for conn in graph.get_connection_list():
@@ -274,7 +215,7 @@ func _on_connection_request(from, from_port, to, to_port):
 		from_node.data["choices"][from_port]["next"] = to_node.data["id"]
 
 	graph.connect_node(from, from_port, to, to_port)
-	_rebuild_choices_list()
+	node_inspector.rebuild_choices_list()
 
 func _on_disconnection_request(from, from_port, to, to_port):
 	var from_node = graph.get_node(NodePath(from))
@@ -283,7 +224,7 @@ func _on_disconnection_request(from, from_port, to, to_port):
 		from_node.data["choices"][from_port]["next"] = ""
 
 	graph.disconnect_node(from, from_port, to, to_port)
-	_rebuild_choices_list()
+	node_inspector.rebuild_choices_list()
 
 func export_module(path: String):
 	# Determine start node from Start connector
@@ -306,6 +247,22 @@ func export_module(path: String):
 
 	for n in nodes:
 		module["nodes"][n.data["id"]] = n.data
+
+	# Serialize frames
+	var frames_data = []
+	for frame in frames:
+		var frame_info = {
+			"title": frame.title,
+			"offset": [frame.position_offset.x, frame.position_offset.y],
+			"size": [frame.size.x, frame.size.y],
+			"attached_nodes": []
+		}
+		for node in nodes:
+			if graph.get_element_frame(node.name) == frame:
+				frame_info["attached_nodes"].append(node.data["id"])
+		frames_data.append(frame_info)
+	if frames_data.size() > 0:
+		module["frames"] = frames_data
 
 	var json = JSON.stringify(module, "\t")
 
@@ -396,7 +353,8 @@ func load_module(path: String):
 		# Connect signals
 		node.id_changed.connect(_on_node_id_changed.bind(node))
 		node.dragged.connect(func(_from, to):
-			node.data["offset"] = [to.x, to.y])
+			node.data["offset"] = [to.x, to.y]
+			_auto_attach_to_frame(node))
 		node.gui_input.connect(func(event):
 			if event is InputEventMouseButton and event.pressed:
 				selected_node = node
@@ -422,6 +380,27 @@ func load_module(path: String):
 		var target = id_map[start_id]
 		graph.connect_node(start_node_gn.name, 0, target.name, 0)
 
+	# Restore frames
+	var frames_data = data.get("frames", [])
+	for fd in frames_data:
+		var frame = GraphFrame.new()
+		frame.name = "frame_" + str(frames.size())
+		frame.title = fd.get("title", "Group")
+		frame.tint_color_enabled = true
+		frame.autoshrink_enabled = true
+		var f_offset = fd.get("offset", [0, 0])
+		frame.position_offset = Vector2(f_offset[0], f_offset[1])
+		var f_size = fd.get("size", [300, 200])
+		frame.custom_minimum_size = Vector2(f_size[0], f_size[1])
+		frame.size = Vector2(f_size[0], f_size[1])
+		graph.add_child(frame)
+		frames.append(frame)
+		_setup_frame_rename(frame)
+		for attached_id in fd.get("attached_nodes", []):
+			if id_map.has(attached_id):
+				var attached_node = id_map[attached_id]
+				graph.attach_graph_element_to_frame(attached_node.name, frame.name)
+
 func _clear_editor():
 	# Disconnect all graph connections
 	graph.clear_connections()
@@ -441,7 +420,13 @@ func _clear_editor():
 	node_map.clear()
 	id_map.clear()
 	selected_node = null
-	node_container.visible = false
+	node_inspector.clear()
+
+	# Remove frames
+	for frame in frames:
+		graph.remove_child(frame)
+		frame.queue_free()
+	frames.clear()
 
 
 func _create_start_node():
@@ -460,7 +445,11 @@ func _on_delete_nodes_request(node_names: Array[StringName]):
 		if str(node_name) == "__start__":
 			continue
 		var node = graph.get_node(NodePath(str(node_name)))
-		if node is StoryNode:
+		if node is GraphFrame:
+			frames.erase(node)
+			graph.remove_child(node)
+			node.queue_free()
+		elif node is StoryNode:
 			# Remove connections involving this node
 			for conn in graph.get_connection_list():
 				if conn["from_node"] == node_name or conn["to_node"] == node_name:

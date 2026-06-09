@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://lrdis40rf1hj"]
 
 [ext_resource type="Script" uid="uid://ch8us7x0jvc5p" path="res://scripts/NodeEditor.gd" id="1_x53ir"]
+[ext_resource type="PackedScene" path="res://scenes/NodeInspector.tscn" id="2_ninsp"]
 
-[node name="NodeEditor" type="Control" unique_id=1289184025 node_paths=PackedStringArray("graph", "module_id_edit", "module_name_edit", "module_version_edit", "module_author_edit", "id_edit", "text_edit", "image_edit", "node_container", "choices_container", "save_button", "save_as_button", "save_file_dialog", "open_file_dialog")]
+[node name="NodeEditor" type="Control" unique_id=1289184025 node_paths=PackedStringArray("graph", "module_id_edit", "module_name_edit", "module_version_edit", "module_author_edit", "node_inspector", "save_button", "save_as_button", "save_file_dialog", "open_file_dialog")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,14 +16,11 @@ module_id_edit = NodePath("HBoxContainer/Panel/VBoxContainer/ModuleIDContainer/M
 module_name_edit = NodePath("HBoxContainer/Panel/VBoxContainer/ModuleNameContainer/ModuleNameEdit")
 module_version_edit = NodePath("HBoxContainer/Panel/VBoxContainer/ModuleVersionContainer/ModuleVersionEdit")
 module_author_edit = NodePath("HBoxContainer/Panel/VBoxContainer/ModuleAuthorContainer/ModuleAuthorEdit")
-id_edit = NodePath("HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer/HBoxContainer/NodeIDEdit")
-text_edit = NodePath("HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer/ScrollContainer/NodeTextEdit")
-image_edit = NodePath("HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer/HBoxContainer2/ImagePathEdit")
-node_container = NodePath("HBoxContainer/Panel/VBoxContainer/NodeScrollContainer")
-choices_container = NodePath("HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer/ChoicesContainer")
+node_inspector = NodePath("HBoxContainer/Panel/VBoxContainer/NodeInspector")
 save_button = NodePath("HBoxContainer/Panel/VBoxContainer/ButtonBar/SaveModuleButton")
 save_as_button = NodePath("HBoxContainer/Panel/VBoxContainer/ButtonBar/SaveAsButton")
 save_file_dialog = NodePath("SaveFileDialog")
+open_file_dialog = NodePath("OpenFileDialog")
 open_file_dialog = NodePath("OpenFileDialog")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=680604682]
@@ -138,65 +136,8 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Selected Node"
 
-[node name="NodeScrollContainer" type="ScrollContainer" parent="HBoxContainer/Panel/VBoxContainer" unique_id=1573252169]
+[node name="NodeInspector" parent="HBoxContainer/Panel/VBoxContainer" instance=ExtResource("2_ninsp")]
 layout_mode = 2
-size_flags_vertical = 3
-
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer" unique_id=1407834611]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer" unique_id=346346756]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer/HBoxContainer" unique_id=4554049]
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "Node ID"
-
-[node name="NodeIDEdit" type="LineEdit" parent="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer/HBoxContainer" unique_id=2102238499]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Label2" type="Label" parent="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer" unique_id=1717684313]
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "Text"
-
-[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer" unique_id=1364111251]
-custom_minimum_size = Vector2(0, 300)
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="NodeTextEdit" type="TextEdit" parent="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer/ScrollContainer" unique_id=698739255]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer" unique_id=2045190866]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer/HBoxContainer2" unique_id=1680991568]
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "Image Path"
-
-[node name="ImagePathEdit" type="LineEdit" parent="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer/HBoxContainer2" unique_id=1215525616]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="ChoicesLabel" type="Label" parent="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer" unique_id=2046077052]
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "Choices"
-
-[node name="ChoicesContainer" type="VBoxContainer" parent="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer" unique_id=1282646033]
-layout_mode = 2
-
-[node name="AddChoiceButton" type="Button" parent="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer" unique_id=373190785]
-layout_mode = 2
-text = "Add Choice"
 
 [node name="SaveFileDialog" type="FileDialog" parent="." unique_id=1032222101]
 title = "Save Module"
@@ -218,9 +159,5 @@ filters = PackedStringArray("*.json ; JSON Files")
 [connection signal="pressed" from="HBoxContainer/Panel/VBoxContainer/ButtonBar/SaveModuleButton" to="." method="_on_save_pressed"]
 [connection signal="pressed" from="HBoxContainer/Panel/VBoxContainer/ButtonBar/SaveAsButton" to="." method="_on_save_as_pressed"]
 [connection signal="pressed" from="HBoxContainer/Panel/VBoxContainer/ButtonBar/CloseEditorButton" to="." method="_on_close_pressed"]
-[connection signal="text_changed" from="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer/HBoxContainer/NodeIDEdit" to="." method="_on_id_changed"]
-[connection signal="text_changed" from="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer/ScrollContainer/NodeTextEdit" to="." method="_on_text_changed"]
-[connection signal="text_changed" from="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer/HBoxContainer2/ImagePathEdit" to="." method="_on_image_changed"]
-[connection signal="pressed" from="HBoxContainer/Panel/VBoxContainer/NodeScrollContainer/VBoxContainer/AddChoiceButton" to="." method="_on_add_choice"]
 [connection signal="file_selected" from="SaveFileDialog" to="." method="_on_file_selected"]
 [connection signal="file_selected" from="OpenFileDialog" to="." method="_on_open_file_selected"]
