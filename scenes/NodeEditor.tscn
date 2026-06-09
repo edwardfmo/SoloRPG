@@ -27,6 +27,7 @@ grow_vertical = 2
 layout_mode = 2
 size_flags_horizontal = 3
 scroll_offset = Vector2(-574, -40)
+right_disconnects = true
 
 [node name="Panel" type="Panel" parent="HBoxContainer" unique_id=924505902]
 custom_minimum_size = Vector2(400, 0)
