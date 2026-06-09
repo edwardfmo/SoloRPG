@@ -4,8 +4,10 @@
 [ext_resource type="PackedScene" uid="uid://rvush6rmt5hc" path="res://scenes/MainMenu.tscn" id="2_rarhs"]
 [ext_resource type="PackedScene" uid="uid://oyo0xpmfxk62" path="res://scenes/GameView.tscn" id="3_vcsgt"]
 [ext_resource type="PackedScene" uid="uid://djg68vjccjucc" path="res://scenes/GameOver.tscn" id="4_c01mt"]
+[ext_resource type="PackedScene" uid="uid://lrdis40rf1hj" path="res://scenes/NodeEditor.tscn" id="5_n3dtr"]
+[ext_resource type="PackedScene" path="res://scenes/ModuleSelect.tscn" id="6_mssel"]
 
-[node name="Main" type="Control" unique_id=900668806]
+[node name="Main" type="Control" unique_id=900668806 node_paths=PackedStringArray("main_menu", "game_view", "game_over", "node_editor", "module_select")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,6 +15,11 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_elqb8")
+main_menu = NodePath("MainMenu")
+game_view = NodePath("GameView")
+game_over = NodePath("GameOver")
+node_editor = NodePath("NodeEditor")
+module_select = NodePath("ModuleSelect")
 
 [node name="MainMenu" parent="." unique_id=1600743337 instance=ExtResource("2_rarhs")]
 layout_mode = 1
@@ -21,4 +28,10 @@ layout_mode = 1
 layout_mode = 1
 
 [node name="GameOver" parent="." unique_id=1760247633 instance=ExtResource("4_c01mt")]
+layout_mode = 1
+
+[node name="NodeEditor" parent="." instance=ExtResource("5_n3dtr")]
+layout_mode = 1
+
+[node name="ModuleSelect" parent="." instance=ExtResource("6_mssel")]
 layout_mode = 1

@@ -1,0 +1,40 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ModuleEntry.gd" id="1_me"]
+
+[node name="ModuleEntry" type="VBoxContainer" node_paths=PackedStringArray("display_name_label", "author_label", "play_button", "file_version_label")]
+layout_mode = 2
+script = ExtResource("1_me")
+display_name_label = NodePath("TopRow/DisplayName")
+author_label = NodePath("TopRow/Author")
+play_button = NodePath("TopRow/PlayButton")
+file_version_label = NodePath("BottomRow/FileVersion")
+
+[node name="TopRow" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="DisplayName" type="Label" parent="TopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+
+[node name="Author" type="Label" parent="TopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+
+[node name="PlayButton" type="Button" parent="TopRow"]
+layout_mode = 2
+text = "Play"
+
+[node name="BottomRow" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="FileVersion" type="Label" parent="BottomRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+
+[node name="HSeparator" type="HSeparator" parent="."]
+layout_mode = 2

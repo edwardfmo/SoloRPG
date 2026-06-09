@@ -1,0 +1,51 @@
+{
+	"id": "editor_module",
+	"name": "Test Module 1",
+	"nodes": {
+		"node": {
+			"choices": [
+				{
+					"id": "c_1",
+					"next": "node_1",
+					"text": "Fight"
+				},
+				{
+					"id": "c_2",
+					"next": "node_2",
+					"text": "Run"
+				}
+			],
+			"id": "node",
+			"image": "",
+			"offset": [
+				240.0,
+				-40.0
+			],
+			"on_enter": [],
+			"text": ""
+		},
+		"node_1": {
+			"choices": [],
+			"id": "node_1",
+			"image": "",
+			"offset": [
+				561.0,
+				-79.8481140136719
+			],
+			"on_enter": [],
+			"text": ""
+		},
+		"node_2": {
+			"choices": [],
+			"id": "node_2",
+			"image": "",
+			"offset": [
+				542.0,
+				159.151885986328
+			],
+			"on_enter": [],
+			"text": ""
+		}
+	},
+	"start_node": "node"
+}

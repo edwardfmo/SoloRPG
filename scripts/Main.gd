@@ -1,8 +1,10 @@
 extends Control
 
-@onready var main_menu = $MainMenu
-@onready var game_view = $GameView
-@onready var game_over = $GameOver
+@export var main_menu: Control
+@export var game_view: Control
+@export var game_over: Control
+@export var node_editor: Control
+@export var module_select: Control
 
 var module
 var api = ModAPI.new()
@@ -16,8 +18,14 @@ func _ready():
 	api.register_system("dnd", dnd)
 
 	# Connect UI
-	main_menu.new_game_pressed.connect(_start_game)
+	main_menu.new_game_pressed.connect(_show_module_select)
+	main_menu.node_editor_pressed.connect(_show_node_editor)
 	main_menu.exit_pressed.connect(func(): get_tree().quit())
+
+	node_editor.close_pressed.connect(_show_menu)
+
+	module_select.module_selected.connect(_start_game)
+	module_select.back_pressed.connect(_show_menu)
 
 	game_view.choice_selected.connect(_on_choice_selected)
 	game_over.back_to_menu.connect(_show_menu)
@@ -33,14 +41,34 @@ func _show_menu():
 	main_menu.visible = true
 	game_view.visible = false
 	game_over.visible = false
+	node_editor.visible = false
+	module_select.visible = false
 
 
-func _start_game():
+func _show_node_editor():
+	main_menu.visible = false
+	game_view.visible = false
+	game_over.visible = false
+	node_editor.visible = true
+	module_select.visible = false
+
+
+func _show_module_select():
+	main_menu.visible = false
+	game_view.visible = false
+	game_over.visible = false
+	node_editor.visible = false
+	module_select.visible = true
+
+
+func _start_game(path: String):
 	main_menu.visible = false
 	game_view.visible = true
 	game_over.visible = false
+	node_editor.visible = false
+	module_select.visible = false
 
-	var data = JSON.parse_string(FileAccess.get_file_as_string("res://modules/module.json"))
+	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
 
 	module = Module.new()
 	module.init(data, api)

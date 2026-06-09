@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://w4w2lfbjpyrt" path="res://scripts/GameView.gd" id="1_mddrd"]
 
-[node name="GameView" type="Control" unique_id=1105955654]
+[node name="GameView" type="Control" unique_id=1105955654 node_paths=PackedStringArray("image", "text", "choices_container", "stats")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,6 +10,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_mddrd")
+image = NodePath("MarginContainer/VBoxContainer/NodeImage")
+text = NodePath("MarginContainer/VBoxContainer/ScrollContainer/StoryText")
+choices_container = NodePath("MarginContainer/VBoxContainer/Choices")
+stats = NodePath("MarginContainer/VBoxContainer/StatsLabel")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1996532331]
 layout_mode = 1

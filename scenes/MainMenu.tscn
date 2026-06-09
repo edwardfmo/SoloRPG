@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d0oatn5pkkbt7" path="res://scripts/MainMenu.gd" id="1_yqorp"]
 
-[node name="MainMenu" type="Control" unique_id=1600743337]
+[node name="MainMenu" type="Control" unique_id=1600743337 node_paths=PackedStringArray("new_game_button", "node_editor_button", "exit_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,6 +12,9 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_yqorp")
+new_game_button = NodePath("CenterContainer/VBoxContainer/NewGame")
+node_editor_button = NodePath("CenterContainer/VBoxContainer/NodeEditor")
+exit_button = NodePath("CenterContainer/VBoxContainer/Exit")
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=849504732]
 layout_mode = 1
@@ -31,11 +34,15 @@ theme_override_constants/margin_bottom = 50
 [node name="Title" type="Label" parent="CenterContainer/VBoxContainer/MarginContainer" unique_id=912177049]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
-text = "Solo DND"
+text = "Solo RPG"
 
 [node name="NewGame" type="Button" parent="CenterContainer/VBoxContainer" unique_id=401252196]
 layout_mode = 2
 text = "New Game"
+
+[node name="NodeEditor" type="Button" parent="CenterContainer/VBoxContainer" unique_id=311297330]
+layout_mode = 2
+text = "Node Editor"
 
 [node name="Exit" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1332089248]
 layout_mode = 2

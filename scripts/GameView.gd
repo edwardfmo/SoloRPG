@@ -2,10 +2,10 @@ extends Control
 
 signal choice_selected(choice_data)
 
-@onready var image = $MarginContainer/VBoxContainer/NodeImage
-@onready var text = $MarginContainer/VBoxContainer/ScrollContainer/StoryText
-@onready var choices_container = $MarginContainer/VBoxContainer/Choices
-@onready var stats = $MarginContainer/VBoxContainer/StatsLabel
+@export var image: TextureRect
+@export var text: Label
+@export var choices_container: VBoxContainer
+@export var stats: Label
 
 
 func display_node(node: Dictionary, module, context):

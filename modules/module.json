@@ -1,25 +1,41 @@
 {
-  "id": "demo",
-  "start_node": "start",
-  "nodes": {
-	"start": {
-	  "text": "You step on a trap!",
-	  "on_enter": [
-		{
-		  "type": "dnd.damage",
-		  "amount": 3
+	"author": "Edwardfmo",
+	"id": "demo",
+	"name": "Demo Module",
+	"nodes": {
+		"end": {
+			"choices": [],
+			"id": "end",
+			"image": "",
+			"offset": [
+				280.0,
+				0.0
+			],
+			"on_enter": [],
+			"text": "You survived."
+		},
+		"start": {
+			"choices": [
+				{
+					"next": "end",
+					"text": "Continue"
+				}
+			],
+			"id": "start",
+			"image": "",
+			"offset": [
+				0.0,
+				0.0
+			],
+			"on_enter": [
+				{
+					"amount": 3.0,
+					"type": "dnd.damage"
+				}
+			],
+			"text": "You step on a trap!"
 		}
-	  ],
-	  "choices": [
-		{
-		  "text": "Continue",
-		  "next": "end"
-		}
-	  ]
 	},
-	"end": {
-	  "text": "You survived.",
-	  "choices": []
-	}
-  }
+	"start_node": "start",
+	"version": "0.1"
 }

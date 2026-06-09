@@ -2,6 +2,9 @@ class_name Module
 extends RefCounted
 
 var id: String
+var display_name: String
+var version: String
+var author: String
 var start_node: String
 var nodes: Dictionary = {}
 
@@ -12,6 +15,9 @@ func init(module_data: Dictionary, _api):
 	api = _api
 
 	id = module_data.get("id", "")
+	display_name = module_data.get("name", "")
+	version = module_data.get("version", "")
+	author = module_data.get("author", "")
 	start_node = module_data.get("start_node", "")
 
 	nodes = module_data.get("nodes", {})
