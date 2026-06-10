@@ -23,6 +23,14 @@ var selected_node: StoryNode = null
 var _last_export_path: String = ""
 var start_node_gn: GraphNode = null
 var frames = []          # GraphFrame instances
+var _api: ModAPI = null
+var _dep_dialog: AcceptDialog = null
+var _pending_save_path: String = ""
+
+func set_api(api: ModAPI):
+	_api = api
+	node_inspector.available_actions = api.get_all_actions()
+	node_inspector.available_conditions = api.get_all_conditions()
 
 func _ready() -> void:
 	graph.connection_request.connect(_on_connection_request)
@@ -264,6 +272,12 @@ func export_module(path: String):
 	if frames_data.size() > 0:
 		module["frames"] = frames_data
 
+	# Save plugin dependencies (only found/loaded plugins)
+	if _api:
+		var deps = _build_dependencies()
+		if deps.size() > 0:
+			module["dependencies"] = deps
+
 	var json = JSON.stringify(module, "\t")
 
 	var file = FileAccess.open(path, FileAccess.WRITE)
@@ -271,18 +285,111 @@ func export_module(path: String):
 
 	print("Exported to: " + path)
 
+
+func _build_dependencies() -> Array:
+	var all_actions = _api.get_all_actions()
+	var all_conditions = _api.get_all_conditions()
+	var provider_map = _api.get_provider_map()
+	var loaded_plugins = _api.plugins.keys()
+
+	# Collect used types
+	var used_types: Array[String] = []
+	for n in nodes:
+		for action in n.data.get("on_enter", []):
+			var t = action.get("type", "")
+			if t != "" and not used_types.has(t):
+				used_types.append(t)
+		for choice in n.data.get("choices", []):
+			for cond in choice.get("conditions", []):
+				var t = cond.get("type", "")
+				if t != "" and not used_types.has(t):
+					used_types.append(t)
+
+	# Group by plugin, only include loaded plugins
+	var plugin_deps := {}  # plugin_id → version
+	for type_str in used_types:
+		if provider_map.has(type_str):
+			var pname = provider_map[type_str]
+			if not plugin_deps.has(pname):
+				var meta = _api.plugin_metadata.get(pname, {})
+				plugin_deps[pname] = meta.get("version", "")
+
+	# Build array
+	var result := []
+	var sorted_keys = plugin_deps.keys()
+	sorted_keys.sort()
+	for pname in sorted_keys:
+		result.append({"id": pname, "version": plugin_deps[pname]})
+	return result
+
 func _on_save_pressed():
 	if _last_export_path != "":
-		export_module(_last_export_path)
+		_validate_then_save(_last_export_path)
 	else:
-		save_file_dialog.popup_centered()
+		_validate_then_pick_file()
 
 func _on_save_as_pressed():
-	save_file_dialog.popup_centered()
+	_validate_then_pick_file()
 
 func _on_file_selected(path: String):
 	_last_export_path = path
 	export_module(path)
+
+
+func _validate_then_save(path: String):
+	_pending_save_path = path
+	if _check_dependencies():
+		export_module(path)
+
+
+func _validate_then_pick_file():
+	_pending_save_path = ""
+	if _check_dependencies():
+		save_file_dialog.popup_centered()
+
+
+## Runs the dependency check. Returns true if no issues (caller can proceed).
+## If issues exist, shows the dialog and returns false (caller waits for signal).
+func _check_dependencies() -> bool:
+	if _api == null:
+		return true
+
+	var module_nodes := []
+	for n in nodes:
+		module_nodes.append(n.data)
+
+	if _dep_dialog:
+		_dep_dialog.queue_free()
+
+	var dialog = load("res://scripts/DependencyCheckDialog.gd").new()
+	add_child(dialog)
+	_dep_dialog = dialog
+
+	var has_issues = dialog.check_and_show(module_nodes, _api)
+	if not has_issues:
+		_dep_dialog.queue_free()
+		_dep_dialog = null
+		return true
+	else:
+		dialog.confirmed_save.connect(_on_dep_confirmed)
+		dialog.cancelled_save.connect(_on_dep_cancelled)
+		return false
+
+
+func _on_dep_confirmed():
+	if _dep_dialog:
+		_dep_dialog.queue_free()
+		_dep_dialog = null
+	if _pending_save_path != "":
+		export_module(_pending_save_path)
+	else:
+		save_file_dialog.popup_centered()
+
+
+func _on_dep_cancelled():
+	if _dep_dialog:
+		_dep_dialog.queue_free()
+		_dep_dialog = null
 
 func _on_close_pressed():
 	close_pressed.emit()

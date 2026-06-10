@@ -1,5 +1,11 @@
 {
 	"author": "Edwardfmo",
+	"dependencies": [
+		{
+			"id": "dnd",
+			"version": "1.0.0"
+		}
+	],
 	"frames": [
 		{
 			"attached_nodes": [

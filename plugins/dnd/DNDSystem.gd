@@ -1,5 +1,13 @@
-class_name DNDSystem
-extends Node
+extends Plugin
+
+
+func get_actions() -> Array[String]:
+	return ["dnd.damage"]
+
+
+func get_conditions() -> Array[String]:
+	return ["dnd.hp_above"]
+
 
 func handle_action(action_name: String, data: Dictionary, context):
 	if action_name == "damage":

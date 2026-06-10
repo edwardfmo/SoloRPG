@@ -7,6 +7,9 @@ signal back_pressed
 @export var back_button: Button
 
 var ModuleEntryScene = preload("res://scenes/ModuleEntry.tscn")
+var api: ModAPI = null
+var _confirm_dialog: ConfirmationDialog = null
+var _pending_path: String = ""
 
 func _ready():
 	back_button.pressed.connect(func(): back_pressed.emit())
@@ -42,5 +45,43 @@ func _refresh_list():
 func _add_module_entry(data: Dictionary, path: String):
 	var entry = ModuleEntryScene.instantiate()
 	module_list.add_child(entry)
-	entry.setup(data, path)
-	entry.play_pressed.connect(func(p): module_selected.emit(p))
+	entry.setup(data, path, api)
+	entry.play_pressed.connect(_on_play_pressed.bind(entry))
+
+
+func _on_play_pressed(path: String, entry: ModuleEntry):
+	if entry.has_dep_issues:
+		_show_dep_confirm(path, entry)
+	else:
+		module_selected.emit(path)
+
+
+func _show_dep_confirm(path: String, entry: ModuleEntry):
+	if _confirm_dialog:
+		_confirm_dialog.queue_free()
+
+	_pending_path = path
+	_confirm_dialog = ConfirmationDialog.new()
+	_confirm_dialog.title = "Plugin Issues"
+	_confirm_dialog.dialog_text = "This module has plugin issues:\n\n" + entry.dep_issues_label.get_parsed_text() + "\n\nProceed anyway?"
+	_confirm_dialog.ok_button_text = "Play Anyway"
+	_confirm_dialog.cancel_button_text = "Cancel"
+	add_child(_confirm_dialog)
+
+	_confirm_dialog.confirmed.connect(_on_confirm_play)
+	_confirm_dialog.canceled.connect(_on_cancel_play)
+	_confirm_dialog.popup_centered()
+
+
+func _on_confirm_play():
+	var path = _pending_path
+	if _confirm_dialog:
+		_confirm_dialog.queue_free()
+		_confirm_dialog = null
+	module_selected.emit(path)
+
+
+func _on_cancel_play():
+	if _confirm_dialog:
+		_confirm_dialog.queue_free()
+		_confirm_dialog = null

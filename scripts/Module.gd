@@ -60,19 +60,19 @@ func _execute_action(action: Dictionary, context):
 		push_warning("Invalid action type: " + action["type"])
 		return
 
-	var system_name = parts[0]
+	var plugin_name = parts[0]
 	var action_name = parts[1]
 
-	var system = api.get_system(system_name)
+	var plugin = api.get_plugin(plugin_name)
 
-	if system == null:
-		push_warning("Missing system: " + system_name)
+	if plugin == null:
+		push_warning("Missing plugin: " + plugin_name)
 		return
 
-	if system.has_method("handle_action"):
-		system.handle_action(action_name, action, context)
+	if plugin.has_method("handle_action"):
+		plugin.handle_action(action_name, action, context)
 	else:
-		push_warning(system_name + " has no handle_action()")
+		push_warning(plugin_name + " has no handle_action()")
 
 
 func are_conditions_met(conditions: Array, context) -> bool:
@@ -90,17 +90,17 @@ func _check_condition(cond: Dictionary, context) -> bool:
 	if parts.size() < 2:
 		return false
 
-	var system_name = parts[0]
+	var plugin_name = parts[0]
 	var cond_name = parts[1]
 
-	var system = api.get_system(system_name)
+	var plugin = api.get_plugin(plugin_name)
 
-	if system == null:
-		push_warning("Missing system: " + system_name)
+	if plugin == null:
+		push_warning("Missing plugin: " + plugin_name)
 		return false
 
-	if system.has_method("check_condition"):
-		return system.check_condition(cond_name, cond, context)
+	if plugin.has_method("check_condition"):
+		return plugin.check_condition(cond_name, cond, context)
 
-	push_warning(system_name + " has no check_condition()")
+	push_warning(plugin_name + " has no check_condition()")
 	return false

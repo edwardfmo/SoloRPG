@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d0oatn5pkkbt7" path="res://scripts/MainMenu.gd" id="1_yqorp"]
 
-[node name="MainMenu" type="Control" unique_id=1600743337 node_paths=PackedStringArray("new_game_button", "node_editor_button", "exit_button")]
+[node name="MainMenu" type="Control" unique_id=1600743337 node_paths=PackedStringArray("new_game_button", "node_editor_button", "plugins_button", "exit_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,6 +14,7 @@ size_flags_vertical = 3
 script = ExtResource("1_yqorp")
 new_game_button = NodePath("CenterContainer/VBoxContainer/NewGame")
 node_editor_button = NodePath("CenterContainer/VBoxContainer/NodeEditor")
+plugins_button = NodePath("CenterContainer/VBoxContainer/Plugins")
 exit_button = NodePath("CenterContainer/VBoxContainer/Exit")
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=849504732]
@@ -43,6 +44,10 @@ text = "New Game"
 [node name="NodeEditor" type="Button" parent="CenterContainer/VBoxContainer" unique_id=311297330]
 layout_mode = 2
 text = "Node Editor"
+
+[node name="Plugins" type="Button" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Plugins"
 
 [node name="Exit" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1332089248]
 layout_mode = 2

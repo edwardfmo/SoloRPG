@@ -13,6 +13,11 @@ var selected_node: StoryNode = null
 var _expanded_choices: Array = []
 var _on_enter_editor: VBoxContainer = null
 
+## Published action types for on_enter autocomplete
+var available_actions: Array[String] = []
+## Published condition types for choice conditions autocomplete
+var available_conditions: Array[String] = []
+
 
 func _ready():
 	add_choice_button.pressed.connect(_on_add_choice)
@@ -63,6 +68,7 @@ func rebuild_on_enter_list():
 		selected_node.data["on_enter"] = []
 
 	_on_enter_editor = ActionListEditor.new()
+	_on_enter_editor.available_types = available_actions
 	on_enter_container.add_child(_on_enter_editor)
 	_on_enter_editor.set_actions(selected_node.data["on_enter"])
 
@@ -191,6 +197,7 @@ func rebuild_choices_list(expand_idx: int = -1):
 		details.add_child(cond_label)
 
 		var cond_editor = ActionListEditor.new()
+		cond_editor.available_types = available_conditions
 		cond_editor.set_actions(choice["conditions"])
 		details.add_child(cond_editor)
 

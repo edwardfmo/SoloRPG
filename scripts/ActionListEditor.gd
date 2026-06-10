@@ -4,6 +4,10 @@ extends VBoxContainer
 
 signal list_changed
 
+## Set this before calling set_actions() to provide autocomplete suggestions.
+## e.g. ["dnd.damage", "dnd.hp_above"]
+var available_types: Array[String] = []
+
 var _actions: Array = []
 var _container: VBoxContainer
 
@@ -47,13 +51,16 @@ func rebuild():
 
 		# Type row
 		var type_row = HBoxContainer.new()
-		var type_field = LineEdit.new()
+		var type_field = HintedLineEdit.new()
 		type_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		type_field.text = action.get("type", "")
 		type_field.placeholder_text = "system.function"
+		type_field.hints = available_types
+
 		type_field.text_changed.connect(func(new_text):
 			_actions[action_idx]["type"] = new_text
 			list_changed.emit())
+
 		type_row.add_child(type_field)
 
 		var remove_btn = Button.new()

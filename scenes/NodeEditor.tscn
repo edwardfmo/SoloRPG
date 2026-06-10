@@ -21,7 +21,6 @@ save_button = NodePath("HBoxContainer/Panel/VBoxContainer/ButtonBar/SaveModuleBu
 save_as_button = NodePath("HBoxContainer/Panel/VBoxContainer/ButtonBar/SaveAsButton")
 save_file_dialog = NodePath("SaveFileDialog")
 open_file_dialog = NodePath("OpenFileDialog")
-open_file_dialog = NodePath("OpenFileDialog")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=680604682]
 layout_mode = 1
@@ -89,41 +88,41 @@ layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Module ID"
 
-[node name="ModuleNameContainer" type="HBoxContainer" parent="HBoxContainer/Panel/VBoxContainer"]
+[node name="ModuleNameContainer" type="HBoxContainer" parent="HBoxContainer/Panel/VBoxContainer" unique_id=1089670214]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/Panel/VBoxContainer/ModuleNameContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/Panel/VBoxContainer/ModuleNameContainer" unique_id=312062493]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Display Name"
 
-[node name="ModuleNameEdit" type="LineEdit" parent="HBoxContainer/Panel/VBoxContainer/ModuleNameContainer"]
+[node name="ModuleNameEdit" type="LineEdit" parent="HBoxContainer/Panel/VBoxContainer/ModuleNameContainer" unique_id=952747359]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Module Display Name"
 
-[node name="ModuleVersionContainer" type="HBoxContainer" parent="HBoxContainer/Panel/VBoxContainer"]
+[node name="ModuleVersionContainer" type="HBoxContainer" parent="HBoxContainer/Panel/VBoxContainer" unique_id=268761611]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/Panel/VBoxContainer/ModuleVersionContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/Panel/VBoxContainer/ModuleVersionContainer" unique_id=1485427026]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Version"
 
-[node name="ModuleVersionEdit" type="LineEdit" parent="HBoxContainer/Panel/VBoxContainer/ModuleVersionContainer"]
+[node name="ModuleVersionEdit" type="LineEdit" parent="HBoxContainer/Panel/VBoxContainer/ModuleVersionContainer" unique_id=1930142004]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "e.g. 1.0.0"
 
-[node name="ModuleAuthorContainer" type="HBoxContainer" parent="HBoxContainer/Panel/VBoxContainer"]
+[node name="ModuleAuthorContainer" type="HBoxContainer" parent="HBoxContainer/Panel/VBoxContainer" unique_id=1505292141]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/Panel/VBoxContainer/ModuleAuthorContainer"]
+[node name="Label" type="Label" parent="HBoxContainer/Panel/VBoxContainer/ModuleAuthorContainer" unique_id=1580914506]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Author"
 
-[node name="ModuleAuthorEdit" type="LineEdit" parent="HBoxContainer/Panel/VBoxContainer/ModuleAuthorContainer"]
+[node name="ModuleAuthorEdit" type="LineEdit" parent="HBoxContainer/Panel/VBoxContainer/ModuleAuthorContainer" unique_id=338147871]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Author name"
@@ -136,22 +135,17 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Selected Node"
 
-[node name="NodeInspector" parent="HBoxContainer/Panel/VBoxContainer" instance=ExtResource("2_ninsp")]
-layout_mode = 2
+[node name="NodeInspector" parent="HBoxContainer/Panel/VBoxContainer" unique_id=1828225823 instance=ExtResource("2_ninsp")]
 
 [node name="SaveFileDialog" type="FileDialog" parent="." unique_id=1032222101]
 title = "Save Module"
 size = Vector2i(600, 400)
-access = 0
-current_dir = "res://modules"
 filters = PackedStringArray("*.json ; JSON Files")
 
 [node name="OpenFileDialog" type="FileDialog" parent="." unique_id=1816813059]
 title = "Open a File"
 size = Vector2i(600, 400)
 file_mode = 0
-access = 0
-current_dir = "res://modules"
 filters = PackedStringArray("*.json ; JSON Files")
 
 [connection signal="pressed" from="HBoxContainer/Panel/VBoxContainer/ButtonBar/NewButton" to="." method="_on_new_pressed"]
