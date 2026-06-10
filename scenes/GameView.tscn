@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://w4w2lfbjpyrt" path="res://scripts/GameView.gd" id="1_mddrd"]
 
-[node name="GameView" type="Control" unique_id=1105955654 node_paths=PackedStringArray("image", "text", "choices_container", "stats")]
+[node name="GameView" type="Control" unique_id=1105955654 node_paths=PackedStringArray("image", "text", "choices_container", "hud_container", "overlay_container", "sidebar_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,7 +13,9 @@ script = ExtResource("1_mddrd")
 image = NodePath("MarginContainer/VBoxContainer/NodeImage")
 text = NodePath("MarginContainer/VBoxContainer/ScrollContainer/StoryText")
 choices_container = NodePath("MarginContainer/VBoxContainer/Choices")
-stats = NodePath("MarginContainer/VBoxContainer/StatsLabel")
+hud_container = NodePath("MarginContainer/VBoxContainer/HudContainer")
+overlay_container = NodePath("OverlayContainer")
+sidebar_container = NodePath("SidebarContainer")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1996532331]
 layout_mode = 1
@@ -43,5 +45,27 @@ layout_mode = 2
 [node name="Choices" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1658738680]
 layout_mode = 2
 
-[node name="StatsLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1055538996]
+[node name="HudContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=845796673]
 layout_mode = 2
+
+[node name="OverlayContainer" type="Control" parent="." unique_id=464997425]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="SidebarContainer" type="VBoxContainer" parent="." unique_id=271388106]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -50.0
+offset_top = -100.0
+offset_bottom = 100.0
+grow_horizontal = 0
+grow_vertical = 2

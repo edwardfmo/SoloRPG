@@ -4,6 +4,9 @@
 class_name Plugin
 extends RefCounted
 
+## Reference to the ModAPI, set automatically on registration.
+var api: ModAPI = null
+
 
 ## Return an array of action type strings this plugin provides.
 ## e.g. ["dnd.damage", "dnd.heal"]
@@ -14,6 +17,13 @@ func get_actions() -> Array[String]:
 ## Return an array of condition type strings this plugin provides.
 ## e.g. ["dnd.hp_above", "dnd.has_item"]
 func get_conditions() -> Array[String]:
+	return []
+
+
+## Return an array of UI panel declarations.
+## Each entry: {slot: String, scene: String, id: String}
+## Slots: "game_hud", "game_overlay"
+func get_ui_panels() -> Array[Dictionary]:
 	return []
 
 

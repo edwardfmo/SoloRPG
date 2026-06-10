@@ -3,12 +3,11 @@
 [ext_resource type="Script" uid="uid://djrcf3yxxru21" path="res://scripts/Main.gd" id="1_elqb8"]
 [ext_resource type="PackedScene" uid="uid://rvush6rmt5hc" path="res://scenes/MainMenu.tscn" id="2_rarhs"]
 [ext_resource type="PackedScene" uid="uid://oyo0xpmfxk62" path="res://scenes/GameView.tscn" id="3_vcsgt"]
-[ext_resource type="PackedScene" uid="uid://djg68vjccjucc" path="res://scenes/GameOver.tscn" id="4_c01mt"]
 [ext_resource type="PackedScene" uid="uid://lrdis40rf1hj" path="res://scenes/NodeEditor.tscn" id="5_n3dtr"]
 [ext_resource type="PackedScene" path="res://scenes/ModuleSelect.tscn" id="6_mssel"]
 [ext_resource type="PackedScene" path="res://scenes/PluginList.tscn" id="7_plgn"]
 
-[node name="Main" type="Control" unique_id=900668806 node_paths=PackedStringArray("main_menu", "game_view", "game_over", "node_editor", "module_select", "plugin_list")]
+[node name="Main" type="Control" unique_id=900668806 node_paths=PackedStringArray("main_menu", "game_view", "node_editor", "module_select", "plugin_list")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,7 +17,6 @@ grow_vertical = 2
 script = ExtResource("1_elqb8")
 main_menu = NodePath("MainMenu")
 game_view = NodePath("GameView")
-game_over = NodePath("GameOver")
 node_editor = NodePath("NodeEditor")
 module_select = NodePath("ModuleSelect")
 plugin_list = NodePath("PluginList")
@@ -29,14 +27,11 @@ layout_mode = 1
 [node name="GameView" parent="." unique_id=1105955654 instance=ExtResource("3_vcsgt")]
 layout_mode = 1
 
-[node name="GameOver" parent="." unique_id=1760247633 instance=ExtResource("4_c01mt")]
+[node name="NodeEditor" parent="." unique_id=201624075 instance=ExtResource("5_n3dtr")]
 layout_mode = 1
 
-[node name="NodeEditor" parent="." instance=ExtResource("5_n3dtr")]
+[node name="ModuleSelect" parent="." unique_id=1050997787 instance=ExtResource("6_mssel")]
 layout_mode = 1
 
-[node name="ModuleSelect" parent="." instance=ExtResource("6_mssel")]
-layout_mode = 1
-
-[node name="PluginList" parent="." instance=ExtResource("7_plgn")]
+[node name="PluginList" parent="." unique_id=857744542 instance=ExtResource("7_plgn")]
 layout_mode = 1

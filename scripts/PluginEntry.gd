@@ -16,9 +16,14 @@ func setup(data: Dictionary, enabled: bool = true):
 	var author = data.get("author", "")
 	var version = data.get("version", "")
 	var file_name = data.get("filename", "")
+	var is_core = data.get("core", false)
 
 	enabled_check.button_pressed = enabled
-	enabled_check.toggled.connect(_on_toggled)
+	if is_core:
+		enabled_check.disabled = true
+		enabled_check.tooltip_text = "Core plugin (always enabled)"
+	else:
+		enabled_check.toggled.connect(_on_toggled)
 	display_name_label.text = display_name
 
 	if author != "":
