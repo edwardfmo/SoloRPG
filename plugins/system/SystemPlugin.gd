@@ -9,6 +9,12 @@ func get_conditions() -> Array[String]:
 	return []
 
 
+func get_action_params(action_name: String) -> Array[Dictionary]:
+	if action_name == "show_view":
+		return [{"name": "view", "mandatory": true}]
+	return []
+
+
 func handle_action(action_name: String, data: Dictionary, _context):
 	if action_name == "show_view":
 		var view_id = data.get("view", "")

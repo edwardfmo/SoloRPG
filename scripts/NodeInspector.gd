@@ -17,6 +17,8 @@ var _on_enter_editor: VBoxContainer = null
 var available_actions: Array[String] = []
 ## Published condition types for choice conditions autocomplete
 var available_conditions: Array[String] = []
+## Reference to ModAPI for param schemas
+var api: ModAPI = null
 
 
 func _ready():
@@ -69,6 +71,8 @@ func rebuild_on_enter_list():
 
 	_on_enter_editor = ActionListEditor.new()
 	_on_enter_editor.available_types = available_actions
+	if api:
+		_on_enter_editor.param_provider = api.get_params_for_type
 	on_enter_container.add_child(_on_enter_editor)
 	_on_enter_editor.set_actions(selected_node.data["on_enter"])
 
@@ -123,7 +127,7 @@ func rebuild_choices_list(expand_idx: int = -1):
 
 		# Collapsed header button
 		var next_id = choice.get("next", "")
-		var header_text = choice.get("id", "") + " -> " + (next_id if next_id != "" else "---")
+		var header_text = choice.get("id", "") + " -> " + (next_id if next_id != "" else "Self")
 		var header = Button.new()
 		header.text = header_text
 		header.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -154,7 +158,7 @@ func rebuild_choices_list(expand_idx: int = -1):
 		id_field.text_changed.connect(func(new_text):
 			selected_node.data["choices"][idx]["id"] = new_text
 			var n = selected_node.data["choices"][idx].get("next", "")
-			header.text = new_text + " -> " + (n if n != "" else "---"))
+			header.text = new_text + " -> " + (n if n != "" else "Self"))
 		id_row.add_child(id_label)
 		id_row.add_child(id_field)
 		details.add_child(id_row)
@@ -181,7 +185,7 @@ func rebuild_choices_list(expand_idx: int = -1):
 		next_label.add_theme_font_size_override("font_size", 11)
 		var next_field = LineEdit.new()
 		next_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		next_field.text = choice.get("next", "")
+		next_field.text = choice.get("next", "") if choice.get("next", "") != "" else "Self"
 		next_field.editable = false
 		next_row.add_child(next_label)
 		next_row.add_child(next_field)
@@ -198,8 +202,26 @@ func rebuild_choices_list(expand_idx: int = -1):
 
 		var cond_editor = ActionListEditor.new()
 		cond_editor.available_types = available_conditions
+		if api:
+			cond_editor.param_provider = api.get_params_for_type
 		cond_editor.set_actions(choice["conditions"])
 		details.add_child(cond_editor)
+
+		# Actions section using ActionListEditor
+		if not choice.has("actions"):
+			choice["actions"] = []
+
+		var act_label = Label.new()
+		act_label.text = "Actions"
+		act_label.add_theme_font_size_override("font_size", 11)
+		details.add_child(act_label)
+
+		var act_editor = ActionListEditor.new()
+		act_editor.available_types = available_actions
+		if api:
+			act_editor.param_provider = api.get_params_for_type
+		act_editor.set_actions(choice["actions"])
+		details.add_child(act_editor)
 
 		details.add_child(HSeparator.new())
 		row.add_child(details)

@@ -35,3 +35,20 @@ func handle_action(_action_name: String, _data: Dictionary, _context):
 ## Check a condition. Override in subclass.
 func check_condition(_cond_name: String, _data: Dictionary, _context) -> bool:
 	return true
+
+
+## Return parameter schema for an action.
+## Each entry: {name: String, mandatory: bool}
+func get_action_params(_action_name: String) -> Array[Dictionary]:
+	return []
+
+
+## Return parameter schema for a condition.
+## Each entry: {name: String, mandatory: bool}
+func get_condition_params(_cond_name: String) -> Array[Dictionary]:
+	return []
+
+
+## Called when a new game starts. Override to initialize context variables.
+func on_game_start(_context: Dictionary):
+	pass

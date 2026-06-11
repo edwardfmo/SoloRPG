@@ -38,7 +38,25 @@
 			"text": "You survived."
 		},
 		"node": {
-			"choices": [],
+			"choices": [
+				{
+					"actions": [
+						{
+							"amount": 1.0,
+							"type": "dnd.damage"
+						}
+					],
+					"conditions": [
+						{
+							"type": "dnd.hp_above",
+							"value": 2.0
+						}
+					],
+					"id": "choice",
+					"next": "",
+					"text": "Step on it again"
+				}
+			],
 			"id": "node",
 			"image": "",
 			"offset": [
@@ -51,6 +69,7 @@
 		"start": {
 			"choices": [
 				{
+					"actions": [],
 					"conditions": [
 						{
 							"type": "dnd.hp_above",
@@ -62,6 +81,7 @@
 					"text": "Whatever"
 				},
 				{
+					"actions": [],
 					"conditions": [],
 					"id": "c2",
 					"next": "node",
@@ -84,5 +104,5 @@
 		}
 	},
 	"start_node": "start",
-	"version": "0.1"
+	"version": "0.2"
 }

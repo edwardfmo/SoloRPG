@@ -3,6 +3,8 @@
 class_name HintedLineEdit
 extends LineEdit
 
+signal hint_selected(value: String)
+
 ## Array of strings to match against as the user types.
 var hints: Array[String] = []
 
@@ -41,6 +43,7 @@ func _on_item_clicked(index: int, _at_pos: Vector2, _mouse_btn: int):
 	var selected_text = _dropdown.get_item_text(index)
 	text = selected_text
 	text_changed.emit(selected_text)
+	hint_selected.emit(selected_text)
 	_dropdown.visible = false
 	grab_focus()
 	caret_column = selected_text.length()

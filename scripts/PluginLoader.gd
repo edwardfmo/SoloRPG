@@ -3,7 +3,7 @@
 class_name PluginLoader
 extends RefCounted
 
-const PLUGIN_DIRS = ["user://plugins", "res://plugins"]
+var PLUGIN_DIRS = [SystemUtils.PLUGINS_DIR, SystemUtils.BUNDLED_PLUGINS_DIR]
 
 
 ## Discovers and loads all plugins, returning an array of {id, plugin} dicts.

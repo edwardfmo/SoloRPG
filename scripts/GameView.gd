@@ -1,6 +1,11 @@
 extends Control
 
 signal choice_selected(choice_data)
+signal save_requested
+signal quicksave_requested
+signal quickload_requested
+signal load_requested
+signal exit_requested
 
 @export var image: TextureRect
 @export var text: Label
@@ -99,6 +104,38 @@ func _load_sidebar_icons():
 		if instance.has_method("set_api"):
 			instance.set_api(_api)
 		_sidebar_nodes.append(instance)
+
+	# System buttons
+	var save_btn = Button.new()
+	save_btn.text = "Save"
+	save_btn.pressed.connect(func(): save_requested.emit())
+	sidebar_container.add_child(save_btn)
+	_sidebar_nodes.append(save_btn)
+
+	var quicksave_btn = Button.new()
+	quicksave_btn.text = "Quick Save"
+	quicksave_btn.pressed.connect(func(): quicksave_requested.emit())
+	sidebar_container.add_child(quicksave_btn)
+	_sidebar_nodes.append(quicksave_btn)
+
+	var quickload_btn = Button.new()
+	quickload_btn.text = "Quick Load"
+	quickload_btn.disabled = not FileAccess.file_exists(SystemUtils.QUICKSAVE_PATH)
+	quickload_btn.pressed.connect(func(): quickload_requested.emit())
+	sidebar_container.add_child(quickload_btn)
+	_sidebar_nodes.append(quickload_btn)
+
+	var load_btn = Button.new()
+	load_btn.text = "Load"
+	load_btn.pressed.connect(func(): load_requested.emit())
+	sidebar_container.add_child(load_btn)
+	_sidebar_nodes.append(load_btn)
+
+	var exit_btn = Button.new()
+	exit_btn.text = "Exit"
+	exit_btn.pressed.connect(func(): exit_requested.emit())
+	sidebar_container.add_child(exit_btn)
+	_sidebar_nodes.append(exit_btn)
 
 
 func show_overlay(overlay_id: String, params: Dictionary = {}):

@@ -17,6 +17,23 @@ func get_ui_panels() -> Array[Dictionary]:
 	]
 
 
+func on_game_start(context: Dictionary):
+	context["hp"] = 10
+	context["max_hp"] = 10
+
+
+func get_action_params(action_name: String) -> Array[Dictionary]:
+	if action_name == "damage":
+		return [{"name": "amount", "mandatory": true}]
+	return []
+
+
+func get_condition_params(cond_name: String) -> Array[Dictionary]:
+	if cond_name == "hp_above":
+		return [{"name": "value", "mandatory": true}]
+	return []
+
+
 func handle_action(action_name: String, data: Dictionary, context):
 	if action_name == "damage":
 		var dmg = data.get("amount", 1)

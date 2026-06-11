@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d0oatn5pkkbt7" path="res://scripts/MainMenu.gd" id="1_yqorp"]
 
-[node name="MainMenu" type="Control" unique_id=1600743337 node_paths=PackedStringArray("new_game_button", "node_editor_button", "plugins_button", "exit_button")]
+[node name="MainMenu" type="Control" unique_id=1600743337 node_paths=PackedStringArray("new_game_button", "continue_button", "load_game_button", "node_editor_button", "plugins_button", "exit_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,6 +13,8 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_yqorp")
 new_game_button = NodePath("CenterContainer/VBoxContainer/NewGame")
+continue_button = NodePath("CenterContainer/VBoxContainer/Continue")
+load_game_button = NodePath("CenterContainer/VBoxContainer/LoadGame")
 node_editor_button = NodePath("CenterContainer/VBoxContainer/NodeEditor")
 plugins_button = NodePath("CenterContainer/VBoxContainer/Plugins")
 exit_button = NodePath("CenterContainer/VBoxContainer/Exit")
@@ -40,6 +42,14 @@ text = "Solo RPG"
 [node name="NewGame" type="Button" parent="CenterContainer/VBoxContainer" unique_id=401252196]
 layout_mode = 2
 text = "New Game"
+
+[node name="Continue" type="Button" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Continue"
+
+[node name="LoadGame" type="Button" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Load Game"
 
 [node name="NodeEditor" type="Button" parent="CenterContainer/VBoxContainer" unique_id=311297330]
 layout_mode = 2

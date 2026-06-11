@@ -25,21 +25,26 @@ func _refresh_list():
 	for child in module_list.get_children():
 		child.queue_free()
 
-	var dir = DirAccess.open("res://modules")
-	if dir == null:
-		return
+	var search_dirs = [SystemUtils.MODULES_DIR, SystemUtils.BUNDLED_MODULES_DIR]
+	var seen_files: Array[String] = []
 
-	dir.list_dir_begin()
-	var file_name = dir.get_next()
-	while file_name != "":
-		if not dir.current_is_dir() and file_name.ends_with(".json"):
-			var path = "res://modules/" + file_name
-			var json_text = FileAccess.get_file_as_string(path)
-			var data = JSON.parse_string(json_text)
-			if data != null:
-				_add_module_entry(data, path)
-		file_name = dir.get_next()
-	dir.list_dir_end()
+	for dir_path in search_dirs:
+		var dir = DirAccess.open(dir_path)
+		if dir == null:
+			continue
+
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		while file_name != "":
+			if not dir.current_is_dir() and file_name.ends_with(".json") and file_name not in seen_files:
+				seen_files.append(file_name)
+				var path = dir_path + "/" + file_name
+				var json_text = FileAccess.get_file_as_string(path)
+				var data = JSON.parse_string(json_text)
+				if data != null:
+					_add_module_entry(data, path)
+			file_name = dir.get_next()
+		dir.list_dir_end()
 
 
 func _add_module_entry(data: Dictionary, path: String):

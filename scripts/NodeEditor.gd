@@ -31,6 +31,7 @@ func set_api(api: ModAPI):
 	_api = api
 	node_inspector.available_actions = api.get_all_actions()
 	node_inspector.available_conditions = api.get_all_conditions()
+	node_inspector.api = api
 
 func _ready() -> void:
 	graph.connection_request.connect(_on_connection_request)

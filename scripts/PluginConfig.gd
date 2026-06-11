@@ -3,8 +3,6 @@
 class_name PluginConfig
 extends RefCounted
 
-const CONFIG_PATH = "user://plugin_config.json"
-
 var _disabled: Array[String] = []
 
 
@@ -26,9 +24,9 @@ func set_enabled(plugin_id: String, enabled: bool):
 
 
 func _load():
-	if not FileAccess.file_exists(CONFIG_PATH):
+	if not FileAccess.file_exists(SystemUtils.PLUGIN_CONFIG_PATH):
 		return
-	var json_text = FileAccess.get_file_as_string(CONFIG_PATH)
+	var json_text = FileAccess.get_file_as_string(SystemUtils.PLUGIN_CONFIG_PATH)
 	var data = JSON.parse_string(json_text)
 	if data is Dictionary:
 		var arr = data.get("disabled", [])
@@ -39,6 +37,6 @@ func _load():
 
 func _save():
 	var data = {"disabled": _disabled}
-	var file = FileAccess.open(CONFIG_PATH, FileAccess.WRITE)
+	var file = FileAccess.open(SystemUtils.PLUGIN_CONFIG_PATH, FileAccess.WRITE)
 	if file:
 		file.store_string(JSON.stringify(data, "\t"))

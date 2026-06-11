@@ -57,6 +57,25 @@ func get_provider_map() -> Dictionary:
 	return map
 
 
+## Returns parameter schema for a given type (action or condition).
+## Returns array of {name: String, mandatory: bool}.
+func get_params_for_type(type: String) -> Array[Dictionary]:
+	var dot_idx = type.find(".")
+	if dot_idx <= 0:
+		return []
+	var plugin_name = type.substr(0, dot_idx)
+	var entry_name = type.substr(dot_idx + 1)
+	var plugin = plugins.get(plugin_name, null)
+	if plugin == null or not plugin is Plugin:
+		return []
+	# Check actions first, then conditions
+	if type in plugin.get_actions():
+		return plugin.get_action_params(entry_name)
+	if type in plugin.get_conditions():
+		return plugin.get_condition_params(entry_name)
+	return []
+
+
 ## Notify plugin UI that context has changed.
 func notify_context_changed(context: Dictionary):
 	if context_changed_callback.is_valid():
@@ -83,3 +102,10 @@ func dispatch_action(type: String, data: Dictionary = {}, context: Dictionary = 
 		return
 	data["type"] = type
 	plugin.handle_action(action_name, data, context)
+
+
+## Notify all plugins that a new game has started so they can initialize context.
+func notify_game_started(context: Dictionary):
+	for plugin in plugins.values():
+		if plugin is Plugin:
+			plugin.on_game_start(context)
