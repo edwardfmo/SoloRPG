@@ -5,6 +5,10 @@ var plugins := {}
 var plugin_metadata := {}  # plugin_name → {name, version, author, ...}
 var context_changed_callback: Callable  # set by GameView to notify UI of context updates
 var show_overlay_callback: Callable     # set by GameView to show overlay views
+var save_to_path_callback: Callable     # set by Main to allow plugins to trigger saves
+var load_from_path_callback: Callable   # set by Main to allow plugins to trigger loads
+var restore_state_callback: Callable    # set by Main: func(context: Dictionary)
+var pre_choice_callback: Callable       # called before a choice is executed
 
 func register_plugin(name: String, plugin: Plugin, metadata: Dictionary = {}):
 	plugins[name] = plugin
@@ -78,6 +82,9 @@ func get_params_for_type(type: String) -> Array[Dictionary]:
 
 ## Notify plugin UI that context has changed.
 func notify_context_changed(context: Dictionary):
+	for plugin in plugins.values():
+		if plugin is Plugin:
+			plugin.on_context_changed(context)
 	if context_changed_callback.is_valid():
 		context_changed_callback.call(context)
 
@@ -109,3 +116,10 @@ func notify_game_started(context: Dictionary):
 	for plugin in plugins.values():
 		if plugin is Plugin:
 			plugin.on_game_start(context)
+
+
+## Notify all plugins before a choice is executed.
+func notify_pre_choice(context: Dictionary):
+	for plugin in plugins.values():
+		if plugin is Plugin:
+			plugin.on_pre_choice(context)

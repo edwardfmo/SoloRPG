@@ -47,18 +47,26 @@ func setup(data: Dictionary, path: String, api: ModAPI = null):
 
 	var issues := ""
 	var loaded_plugins = api.plugins.keys()
+	# Scan all installed plugins (regardless of enabled/disabled)
+	var loader = PluginLoader.new()
+	var all_installed = loader.scan_metadata()
+	var installed_ids := {}
+	for meta in all_installed:
+		var id = meta.get("id", meta.get("filename", ""))
+		installed_ids[id] = meta
 
 	for dep in deps:
 		var dep_id = dep.get("id", "")
 		var dep_version = dep.get("version", "")
 		if dep_id == "":
 			continue
-		if not loaded_plugins.has(dep_id):
-			issues += "[color=red]✗ " + dep_id + " (missing)[/color]\n"
+		if not installed_ids.has(dep_id):
+			# Truly not installed on disk
+			issues += "[color=red]✗ " + dep_id + " (not installed)[/color]\n"
 			has_dep_issues = true
 		else:
-			# Check version match
-			var meta = api.plugin_metadata.get(dep_id, {})
+			# Installed — check version
+			var meta = installed_ids[dep_id]
 			var current_ver = meta.get("version", "")
 			if dep_version != "" and current_ver != "" and dep_version != current_ver:
 				issues += "[color=yellow]⚠ " + dep_id + " (need v" + dep_version + ", have v" + current_ver + ")[/color]\n"

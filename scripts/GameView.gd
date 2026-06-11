@@ -153,6 +153,9 @@ func _on_context_changed(context: Dictionary):
 	for node in _hud_nodes:
 		if is_instance_valid(node) and node.has_method("update_context"):
 			node.update_context(context)
+	for node in _sidebar_nodes:
+		if is_instance_valid(node) and node.has_method("update_context"):
+			node.update_context(context)
 	# Also update visible overlays
 	for id in _overlay_nodes:
 		var overlay = _overlay_nodes[id]

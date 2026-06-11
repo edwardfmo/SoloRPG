@@ -23,6 +23,11 @@ func _ready():
 	# Load only enabled plugins
 	_reload_plugins()
 
+	# Wire save/load callbacks for plugins
+	api.save_to_path_callback = _write_save
+	api.load_from_path_callback = _load_save_file
+	api.restore_state_callback = _restore_state
+
 	# Pass plugin hints to the editor and game view
 	node_editor.set_api(api)
 	game_view.set_api(api)
@@ -37,7 +42,7 @@ func _ready():
 
 	node_editor.close_pressed.connect(_show_menu)
 
-	module_select.module_selected.connect(_start_game)
+	module_select.module_selected.connect(_on_module_selected)
 	module_select.back_pressed.connect(_show_menu)
 
 	plugin_list.back_pressed.connect(_show_menu)
@@ -65,8 +70,9 @@ func _reload_plugins():
 	var plugins = loader.load_all()
 	for entry in plugins:
 		var meta = entry.get("metadata", {})
-		var is_core = meta.get("core", false)
-		if is_core or plugin_config.is_enabled(entry["id"]):
+		var ptype = _get_plugin_type(meta)
+		# Editor/menu context: load all plugins (core + module_required + enabled optional)
+		if ptype == "core" or ptype == "module_required" or plugin_config.is_enabled(entry["id"]):
 			api.register_plugin(entry["id"], entry["plugin"], meta)
 	node_editor.set_api(api)
 	game_view.set_api(api)
@@ -83,6 +89,8 @@ func _show_menu():
 	node_editor.visible = false
 	module_select.visible = false
 	plugin_list.visible = false
+	# Restore plugins to global config state
+	_reload_plugins()
 
 
 func _show_node_editor():
@@ -115,7 +123,18 @@ func _continue_game():
 		_load_save_file(last_save)
 
 
-func _start_game(path: String):
+const PluginSelector = preload("res://scripts/PluginSelector.gd")
+
+func _on_module_selected(path: String):
+	var selector = PluginSelector.new()
+	add_child(selector)
+	selector.confirmed_selection.connect(func(enabled_ids):
+		_start_game(path, enabled_ids))
+	selector.canceled.connect(func(): selector.queue_free())
+	selector.popup_centered()
+
+
+func _start_game(path: String, optional_ids: Array[String] = []):
 	main_menu.visible = false
 	game_view.visible = true
 	node_editor.visible = false
@@ -125,10 +144,21 @@ func _start_game(path: String):
 	current_module_path = path
 	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
 
+	# Auto-enable required plugins for this session
+	var deps = data.get("dependencies", [])
+	var required_ids: Array[String] = []
+	for dep in deps:
+		var dep_id = dep.get("id", "")
+		if dep_id != "":
+			required_ids.append(dep_id)
+	_load_plugins_for_session(required_ids, optional_ids)
+
 	module = Module.new()
 	module.init(data, api)
 
 	context = {}
+	# Snapshot active plugins for this game session
+	context["_plugins"] = _build_plugin_snapshot()
 	api.notify_game_started(context)
 	current_node_id = module.start_node
 
@@ -136,9 +166,18 @@ func _start_game(path: String):
 
 
 func _enter_node():
+	context["_current_node_id"] = current_node_id
 	module.enter_node(current_node_id, context)
 	api.notify_context_changed(context)
 
+	var node = module.get_node(current_node_id)
+	game_view.display_node(node, module, context)
+
+
+func _restore_state(new_context: Dictionary):
+	context = new_context
+	current_node_id = context.get("_current_node_id", current_node_id)
+	api.notify_context_changed(context)
 	var node = module.get_node(current_node_id)
 	game_view.display_node(node, module, context)
 
@@ -147,6 +186,7 @@ func _on_choice_selected(choice):
 	if choice.get("_end_game", false):
 		_show_menu()
 		return
+	api.notify_pre_choice(context)
 	for action in choice.get("actions", []):
 		module._execute_action(action, context)
 	api.notify_context_changed(context)
@@ -164,8 +204,8 @@ func _get_save_data() -> Dictionary:
 	return {
 		"module_path": current_module_path,
 		"module_version": module.version if module else "",
-		"node_id": current_node_id,
 		"context": context,
+		"plugins": context.get("_plugins", {}),
 	}
 
 
@@ -241,12 +281,20 @@ func _load_save_file(save_path: String):
 
 
 func _apply_load(path: String, data: Dictionary, save_data: Dictionary):
+	# Restore plugin selection from save (session-only, not global)
+	var saved_plugins = save_data.get("plugins", {})
+	if not saved_plugins.is_empty():
+		_load_plugins_from_snapshot(saved_plugins)
+
 	current_module_path = path
 	module = Module.new()
 	module.init(data, api)
 
 	context = save_data.get("context", {})
-	current_node_id = save_data.get("node_id", module.start_node)
+	# Ensure _plugins is present in context
+	if not context.has("_plugins"):
+		context["_plugins"] = saved_plugins if not saved_plugins.is_empty() else _build_plugin_snapshot()
+	current_node_id = context.get("_current_node_id", save_data.get("node_id", module.start_node))
 
 	main_menu.visible = false
 	game_view.visible = true
@@ -257,6 +305,78 @@ func _apply_load(path: String, data: Dictionary, save_data: Dictionary):
 	api.notify_context_changed(context)
 	var node = module.get_node(current_node_id)
 	game_view.display_node(node, module, context)
+
+
+func _build_plugin_snapshot() -> Dictionary:
+	var snapshot := {}
+	for id in api.plugins:
+		var meta = api.plugin_metadata.get(id, {})
+		snapshot[id] = meta.get("version", "")
+	return snapshot
+
+
+func _load_plugins_from_snapshot(snapshot: Dictionary):
+	api.plugins.clear()
+	api.plugin_metadata.clear()
+	var loader = PluginLoader.new()
+	var plugins = loader.load_all()
+	for entry in plugins:
+		var meta = entry.get("metadata", {})
+		var ptype = _get_plugin_type(meta)
+		var id = entry["id"]
+		if ptype == "core" or snapshot.has(id):
+			api.register_plugin(id, entry["plugin"], meta)
+	game_view.set_api(api)
+
+
+func _load_plugins_with_required(required_ids: Array[String]):
+	api.plugins.clear()
+	api.plugin_metadata.clear()
+	var loader = PluginLoader.new()
+	var plugins = loader.load_all()
+	for entry in plugins:
+		var meta = entry.get("metadata", {})
+		var ptype = _get_plugin_type(meta)
+		var id = entry["id"]
+		# Core: always. module_required: only if module needs it. optional: only if globally enabled.
+		if ptype == "core":
+			api.register_plugin(id, entry["plugin"], meta)
+		elif ptype == "module_required":
+			if required_ids.has(id):
+				api.register_plugin(id, entry["plugin"], meta)
+		else:  # optional
+			if plugin_config.is_enabled(id):
+				api.register_plugin(id, entry["plugin"], meta)
+	game_view.set_api(api)
+
+
+func _load_plugins_for_session(required_ids: Array[String], optional_ids: Array[String]):
+	api.plugins.clear()
+	api.plugin_metadata.clear()
+	var loader = PluginLoader.new()
+	var plugins = loader.load_all()
+	for entry in plugins:
+		var meta = entry.get("metadata", {})
+		var ptype = _get_plugin_type(meta)
+		var id = entry["id"]
+		if ptype == "core":
+			api.register_plugin(id, entry["plugin"], meta)
+		elif ptype == "module_required":
+			if required_ids.has(id):
+				api.register_plugin(id, entry["plugin"], meta)
+		else:  # optional
+			if optional_ids.has(id):
+				api.register_plugin(id, entry["plugin"], meta)
+	game_view.set_api(api)
+
+
+func _get_plugin_type(meta: Dictionary) -> String:
+	# Support both new "type" field and legacy "core" field
+	if meta.has("type"):
+		return meta["type"]
+	if meta.get("core", false):
+		return "core"
+	return "optional"
 
 
 func _show_load_error(message: String):

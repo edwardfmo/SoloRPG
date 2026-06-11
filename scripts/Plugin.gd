@@ -52,3 +52,13 @@ func get_condition_params(_cond_name: String) -> Array[Dictionary]:
 ## Called when a new game starts. Override to initialize context variables.
 func on_game_start(_context: Dictionary):
 	pass
+
+
+## Called when game context changes (after entering a node or choice action).
+func on_context_changed(_context: Dictionary):
+	pass
+
+
+## Called just before a choice is executed. Use for pre-choice saves.
+func on_pre_choice(_context: Dictionary):
+	pass
