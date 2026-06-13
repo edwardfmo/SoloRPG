@@ -65,6 +65,19 @@ func evaluate(value: Variant) -> Variant:
 	return value
 
 
+## Resolve a value that may be a reference wrapper {_ref: "@..."}.
+## Returns the resolved entry dict, or the original value if not a ref.
+func resolve(value: Variant) -> Variant:
+	if value is Dictionary and value.has("_ref"):
+		return evaluate(value["_ref"])
+	return value
+
+
+## Create a reference wrapper for an entry evaluator string.
+static func make_ref(entry_ref: String) -> Dictionary:
+	return {"_ref": entry_ref}
+
+
 ## Returns all published action types from registered plugins.
 func get_all_actions() -> Array[String]:
 	var result: Array[String] = []
@@ -163,15 +176,26 @@ func dispatch_action(type: String, data: Dictionary = {}, context: Dictionary = 
 			if p.get("direction", "input") == "output" and data.has(p["name"]):
 				output_paths[p["name"]] = data[p["name"]]
 
-	# Resolve evaluators in input parameters
+	# Resolve evaluators in input parameters, preserve original refs
+	var _raw_refs := {}
 	for key in data:
 		if key == "type":
 			continue
 		if output_paths.has(key):
 			continue
-		data[key] = evaluate(data[key])
+		var val = data[key]
+		if val is String and val.begins_with("@"):
+			_raw_refs[key] = val
+		if val is String and val.begins_with("$"):
+			data[key] = _get_context_path(context, val.substr(1))
+		else:
+			data[key] = evaluate(val)
+	data["_raw_refs"] = _raw_refs
 
 	plugin.handle_action(action_name, data, context)
+
+	# Clean up internal key
+	data.erase("_raw_refs")
 
 	# Write output params to context at their dot-paths
 	for key in output_paths:
@@ -189,6 +213,23 @@ func _set_context_path(context: Dictionary, path: String, value):
 			current[k] = {}
 		current = current[k]
 	current[keys[keys.size() - 1]] = value
+
+
+## Read a value from context at a dot-separated path. Resolves _ref wrappers
+## transparently. Returns null and warns if the path does not exist.
+func _get_context_path(context: Dictionary, path: String) -> Variant:
+	var keys = path.split(".")
+	var current: Variant = context
+	for k in keys:
+		if current is Dictionary and current.has("_ref"):
+			current = evaluate(current["_ref"])
+		if not current is Dictionary or not current.has(k):
+			push_warning("[ModAPI] Context path '$%s' does not exist (failed at '%s')" % [path, k])
+			return null
+		current = current[k]
+	if current is Dictionary and current.has("_ref"):
+		current = evaluate(current["_ref"])
+	return current
 
 
 ## Notify all plugins that a new game has started so they can initialize context.

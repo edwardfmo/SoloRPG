@@ -101,11 +101,18 @@ func handle_action(action_name: String, data: Dictionary, context):
 		if not item is Dictionary or slot == "":
 			push_warning("[DND] equip_item: invalid item or missing slot")
 			return
-		# item is already resolved by the EntryEvaluator
+		# Store as reference if the original was an entry ref
+		var raw_refs = data.get("_raw_refs", {})
+		var stored_value
+		if raw_refs.has("item"):
+			stored_value = ModAPI.make_ref(raw_refs["item"])
+		else:
+			stored_value = item
+		# Equip to slot
 		if not context.has("character"):
 			context["character"] = {"hp": 10, "max_hp": 10, "equipment": {"weapon": {}, "armor": {}}}
 		var equipment = context["character"].get("equipment", {})
-		equipment[slot] = item
+		equipment[slot] = stored_value
 		context["character"]["equipment"] = equipment
 		print("[DND] Equipped ", item.get("name", "unknown"), " to ", slot)
 
