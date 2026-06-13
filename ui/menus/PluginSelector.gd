@@ -4,7 +4,7 @@ extends AcceptDialog
 
 signal confirmed_selection(enabled_ids: Array)
 
-var PluginEntryScene = preload("res://scenes/PluginEntry.tscn")
+var PluginEntryScene = preload("res://ui/menus/PluginEntry.tscn")
 var _plugin_list: VBoxContainer
 var _selections := {}  # plugin_id → bool
 

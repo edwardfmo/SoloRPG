@@ -6,7 +6,7 @@ signal back_pressed
 @export var module_list: VBoxContainer
 @export var back_button: Button
 
-var ModuleEntryScene = preload("res://scenes/ModuleEntry.tscn")
+var ModuleEntryScene = preload("res://ui/menus/ModuleEntry.tscn")
 var api: ModAPI = null
 var _confirm_dialog: ConfirmationDialog = null
 var _pending_path: String = ""

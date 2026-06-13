@@ -1,16 +1,16 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/PluginList.gd" id="1_pl"]
+[ext_resource type="Script" path="res://ui/menus/ModuleSelect.gd" id="1_ms"]
 
-[node name="PluginList" type="Control" node_paths=PackedStringArray("plugin_list", "back_button")]
+[node name="ModuleSelect" type="Control" node_paths=PackedStringArray("module_list", "back_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_pl")
-plugin_list = NodePath("CenterContainer/VBoxContainer/ScrollContainer/PluginList")
+script = ExtResource("1_ms")
+module_list = NodePath("CenterContainer/VBoxContainer/ScrollContainer/ModuleList")
 back_button = NodePath("CenterContainer/VBoxContainer/BackButton")
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
@@ -28,7 +28,7 @@ custom_minimum_size = Vector2(400, 0)
 [node name="Title" type="Label" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "Plugins"
+text = "Select Module"
 horizontal_alignment = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="CenterContainer/VBoxContainer"]
@@ -40,7 +40,7 @@ theme_override_constants/margin_bottom = 20
 layout_mode = 2
 custom_minimum_size = Vector2(0, 300)
 
-[node name="PluginList" type="VBoxContainer" parent="CenterContainer/VBoxContainer/ScrollContainer"]
+[node name="ModuleList" type="VBoxContainer" parent="CenterContainer/VBoxContainer/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3

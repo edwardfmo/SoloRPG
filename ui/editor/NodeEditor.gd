@@ -407,7 +407,7 @@ func _check_dependencies() -> bool:
 	if _dep_dialog:
 		_dep_dialog.queue_free()
 
-	var dialog = load("res://scripts/DependencyCheckDialog.gd").new()
+	var dialog = load("res://ui/editor/DependencyCheckDialog.gd").new()
 	add_child(dialog)
 	_dep_dialog = dialog
 

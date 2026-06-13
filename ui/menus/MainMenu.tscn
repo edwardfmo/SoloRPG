@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://rvush6rmt5hc"]
 
-[ext_resource type="Script" uid="uid://d0oatn5pkkbt7" path="res://scripts/MainMenu.gd" id="1_yqorp"]
+[ext_resource type="Script" uid="uid://d0oatn5pkkbt7" path="res://ui/menus/MainMenu.gd" id="1_yqorp"]
 
 [node name="MainMenu" type="Control" unique_id=1600743337 node_paths=PackedStringArray("new_game_button", "continue_button", "load_game_button", "node_editor_button", "plugins_button", "exit_button")]
 layout_mode = 3
@@ -15,7 +15,7 @@ script = ExtResource("1_yqorp")
 new_game_button = NodePath("CenterContainer/VBoxContainer/NewGame")
 continue_button = NodePath("CenterContainer/VBoxContainer/Continue")
 load_game_button = NodePath("CenterContainer/VBoxContainer/LoadGame")
-node_editor_button = NodePath("CenterContainer/VBoxContainer/NodeEditor")
+node_editor_button = NodePath("CenterContainer/VBoxContainer/ModuleEditor")
 plugins_button = NodePath("CenterContainer/VBoxContainer/Plugins")
 exit_button = NodePath("CenterContainer/VBoxContainer/Exit")
 
@@ -43,19 +43,19 @@ text = "Solo RPG"
 layout_mode = 2
 text = "New Game"
 
-[node name="Continue" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="Continue" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1232530236]
 layout_mode = 2
 text = "Continue"
 
-[node name="LoadGame" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="LoadGame" type="Button" parent="CenterContainer/VBoxContainer" unique_id=927382111]
 layout_mode = 2
 text = "Load Game"
 
-[node name="NodeEditor" type="Button" parent="CenterContainer/VBoxContainer" unique_id=311297330]
+[node name="ModuleEditor" type="Button" parent="CenterContainer/VBoxContainer" unique_id=311297330]
 layout_mode = 2
-text = "Node Editor"
+text = "Module Editor"
 
-[node name="Plugins" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="Plugins" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1122193966]
 layout_mode = 2
 text = "Plugins"
 

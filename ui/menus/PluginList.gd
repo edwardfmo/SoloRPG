@@ -6,7 +6,7 @@ signal plugins_changed
 @export var plugin_list: VBoxContainer
 @export var back_button: Button
 
-var PluginEntryScene = preload("res://scenes/PluginEntry.tscn")
+var PluginEntryScene = preload("res://ui/menus/PluginEntry.tscn")
 var config := PluginConfig.new()
 
 

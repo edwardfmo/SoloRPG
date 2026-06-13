@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://lrdis40rf1hj"]
 
-[ext_resource type="Script" uid="uid://ch8us7x0jvc5p" path="res://scripts/NodeEditor.gd" id="1_x53ir"]
-[ext_resource type="PackedScene" path="res://scenes/NodeInspector.tscn" id="2_ninsp"]
+[ext_resource type="Script" uid="uid://ch8us7x0jvc5p" path="res://ui/editor/NodeEditor.gd" id="1_x53ir"]
+[ext_resource type="PackedScene" path="res://ui/editor/NodeInspector.tscn" id="2_ninsp"]
 
 [node name="NodeEditor" type="Control" unique_id=1289184025 node_paths=PackedStringArray("graph", "module_id_edit", "module_name_edit", "module_version_edit", "module_author_edit", "node_inspector", "save_button", "save_as_button", "save_file_dialog", "open_file_dialog")]
 layout_mode = 3

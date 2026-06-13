@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://oyo0xpmfxk62"]
 
-[ext_resource type="Script" uid="uid://w4w2lfbjpyrt" path="res://scripts/GameView.gd" id="1_mddrd"]
+[ext_resource type="Script" uid="uid://w4w2lfbjpyrt" path="res://ui/game/GameView.gd" id="1_mddrd"]
 
 [node name="GameView" type="Control" unique_id=1105955654 node_paths=PackedStringArray("image", "text", "choices_container", "hud_container", "overlay_container", "sidebar_container")]
 layout_mode = 3

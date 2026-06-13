@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/NodeInspector.gd" id="1_ni"]
+[ext_resource type="Script" path="res://ui/editor/NodeInspector.gd" id="1_ni"]
 
 [node name="NodeInspector" type="ScrollContainer" node_paths=PackedStringArray("id_edit", "text_edit", "image_edit", "on_enter_container", "choices_container", "add_choice_button")]
 layout_mode = 2

@@ -141,7 +141,7 @@ func _continue_game():
 		_load_save_file(last_save)
 
 
-const PluginSelector = preload("res://scripts/PluginSelector.gd")
+const PluginSelector = preload("res://ui/menus/PluginSelector.gd")
 
 func _on_module_selected(path: String):
 	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
