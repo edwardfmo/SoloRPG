@@ -12,8 +12,9 @@ func _ready():
 
 
 func update_context(context: Dictionary):
-	var hp = context.get("hp", 0)
-	var max_hp = context.get("max_hp", 10)
+	var character = context.get("character", {})
+	var hp = character.get("hp", 0)
+	var max_hp = character.get("max_hp", 10)
 	bar.max_value = max_hp
 	bar.value = hp
 	label.text = "HP: %d/%d" % [hp, max_hp]

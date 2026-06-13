@@ -17,10 +17,14 @@ var current_module_path: String = ""
 func _ready():
 	# Register built-in evaluators
 	DiceRoller.new().register(api)
+	var entry_eval = EntryEvaluator.new()
+	entry_eval.api = api
+	entry_eval.register(api)
 	# Ensure user directories exist
 	DirAccess.make_dir_recursive_absolute(SystemUtils.SAVE_DIR)
 	DirAccess.make_dir_recursive_absolute(SystemUtils.MODULES_DIR)
 	DirAccess.make_dir_recursive_absolute(SystemUtils.PLUGINS_DIR)
+	DirAccess.make_dir_recursive_absolute(SystemUtils.COMPENDIUMS_DIR)
 
 	# Load only enabled plugins
 	_reload_plugins()
@@ -68,6 +72,9 @@ func _reload_plugins():
 	plugin_config = PluginConfig.new()
 	api.plugins.clear()
 	api.plugin_metadata.clear()
+	api._templates.clear()
+	api._entries.clear()
+	api._compendium_metadata.clear()
 	var loader = PluginLoader.new()
 	var plugins = loader.load_all()
 	for entry in plugins:
@@ -76,9 +83,18 @@ func _reload_plugins():
 		# Editor/menu context: load all plugins (core + module_required + enabled optional)
 		if ptype == "core" or ptype == "module_required" or plugin_config.is_enabled(entry["id"]):
 			api.register_plugin(entry["id"], entry["plugin"], meta)
+	# Load compendiums after plugins (they depend on plugin templates)
+	_load_compendiums()
 	node_editor.set_api(api)
 	game_view.set_api(api)
 	module_select.api = api
+
+
+func _load_compendiums():
+	var loader = CompendiumLoader.new()
+	var compendiums = loader.load_all()
+	for entry in compendiums:
+		api.register_compendium(entry["id"], entry["data"])
 
 
 # -------------------------
@@ -128,12 +144,90 @@ func _continue_game():
 const PluginSelector = preload("res://scripts/PluginSelector.gd")
 
 func _on_module_selected(path: String):
+	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if data == null:
+		push_warning("Failed to parse module: " + path)
+		return
+
+	var dep_result = _check_module_dependencies(data)
+	if dep_result["missing"]:
+		# Hard block — cannot start
+		var dialog = AcceptDialog.new()
+		dialog.title = "Missing Dependencies"
+		dialog.dialog_text = dep_result["text"]
+		dialog.get_ok_button().text = "OK"
+		add_child(dialog)
+		dialog.confirmed.connect(func(): dialog.queue_free())
+		dialog.canceled.connect(func(): dialog.queue_free())
+		dialog.popup_centered()
+		return
+	elif dep_result["text"] != "":
+		# Version warnings — allow proceeding
+		var dialog = ConfirmationDialog.new()
+		dialog.title = "Dependency Warnings"
+		dialog.dialog_text = dep_result["text"] + "\nProceed anyway?"
+		dialog.get_ok_button().text = "Start"
+		add_child(dialog)
+		dialog.confirmed.connect(func():
+			dialog.queue_free()
+			_show_plugin_selector(path))
+		dialog.canceled.connect(func(): dialog.queue_free())
+		dialog.popup_centered()
+		return
+
+	_show_plugin_selector(path)
+
+
+func _show_plugin_selector(path: String):
 	var selector = PluginSelector.new()
 	add_child(selector)
 	selector.confirmed_selection.connect(func(enabled_ids):
 		_start_game(path, enabled_ids))
 	selector.canceled.connect(func(): selector.queue_free())
 	selector.popup_centered()
+
+
+func _check_module_dependencies(data: Dictionary) -> Dictionary:
+	var deps = data.get("dependencies", [])
+	if deps.is_empty():
+		return {"text": "", "missing": false}
+
+	var loader = PluginLoader.new()
+	var all_plugins = loader.scan_metadata()
+	var installed_plugins := {}
+	for meta in all_plugins:
+		var id = meta.get("id", meta.get("filename", ""))
+		installed_plugins[id] = meta
+
+	var comp_loader = CompendiumLoader.new()
+	var all_compendiums = comp_loader.scan_metadata()
+	var installed_compendiums := {}
+	for meta in all_compendiums:
+		var id = meta.get("id", "")
+		installed_compendiums[id] = meta
+
+	var text := ""
+	var has_missing := false
+	for dep in deps:
+		var dep_id = dep.get("id", "")
+		var dep_version = dep.get("version", "")
+		var dep_type = dep.get("type", "plugin")
+		if dep_id == "":
+			continue
+
+		var label = "Plugin" if dep_type != "compendium" else "Compendium"
+		var installed_map = installed_plugins if dep_type != "compendium" else installed_compendiums
+
+		if not installed_map.has(dep_id):
+			text += "✗ " + label + ": " + dep_id + " (not installed)\n"
+			has_missing = true
+		else:
+			var meta = installed_map[dep_id]
+			var current_ver = meta.get("version", "")
+			if dep_version != "" and current_ver != "" and dep_version != current_ver:
+				text += "⚠ " + label + ": " + dep_id + " (need v" + dep_version + ", have v" + current_ver + ")\n"
+
+	return {"text": text.strip_edges(), "missing": has_missing}
 
 
 func _start_game(path: String, optional_ids: Array[String] = []):

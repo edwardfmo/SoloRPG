@@ -295,16 +295,24 @@ func _build_dependencies() -> Array:
 
 	# Collect used types
 	var used_types: Array[String] = []
+	var used_compendiums: Dictionary = {}  # compendium_id → true
 	for n in nodes:
 		for action in n.data.get("on_enter", []):
 			var t = action.get("type", "")
 			if t != "" and not used_types.has(t):
 				used_types.append(t)
+			_scan_entry_refs(action, used_compendiums)
 		for choice in n.data.get("choices", []):
+			for action in choice.get("actions", []):
+				var t = action.get("type", "")
+				if t != "" and not used_types.has(t):
+					used_types.append(t)
+				_scan_entry_refs(action, used_compendiums)
 			for cond in choice.get("conditions", []):
 				var t = cond.get("type", "")
 				if t != "" and not used_types.has(t):
 					used_types.append(t)
+				_scan_entry_refs(cond, used_compendiums)
 
 	# Group by plugin, only include loaded plugins
 	var plugin_deps := {}  # plugin_id → version
@@ -321,7 +329,44 @@ func _build_dependencies() -> Array:
 	sorted_keys.sort()
 	for pname in sorted_keys:
 		result.append({"id": pname, "version": plugin_deps[pname]})
+
+	# Add compendium dependencies
+	var comp_loader = CompendiumLoader.new()
+	var all_comps = comp_loader.scan_metadata()
+	var comp_meta_map := {}
+	for meta in all_comps:
+		comp_meta_map[meta.get("id", "")] = meta
+
+	var sorted_comps = used_compendiums.keys()
+	sorted_comps.sort()
+	for comp_id in sorted_comps:
+		var version = ""
+		if comp_meta_map.has(comp_id):
+			version = comp_meta_map[comp_id].get("version", "")
+		result.append({"id": comp_id, "type": "compendium", "version": version})
+
 	return result
+
+
+## Scans a dict's values for @entry references and collects compendium IDs.
+func _scan_entry_refs(data: Dictionary, out_compendiums: Dictionary):
+	for key in data:
+		if key == "type":
+			continue
+		var val = data[key]
+		if val is String and val.begins_with("@"):
+			var rest = val.substr(1)
+			# Handle optional template prefix: @template/namespace.entry_id
+			var slash_idx = rest.find("/")
+			if slash_idx > 0:
+				rest = rest.substr(slash_idx + 1)
+			# rest is now namespace.entry_id — namespace is the compendium/plugin id
+			var dot_idx = rest.find(".")
+			if dot_idx > 0:
+				var namespace_id = rest.substr(0, dot_idx)
+				# Only add if it's actually a compendium (not a plugin seed)
+				if not _api.plugins.has(namespace_id):
+					out_compendiums[namespace_id] = true
 
 func _on_save_pressed():
 	if _last_export_path != "":

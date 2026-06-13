@@ -5,6 +5,9 @@ var plugins := {}
 var plugin_metadata := {}  # plugin_name → {name, version, author, ...}
 var _evaluators := {}  # prefix → Callable(code: String) -> Variant
 var _evaluator_instances := []  # keeps RefCounted evaluators alive
+var _templates := {}  # template_id → {id, name, fields, source_plugin}
+var _entries := {}  # template_id → {namespace.entry_id → entry_dict}
+var _compendium_metadata := {}  # compendium_id → {name, version, author, ...}
 var context_changed_callback: Callable  # set by GameView to notify UI of context updates
 var show_overlay_callback: Callable     # set by GameView to show overlay views
 var save_to_path_callback: Callable     # set by Main to allow plugins to trigger saves
@@ -16,6 +19,22 @@ func register_plugin(name: String, plugin: Plugin, metadata: Dictionary = {}):
 	plugins[name] = plugin
 	plugin_metadata[name] = metadata
 	plugin.api = self
+	# Register templates and seed entries from this plugin
+	for tmpl in plugin.get_templates():
+		var tmpl_id = tmpl.get("id", "")
+		if tmpl_id != "":
+			tmpl["source_plugin"] = name
+			_templates[tmpl_id] = tmpl
+			if not _entries.has(tmpl_id):
+				_entries[tmpl_id] = {}
+	var seed_entries = plugin.get_template_entries()
+	for tmpl_id in seed_entries:
+		if not _entries.has(tmpl_id):
+			_entries[tmpl_id] = {}
+		for entry in seed_entries[tmpl_id]:
+			var entry_id = entry.get("id", "")
+			if entry_id != "":
+				_entries[tmpl_id][name + "." + entry_id] = entry
 
 func get_plugin(name: String):
 	return plugins.get(name, null)
@@ -184,3 +203,80 @@ func notify_pre_choice(context: Dictionary):
 	for plugin in plugins.values():
 		if plugin is Plugin:
 			plugin.on_pre_choice(context)
+
+
+# ─── Compendium / Template API ───────────────────────────────────────────────
+
+
+## Register a compendium's entries into the registry.
+func register_compendium(compendium_id: String, data: Dictionary):
+	_compendium_metadata[compendium_id] = data
+	var entries = data.get("entries", {})
+	for tmpl_id in entries:
+		if not _entries.has(tmpl_id):
+			_entries[tmpl_id] = {}
+		for entry in entries[tmpl_id]:
+			var entry_id = entry.get("id", "")
+			if entry_id != "":
+				_entries[tmpl_id][compendium_id + "." + entry_id] = entry
+
+
+## Get all registered templates.
+func get_templates() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for tmpl in _templates.values():
+		result.append(tmpl)
+	return result
+
+
+## Get a template by id.
+func get_template(template_id: String) -> Dictionary:
+	return _templates.get(template_id, {})
+
+
+## Get all entries for a template (from plugins and compendiums).
+func get_entries(template_id: String) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	var map = _entries.get(template_id, {})
+	for entry in map.values():
+		result.append(entry)
+	return result
+
+
+## Get a single entry by its namespaced id (e.g. "dnd.dagger" or "srd_items.longsword").
+func get_entry(template_id: String, namespaced_id: String) -> Dictionary:
+	var map = _entries.get(template_id, {})
+	return map.get(namespaced_id, {})
+
+
+## Query entries matching a filter dict. Each key in filter must match the entry value.
+## Array filter values match if the entry's array contains the filter value.
+func query_entries(template_id: String, filter: Dictionary) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	var map = _entries.get(template_id, {})
+	for entry in map.values():
+		var matches = true
+		for key in filter:
+			if not entry.has(key):
+				matches = false
+				break
+			var entry_val = entry[key]
+			var filter_val = filter[key]
+			if entry_val is Array:
+				if not entry_val.has(filter_val):
+					matches = false
+					break
+			elif entry_val != filter_val:
+				matches = false
+				break
+		if matches:
+			result.append(entry)
+	return result
+
+
+## Get all loaded compendium ids.
+func get_compendium_ids() -> Array[String]:
+	var result: Array[String] = []
+	for key in _compendium_metadata:
+		result.append(key)
+	return result

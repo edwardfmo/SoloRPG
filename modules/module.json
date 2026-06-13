@@ -4,12 +4,18 @@
 		{
 			"id": "dnd",
 			"version": "1.0.0"
+		},
+		{
+			"id": "srd_equipment",
+			"type": "compendium",
+			"version": "1.0.0"
 		}
 	],
 	"frames": [
 		{
 			"attached_nodes": [
 				"node",
+				"node_1",
 				"start"
 			],
 			"offset": [
@@ -17,8 +23,8 @@
 				100.0
 			],
 			"size": [
-				540.0,
-				390.0
+				760.000122070312,
+				570.0
 			],
 			"title": "Chapter1"
 		}
@@ -60,11 +66,22 @@
 			"id": "node",
 			"image": "",
 			"offset": [
-				500.0,
+				720.0,
 				300.0
 			],
 			"on_enter": [],
 			"text": "You survived, but hurt."
+		},
+		"node_1": {
+			"choices": [],
+			"id": "node_1",
+			"image": "",
+			"offset": [
+				540.0,
+				480.0
+			],
+			"on_enter": [],
+			"text": ""
 		},
 		"start": {
 			"choices": [
@@ -86,6 +103,19 @@
 					"id": "c2",
 					"next": "node",
 					"text": "Ouch"
+				},
+				{
+					"actions": [
+						{
+							"item": "@srd_equipment.longsword",
+							"slot": "weapon",
+							"type": "dnd.equip_item"
+						}
+					],
+					"conditions": [],
+					"id": "c3",
+					"next": "node_1",
+					"text": "Equip sword"
 				}
 			],
 			"id": "start",

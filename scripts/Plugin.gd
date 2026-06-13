@@ -51,6 +51,18 @@ func get_condition_params(_cond_name: String) -> Array[Dictionary]:
 	return []
 
 
+## Return template definitions this plugin provides.
+## Each entry: {id: String, name: String, fields: [{name, type, mandatory}]}
+func get_templates() -> Array[Dictionary]:
+	return []
+
+
+## Return seed entries for templates this plugin defines.
+## Format: {template_id: [{field: value, ...}, ...]}
+func get_template_entries() -> Dictionary:
+	return {}
+
+
 ## Called when a new game starts. Override to initialize context variables.
 func on_game_start(_context: Dictionary):
 	pass

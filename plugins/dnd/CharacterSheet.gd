@@ -27,5 +27,6 @@ func _update_display():
 	if not is_inside_tree():
 		return
 	title_label.text = "Character Sheet"
-	hp_label.text = "HP: %d" % _context.get("hp", 0)
-	max_hp_label.text = "Max HP: %d" % _context.get("max_hp", 10)
+	var character = _context.get("character", {})
+	hp_label.text = "HP: %d" % character.get("hp", 0)
+	max_hp_label.text = "Max HP: %d" % character.get("max_hp", 10)
