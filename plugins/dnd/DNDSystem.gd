@@ -2,7 +2,7 @@ extends Plugin
 
 
 func get_actions() -> Array[String]:
-	return ["dnd.damage"]
+	return ["dnd.take_damage"]
 
 
 func get_conditions() -> Array[String]:
@@ -23,8 +23,11 @@ func on_game_start(context: Dictionary):
 
 
 func get_action_params(action_name: String) -> Array[Dictionary]:
-	if action_name == "damage":
-		return [{"name": "amount", "mandatory": true}]
+	if action_name == "take_damage":
+		return [
+			{"name": "amount", "mandatory": true, "direction": "input"},
+			{"name": "damage_taken", "mandatory": false, "direction": "output"},
+		]
 	return []
 
 
@@ -35,9 +38,10 @@ func get_condition_params(cond_name: String) -> Array[Dictionary]:
 
 
 func handle_action(action_name: String, data: Dictionary, context):
-	if action_name == "damage":
+	if action_name == "take_damage":
 		var dmg = data.get("amount", 1)
 		context["hp"] = context.get("hp", 10) - dmg
+		data["damage_taken"] = dmg
 		print("Player takes", dmg, "damage. HP:", context["hp"])
 
 func check_condition(cond_name: String, data: Dictionary, context) -> bool:

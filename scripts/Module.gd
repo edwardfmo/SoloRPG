@@ -69,10 +69,44 @@ func _execute_action(action: Dictionary, context):
 		push_warning("Missing plugin: " + plugin_name)
 		return
 
-	if plugin.has_method("handle_action"):
-		plugin.handle_action(action_name, action, context)
-	else:
+	if not plugin.has_method("handle_action"):
 		push_warning(plugin_name + " has no handle_action()")
+		return
+
+	# Save output param paths before handle_action overwrites them
+	var output_paths := {}
+	if plugin.has_method("get_action_params"):
+		var params = plugin.get_action_params(action_name)
+		for p in params:
+			if p.get("direction", "input") == "output" and action.has(p["name"]):
+				output_paths[p["name"]] = action[p["name"]]
+
+	# Resolve evaluators in input parameters
+	for key in action:
+		if key == "type":
+			continue
+		if output_paths.has(key):
+			continue
+		action[key] = api.evaluate(action[key])
+
+	plugin.handle_action(action_name, action, context)
+
+	# Write output params to context at their dot-paths
+	for key in output_paths:
+		if action.has(key):
+			_set_context_path(context, output_paths[key], action[key])
+
+
+## Write a value into context at a dot-separated path, creating nested dicts as needed.
+func _set_context_path(context: Dictionary, path: String, value):
+	var keys = path.split(".")
+	var current = context
+	for i in keys.size() - 1:
+		var k = keys[i]
+		if not current.has(k) or not current[k] is Dictionary:
+			current[k] = {}
+		current = current[k]
+	current[keys[keys.size() - 1]] = value
 
 
 func are_conditions_met(conditions: Array, context) -> bool:

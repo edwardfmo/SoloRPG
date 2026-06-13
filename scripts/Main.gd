@@ -15,6 +15,8 @@ var current_module_path: String = ""
 
 
 func _ready():
+	# Register built-in evaluators
+	DiceRoller.new().register(api)
 	# Ensure user directories exist
 	DirAccess.make_dir_recursive_absolute(SystemUtils.SAVE_DIR)
 	DirAccess.make_dir_recursive_absolute(SystemUtils.MODULES_DIR)

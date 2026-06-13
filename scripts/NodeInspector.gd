@@ -7,8 +7,6 @@ extends ScrollContainer
 @export var choices_container: VBoxContainer
 @export var add_choice_button: Button
 
-const ActionListEditor = preload("res://scripts/ActionListEditor.gd")
-
 var selected_node: StoryNode = null
 var _expanded_choices: Array = []
 var _on_enter_editor: VBoxContainer = null

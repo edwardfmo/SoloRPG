@@ -3,6 +3,8 @@ extends RefCounted
 
 var plugins := {}
 var plugin_metadata := {}  # plugin_name → {name, version, author, ...}
+var _evaluators := {}  # prefix → Callable(code: String) -> Variant
+var _evaluator_instances := []  # keeps RefCounted evaluators alive
 var context_changed_callback: Callable  # set by GameView to notify UI of context updates
 var show_overlay_callback: Callable     # set by GameView to show overlay views
 var save_to_path_callback: Callable     # set by Main to allow plugins to trigger saves
@@ -17,6 +19,31 @@ func register_plugin(name: String, plugin: Plugin, metadata: Dictionary = {}):
 
 func get_plugin(name: String):
 	return plugins.get(name, null)
+
+
+## Register an evaluator for a given prefix (e.g. "/r", "/roll").
+## handler signature: func(code: String) -> Variant
+func register_evaluator(prefix: String, handler: Callable):
+	_evaluators[prefix] = handler
+
+
+## Register an Evaluator instance. Keeps it alive and registers all its prefixes.
+func register_evaluator_instance(evaluator: Evaluator):
+	_evaluator_instances.append(evaluator)
+	for prefix in evaluator.get_prefixes():
+		_evaluators[prefix] = evaluator.evaluate
+
+
+## Evaluate a value. If it's a string starting with a registered prefix,
+## pass it to the corresponding evaluator. Otherwise return as-is.
+func evaluate(value: Variant) -> Variant:
+	if not value is String:
+		return value
+	var s: String = value
+	for prefix in _evaluators:
+		if s.begins_with(prefix):
+			return _evaluators[prefix].call(s)
+	return value
 
 
 ## Returns all published action types from registered plugins.
@@ -108,7 +135,41 @@ func dispatch_action(type: String, data: Dictionary = {}, context: Dictionary = 
 		push_warning("[ModAPI] Plugin not found for action: ", type)
 		return
 	data["type"] = type
+
+	# Save output param paths before handle_action overwrites them
+	var output_paths := {}
+	if plugin.has_method("get_action_params"):
+		var params = plugin.get_action_params(action_name)
+		for p in params:
+			if p.get("direction", "input") == "output" and data.has(p["name"]):
+				output_paths[p["name"]] = data[p["name"]]
+
+	# Resolve evaluators in input parameters
+	for key in data:
+		if key == "type":
+			continue
+		if output_paths.has(key):
+			continue
+		data[key] = evaluate(data[key])
+
 	plugin.handle_action(action_name, data, context)
+
+	# Write output params to context at their dot-paths
+	for key in output_paths:
+		if data.has(key):
+			_set_context_path(context, output_paths[key], data[key])
+
+
+## Write a value into context at a dot-separated path, creating nested dicts as needed.
+func _set_context_path(context: Dictionary, path: String, value):
+	var keys = path.split(".")
+	var current = context
+	for i in keys.size() - 1:
+		var k = keys[i]
+		if not current.has(k) or not current[k] is Dictionary:
+			current[k] = {}
+		current = current[k]
+	current[keys[keys.size() - 1]] = value
 
 
 ## Notify all plugins that a new game has started so they can initialize context.

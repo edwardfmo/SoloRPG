@@ -1,15 +1,17 @@
 ## Reusable editor for an array of {type, ...params} dictionaries.
 ## Used for on_enter actions and choice conditions.
+class_name ActionListEditor
 extends VBoxContainer
 
 signal list_changed
 
 ## Set this before calling set_actions() to provide autocomplete suggestions.
-## e.g. ["dnd.damage", "dnd.hp_above"]
+## e.g. ["dnd.take_damage", "dnd.hp_above"]
 var available_types: Array[String] = []
 
-## Callable that returns Array[Dictionary] of {name, mandatory} for a type string.
-## Set this to enable auto-param injection. Signature: func(type: String) -> Array[Dictionary]
+## Callable that returns Array[Dictionary] of {name, mandatory, direction} for a type string.
+## direction is "input" (default) or "output". Set this to enable auto-param injection.
+## Signature: func(type: String) -> Array[Dictionary]
 var param_provider: Callable
 
 var _actions: Array = []
@@ -86,29 +88,48 @@ func rebuild():
 
 		# Parameter rows
 		var mandatory_keys = _get_mandatory_keys(action.get("type", ""))
+		var optional_hints = _get_optional_keys(action.get("type", ""))
+		var param_directions = _get_param_directions(action.get("type", ""))
 		var params_container = VBoxContainer.new()
 		for key in action:
 			if key == "type":
 				continue
 			var is_mandatory = mandatory_keys.has(key)
 			var param_row = HBoxContainer.new()
-			var key_field = LineEdit.new()
-			key_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			key_field.text = key
-			key_field.placeholder_text = "key"
+			var original_key = key
+
+			# Direction indicator
+			var dir_label = Label.new()
+			var direction = param_directions.get(key, "input")
+			dir_label.text = ">" if direction == "input" else "<"
+			dir_label.tooltip_text = "input" if direction == "input" else "output"
+			dir_label.custom_minimum_size = Vector2(16, 0)
+			param_row.add_child(dir_label)
+
 			if is_mandatory:
+				var key_field = LineEdit.new()
+				key_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				key_field.text = key
+				key_field.placeholder_text = "key"
 				key_field.editable = false
 				key_field.modulate = Color(0.7, 0.7, 0.7)
-			var val_field = LineEdit.new()
-			val_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			val_field.text = str(action[key])
-			val_field.placeholder_text = "value"
-			var original_key = key
-			if not is_mandatory:
+				param_row.add_child(key_field)
+			else:
+				var key_field = HintedLineEdit.new()
+				key_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				key_field.text = key
+				key_field.placeholder_text = "key"
+				key_field.hints = optional_hints
+				var _renamed := {&"done": false}
 				var _commit_key_rename = func():
+					if _renamed[&"done"]:
+						return
 					var new_key = key_field.text
 					if new_key == original_key or new_key == "":
 						return
+					if action_idx >= _actions.size():
+						return
+					_renamed[&"done"] = true
 					var val = _actions[action_idx].get(original_key, "")
 					_actions[action_idx].erase(original_key)
 					_actions[action_idx][new_key] = val
@@ -116,14 +137,18 @@ func rebuild():
 					rebuild()
 				key_field.text_submitted.connect(func(_t): _commit_key_rename.call())
 				key_field.focus_exited.connect(_commit_key_rename)
+				key_field.hint_selected.connect(func(_t): _commit_key_rename.call())
+				param_row.add_child(key_field)
+			var val_field = LineEdit.new()
+			val_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			val_field.text = str(action[key])
+			val_field.placeholder_text = "value"
 			val_field.text_changed.connect(func(new_val):
-				var k = key_field.text if key_field.text != "" else original_key
 				if new_val.is_valid_float():
-					_actions[action_idx][k] = new_val.to_float()
+					_actions[action_idx][original_key] = new_val.to_float()
 				else:
-					_actions[action_idx][k] = new_val
+					_actions[action_idx][original_key] = new_val
 				list_changed.emit())
-			param_row.add_child(key_field)
 			param_row.add_child(val_field)
 			if is_mandatory:
 				# Spacer to keep alignment but no delete button
@@ -169,6 +194,27 @@ func _get_mandatory_keys(type: String) -> Array[String]:
 	for p in params:
 		if p.get("mandatory", false):
 			result.append(p["name"])
+	return result
+
+
+func _get_optional_keys(type: String) -> Array[String]:
+	var result: Array[String] = []
+	if not param_provider.is_valid() or type == "":
+		return result
+	var params = param_provider.call(type)
+	for p in params:
+		if not p.get("mandatory", false):
+			result.append(p["name"])
+	return result
+
+
+func _get_param_directions(type: String) -> Dictionary:
+	var result: Dictionary = {}
+	if not param_provider.is_valid() or type == "":
+		return result
+	var params = param_provider.call(type)
+	for p in params:
+		result[p["name"]] = p.get("direction", "input")
 	return result
 
 

@@ -9,7 +9,7 @@ var api: ModAPI = null
 
 
 ## Return an array of action type strings this plugin provides.
-## e.g. ["dnd.damage", "dnd.heal"]
+## e.g. ["dnd.take_damage", "dnd.heal"]
 func get_actions() -> Array[String]:
 	return []
 
@@ -38,13 +38,15 @@ func check_condition(_cond_name: String, _data: Dictionary, _context) -> bool:
 
 
 ## Return parameter schema for an action.
-## Each entry: {name: String, mandatory: bool}
+## Each entry: {name: String, mandatory: bool, direction: "input"|"output"}
+## direction defaults to "input" if omitted. Output params store their value
+## in context at the dot-path specified by the user (e.g. "combat.last_damage").
 func get_action_params(_action_name: String) -> Array[Dictionary]:
 	return []
 
 
 ## Return parameter schema for a condition.
-## Each entry: {name: String, mandatory: bool}
+## Each entry: {name: String, mandatory: bool, direction: "input"|"output"}
 func get_condition_params(_cond_name: String) -> Array[Dictionary]:
 	return []
 

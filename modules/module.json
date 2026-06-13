@@ -43,7 +43,7 @@
 					"actions": [
 						{
 							"amount": 1.0,
-							"type": "dnd.damage"
+							"type": "dnd.take_damage"
 						}
 					],
 					"conditions": [
@@ -96,8 +96,9 @@
 			],
 			"on_enter": [
 				{
-					"amount": 3.0,
-					"type": "dnd.damage"
+					"amount": "/r1d6",
+					"damage_taken": "tmp.dam",
+					"type": "dnd.take_damage"
 				}
 			],
 			"text": "You step on a trap!\n\ntook 3 damage."

@@ -159,7 +159,7 @@ func check_and_show(module_nodes: Array, api: ModAPI) -> bool:
 	return true
 
 
-## Infers plugin name from a type string (e.g. "dnd.damage" → "dnd").
+## Infers plugin name from a type string (e.g. "dnd.take_damage" → "dnd").
 func _infer_plugin(type_string: String) -> String:
 	var dot_idx = type_string.find(".")
 	if dot_idx > 0:
