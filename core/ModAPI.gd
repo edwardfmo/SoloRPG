@@ -205,7 +205,12 @@ func _resolve_and_dispatch(plugin, action_name: String, data: Dictionary, contex
 		var val = data[key]
 		if val is String and val.begins_with("@"):
 			_raw_refs[key] = val
-		if val is String and val.begins_with("$"):
+		if val is String and val.begins_with("$$"):
+			# Read from context and evaluate the result
+			var resolved = _get_context_path(context, val.substr(2))
+			data[key] = evaluate(resolved) if resolved is String else resolved
+		elif val is String and val.begins_with("$"):
+			# Read from context (raw)
 			data[key] = _get_context_path(context, val.substr(1))
 		else:
 			data[key] = evaluate(val)

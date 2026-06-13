@@ -78,6 +78,8 @@ func _load_overlay_panels():
 		var instance = scene.instantiate()
 		overlay_container.add_child(instance)
 		instance.visible = false
+		if "api" in instance:
+			instance.api = _api
 		_overlay_nodes[overlay_id] = instance
 
 
