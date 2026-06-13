@@ -79,7 +79,7 @@ func _reload_plugins():
 	var plugins = loader.load_all()
 	for entry in plugins:
 		var meta = entry.get("metadata", {})
-		var ptype = _get_plugin_type(meta)
+		var ptype = SystemUtils.get_plugin_type(meta)
 		# Editor/menu context: load all plugins (core + module_required + enabled optional)
 		if ptype == "core" or ptype == "module_required" or plugin_config.is_enabled(entry["id"]):
 			api.register_plugin(entry["id"], entry["plugin"], meta)
@@ -189,45 +189,19 @@ func _show_plugin_selector(path: String):
 
 func _check_module_dependencies(data: Dictionary) -> Dictionary:
 	var deps = data.get("dependencies", [])
-	if deps.is_empty():
+	var result = DependencyChecker.check(deps)
+	if not result["has_issues"]:
 		return {"text": "", "missing": false}
 
-	var loader = PluginLoader.new()
-	var all_plugins = loader.scan_metadata()
-	var installed_plugins := {}
-	for meta in all_plugins:
-		var id = meta.get("id", meta.get("filename", ""))
-		installed_plugins[id] = meta
-
-	var comp_loader = CompendiumLoader.new()
-	var all_compendiums = comp_loader.scan_metadata()
-	var installed_compendiums := {}
-	for meta in all_compendiums:
-		var id = meta.get("id", "")
-		installed_compendiums[id] = meta
-
 	var text := ""
-	var has_missing := false
-	for dep in deps:
-		var dep_id = dep.get("id", "")
-		var dep_version = dep.get("version", "")
-		var dep_type = dep.get("type", "plugin")
-		if dep_id == "":
-			continue
-
-		var label = "Plugin" if dep_type != "compendium" else "Compendium"
-		var installed_map = installed_plugins if dep_type != "compendium" else installed_compendiums
-
-		if not installed_map.has(dep_id):
-			text += "✗ " + label + ": " + dep_id + " (not installed)\n"
-			has_missing = true
+	for issue in result["issues"]:
+		var label = "Plugin" if issue["type"] != "compendium" else "Compendium"
+		if issue["status"] == "missing":
+			text += "✗ " + label + ": " + issue["id"] + " (not installed)\n"
 		else:
-			var meta = installed_map[dep_id]
-			var current_ver = meta.get("version", "")
-			if dep_version != "" and current_ver != "" and dep_version != current_ver:
-				text += "⚠ " + label + ": " + dep_id + " (need v" + dep_version + ", have v" + current_ver + ")\n"
+			text += "⚠ " + label + ": " + issue["id"] + " (" + issue["message"] + ")\n"
 
-	return {"text": text.strip_edges(), "missing": has_missing}
+	return {"text": text.strip_edges(), "missing": result["has_missing"]}
 
 
 func _start_game(path: String, optional_ids: Array[String] = []):
@@ -418,7 +392,7 @@ func _load_plugins_from_snapshot(snapshot: Dictionary):
 	var plugins = loader.load_all()
 	for entry in plugins:
 		var meta = entry.get("metadata", {})
-		var ptype = _get_plugin_type(meta)
+		var ptype = SystemUtils.get_plugin_type(meta)
 		var id = entry["id"]
 		if ptype == "core" or snapshot.has(id):
 			api.register_plugin(id, entry["plugin"], meta)
@@ -432,7 +406,7 @@ func _load_plugins_with_required(required_ids: Array[String]):
 	var plugins = loader.load_all()
 	for entry in plugins:
 		var meta = entry.get("metadata", {})
-		var ptype = _get_plugin_type(meta)
+		var ptype = SystemUtils.get_plugin_type(meta)
 		var id = entry["id"]
 		# Core: always. module_required: only if module needs it. optional: only if globally enabled.
 		if ptype == "core":
@@ -453,7 +427,7 @@ func _load_plugins_for_session(required_ids: Array[String], optional_ids: Array[
 	var plugins = loader.load_all()
 	for entry in plugins:
 		var meta = entry.get("metadata", {})
-		var ptype = _get_plugin_type(meta)
+		var ptype = SystemUtils.get_plugin_type(meta)
 		var id = entry["id"]
 		if ptype == "core":
 			api.register_plugin(id, entry["plugin"], meta)
@@ -464,15 +438,6 @@ func _load_plugins_for_session(required_ids: Array[String], optional_ids: Array[
 			if optional_ids.has(id):
 				api.register_plugin(id, entry["plugin"], meta)
 	game_view.set_api(api)
-
-
-func _get_plugin_type(meta: Dictionary) -> String:
-	# Support both new "type" field and legacy "core" field
-	if meta.has("type"):
-		return meta["type"]
-	if meta.get("core", false):
-		return "core"
-	return "optional"
 
 
 func _show_load_error(message: String):

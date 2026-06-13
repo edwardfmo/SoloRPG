@@ -355,18 +355,11 @@ func _scan_entry_refs(data: Dictionary, out_compendiums: Dictionary):
 			continue
 		var val = data[key]
 		if val is String and val.begins_with("@"):
-			var rest = val.substr(1)
-			# Handle optional template prefix: @template/namespace.entry_id
-			var slash_idx = rest.find("/")
-			if slash_idx > 0:
-				rest = rest.substr(slash_idx + 1)
-			# rest is now namespace.entry_id — namespace is the compendium/plugin id
-			var dot_idx = rest.find(".")
-			if dot_idx > 0:
-				var namespace_id = rest.substr(0, dot_idx)
-				# Only add if it's actually a compendium (not a plugin seed)
-				if not _api.plugins.has(namespace_id):
-					out_compendiums[namespace_id] = true
+			var parsed = ModAPI.parse_entry_ref(val)
+			var namespace_id = parsed["namespace"]
+			# Only add if it's actually a compendium (not a plugin seed)
+			if not _api.plugins.has(namespace_id):
+				out_compendiums[namespace_id] = true
 
 func _on_save_pressed():
 	if _last_export_path != "":

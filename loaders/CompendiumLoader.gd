@@ -11,7 +11,7 @@ func load_all() -> Array:
 	var loaded := []
 
 	for dir_path in COMPENDIUM_DIRS:
-		var subdirs = _find_subdirs(dir_path)
+		var subdirs = SystemUtils.find_subdirs(dir_path)
 		for subdir in subdirs:
 			var comp_path = subdir + "/compendium.json"
 			if FileAccess.file_exists(comp_path):
@@ -27,7 +27,7 @@ func scan_metadata() -> Array:
 	var results := []
 
 	for dir_path in COMPENDIUM_DIRS:
-		var subdirs = _find_subdirs(dir_path)
+		var subdirs = SystemUtils.find_subdirs(dir_path)
 		for subdir in subdirs:
 			var comp_path = subdir + "/compendium.json"
 			if FileAccess.file_exists(comp_path):
@@ -54,18 +54,3 @@ func _load_compendium(path: String) -> Dictionary:
 
 	print("[CompendiumLoader] Loaded compendium: ", comp_id, " (", data.get("name", ""), ")")
 	return {"id": comp_id, "data": data}
-
-
-func _find_subdirs(dir_path: String) -> Array[String]:
-	var results: Array[String] = []
-	var dir = DirAccess.open(dir_path)
-	if dir == null:
-		return results
-	dir.list_dir_begin()
-	var file_name = dir.get_next()
-	while file_name != "":
-		if dir.current_is_dir() and not file_name.begins_with("."):
-			results.append(dir_path + "/" + file_name)
-		file_name = dir.get_next()
-	dir.list_dir_end()
-	return results

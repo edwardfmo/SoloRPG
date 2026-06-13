@@ -13,35 +13,28 @@ func get_prefixes() -> Array[String]:
 
 
 func evaluate(code: String) -> Variant:
-	var rest = code.substr(1)  # remove @
+	var parsed = ModAPI.parse_entry_ref(code)
+	var template_id: String = parsed["template"]
+	# Reconstruct the full entry key (namespace.entry_id)
+	var entry_key: String = parsed["namespace"]
+	if parsed["entry_id"] != "":
+		entry_key += "." + parsed["entry_id"]
 
-	var template_id := ""
-	var entry_id := ""
-
-	var slash_idx = rest.find("/")
-	if slash_idx > 0:
-		# Explicit template: @template_id/namespace.entry_id
-		template_id = rest.substr(0, slash_idx)
-		entry_id = rest.substr(slash_idx + 1)
-	else:
-		# Short form: @namespace.entry_id — search all templates
-		entry_id = rest
-
-	if entry_id == "":
+	if entry_key == "":
 		push_warning("[EntryEvaluator] Invalid entry reference: " + code)
 		return code
 
 	if template_id != "":
-		var entry = api.get_entry(template_id, entry_id)
+		var entry = api.get_entry(template_id, entry_key)
 		if entry.is_empty():
 			push_warning("[EntryEvaluator] Entry not found: " + code)
 			return code
 		return entry
 	else:
-		# Search all templates for this entry_id
+		# Search all templates for this entry_key
 		for tmpl_id in api._entries:
 			var map = api._entries[tmpl_id]
-			if map.has(entry_id):
-				return map[entry_id]
+			if map.has(entry_key):
+				return map[entry_key]
 		push_warning("[EntryEvaluator] Entry not found in any template: " + code)
 		return code

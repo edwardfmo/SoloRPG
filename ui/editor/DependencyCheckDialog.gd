@@ -174,7 +174,7 @@ func check_and_show(module_nodes: Array, api: ModAPI) -> bool:
 			installed_comps[meta.get("id", "")] = meta
 
 		for ref in entry_refs:
-			var parsed = _parse_entry_ref(ref)
+			var parsed = ModAPI.parse_entry_ref(ref)
 			var comp_id = parsed["namespace"]
 			var entry_id = parsed["entry_id"]
 			# Skip plugin-seeded entries
@@ -275,17 +275,3 @@ func _collect_entry_refs(data: Dictionary, out_refs: Array[String]):
 		var val = data[key]
 		if val is String and val.begins_with("@") and not out_refs.has(val):
 			out_refs.append(val)
-
-
-## Parses an @entry reference into {namespace, entry_id}.
-func _parse_entry_ref(ref: String) -> Dictionary:
-	var rest = ref.substr(1)  # remove @
-	# Handle optional template prefix: @template/namespace.entry_id
-	var slash_idx = rest.find("/")
-	if slash_idx > 0:
-		rest = rest.substr(slash_idx + 1)
-	# rest is now namespace.entry_id
-	var dot_idx = rest.find(".")
-	if dot_idx > 0:
-		return {"namespace": rest.substr(0, dot_idx), "entry_id": rest.substr(dot_idx + 1)}
-	return {"namespace": rest, "entry_id": ""}

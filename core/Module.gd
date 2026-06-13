@@ -73,51 +73,7 @@ func _execute_action(action: Dictionary, context):
 		push_warning(plugin_name + " has no handle_action()")
 		return
 
-	# Save output param paths before handle_action overwrites them
-	var output_paths := {}
-	if plugin.has_method("get_action_params"):
-		var params = plugin.get_action_params(action_name)
-		for p in params:
-			if p.get("direction", "input") == "output" and action.has(p["name"]):
-				output_paths[p["name"]] = action[p["name"]]
-
-	# Resolve evaluators in input parameters, preserve original refs
-	var _raw_refs := {}
-	for key in action:
-		if key == "type":
-			continue
-		if output_paths.has(key):
-			continue
-		var val = action[key]
-		if val is String and val.begins_with("@"):
-			_raw_refs[key] = val
-		if val is String and val.begins_with("$"):
-			action[key] = api._get_context_path(context, val.substr(1))
-		else:
-			action[key] = api.evaluate(val)
-	action["_raw_refs"] = _raw_refs
-
-	plugin.handle_action(action_name, action, context)
-
-	# Clean up internal key
-	action.erase("_raw_refs")
-
-	# Write output params to context at their dot-paths
-	for key in output_paths:
-		if action.has(key):
-			_set_context_path(context, output_paths[key], action[key])
-
-
-## Write a value into context at a dot-separated path, creating nested dicts as needed.
-func _set_context_path(context: Dictionary, path: String, value):
-	var keys = path.split(".")
-	var current = context
-	for i in keys.size() - 1:
-		var k = keys[i]
-		if not current.has(k) or not current[k] is Dictionary:
-			current[k] = {}
-		current = current[k]
-	current[keys[keys.size() - 1]] = value
+	api._resolve_and_dispatch(plugin, action_name, action, context)
 
 
 func are_conditions_met(conditions: Array, context) -> bool:

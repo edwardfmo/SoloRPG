@@ -20,7 +20,7 @@ func load_all() -> Array:
 				push_warning("[PluginLoader] Failed to load pack: ", pck_path)
 
 		# Find plugin.cfg in subdirectories (works for both loose and pck-loaded plugins)
-		var subdirs = _find_subdirs(dir_path)
+		var subdirs = SystemUtils.find_subdirs(dir_path)
 		for subdir in subdirs:
 			var cfg_path = subdir + "/plugin.cfg"
 			if FileAccess.file_exists(cfg_path):
@@ -42,7 +42,7 @@ func scan_metadata() -> Array:
 		for pck_path in pck_files:
 			ProjectSettings.load_resource_pack(pck_path)
 
-		var subdirs = _find_subdirs(dir_path)
+		var subdirs = SystemUtils.find_subdirs(dir_path)
 		for subdir in subdirs:
 			var cfg_path = subdir + "/plugin.cfg"
 			if FileAccess.file_exists(cfg_path):
@@ -91,21 +91,6 @@ func _find_files(dir_path: String, extension: String) -> Array[String]:
 	var file_name = dir.get_next()
 	while file_name != "":
 		if not dir.current_is_dir() and file_name.ends_with(extension):
-			results.append(dir_path + "/" + file_name)
-		file_name = dir.get_next()
-	dir.list_dir_end()
-	return results
-
-
-func _find_subdirs(dir_path: String) -> Array[String]:
-	var results: Array[String] = []
-	var dir = DirAccess.open(dir_path)
-	if dir == null:
-		return results
-	dir.list_dir_begin()
-	var file_name = dir.get_next()
-	while file_name != "":
-		if dir.current_is_dir() and not file_name.begins_with("."):
 			results.append(dir_path + "/" + file_name)
 		file_name = dir.get_next()
 	dir.list_dir_end()

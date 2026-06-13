@@ -32,7 +32,7 @@ func _refresh_list():
 	var core_plugins := []
 
 	for data in plugins:
-		var ptype = _get_plugin_type(data)
+		var ptype = SystemUtils.get_plugin_type(data)
 		if ptype == "optional":
 			optional_plugins.append(data)
 		elif ptype == "module_required":
@@ -85,14 +85,6 @@ func _add_plugin_entry(data: Dictionary, show_toggle: bool):
 	entry.setup(data, config.is_enabled(plugin_id), show_toggle)
 	if show_toggle:
 		entry.toggled.connect(_on_plugin_toggled)
-
-
-func _get_plugin_type(data: Dictionary) -> String:
-	if data.has("type"):
-		return data["type"]
-	if data.get("core", false):
-		return "core"
-	return "optional"
 
 
 func _on_plugin_toggled(plugin_id: String, enabled: bool):

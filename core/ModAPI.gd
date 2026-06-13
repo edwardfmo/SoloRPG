@@ -78,6 +78,21 @@ static func make_ref(entry_ref: String) -> Dictionary:
 	return {"_ref": entry_ref}
 
 
+## Parse an entry reference string like "@template/namespace.entry_id" or "@namespace.entry_id".
+## Returns {"template": String, "namespace": String, "entry_id": String}.
+static func parse_entry_ref(ref: String) -> Dictionary:
+	var rest = ref.substr(1)  # remove @
+	var template := ""
+	var slash_idx = rest.find("/")
+	if slash_idx > 0:
+		template = rest.substr(0, slash_idx)
+		rest = rest.substr(slash_idx + 1)
+	var dot_idx = rest.find(".")
+	if dot_idx > 0:
+		return {"template": template, "namespace": rest.substr(0, dot_idx), "entry_id": rest.substr(dot_idx + 1)}
+	return {"template": template, "namespace": rest, "entry_id": ""}
+
+
 ## Returns all published action types from registered plugins.
 func get_all_actions() -> Array[String]:
 	var result: Array[String] = []
@@ -167,7 +182,11 @@ func dispatch_action(type: String, data: Dictionary = {}, context: Dictionary = 
 		push_warning("[ModAPI] Plugin not found for action: ", type)
 		return
 	data["type"] = type
+	_resolve_and_dispatch(plugin, action_name, data, context)
 
+
+## Shared action resolution: resolve inputs, dispatch to plugin, write outputs.
+func _resolve_and_dispatch(plugin, action_name: String, data: Dictionary, context: Dictionary):
 	# Save output param paths before handle_action overwrites them
 	var output_paths := {}
 	if plugin.has_method("get_action_params"):

@@ -43,7 +43,7 @@ func _refresh_list():
 
 	var has_optional = false
 	for data in plugins:
-		var ptype = _get_plugin_type(data)
+		var ptype = SystemUtils.get_plugin_type(data)
 		if ptype == "optional":
 			has_optional = true
 			var plugin_id = data.get("id", "")
@@ -72,11 +72,3 @@ func _on_confirmed():
 			enabled_ids.append(id)
 	confirmed_selection.emit(enabled_ids)
 	queue_free()
-
-
-func _get_plugin_type(data: Dictionary) -> String:
-	if data.has("type"):
-		return data["type"]
-	if data.get("core", false):
-		return "core"
-	return "optional"
