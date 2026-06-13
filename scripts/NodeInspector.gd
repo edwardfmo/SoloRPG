@@ -19,6 +19,16 @@ var available_conditions: Array[String] = []
 var api: ModAPI = null
 
 
+func _get_entry_hints() -> Array[String]:
+	var result: Array[String] = []
+	if api == null:
+		return result
+	for tmpl_id in api._entries:
+		for namespaced_id in api._entries[tmpl_id]:
+			result.append("@" + namespaced_id)
+	return result
+
+
 func _ready():
 	add_choice_button.pressed.connect(_on_add_choice)
 
@@ -71,6 +81,7 @@ func rebuild_on_enter_list():
 	_on_enter_editor.available_types = available_actions
 	if api:
 		_on_enter_editor.param_provider = api.get_params_for_type
+		_on_enter_editor.entry_hints = _get_entry_hints()
 	on_enter_container.add_child(_on_enter_editor)
 	_on_enter_editor.set_actions(selected_node.data["on_enter"])
 
@@ -202,6 +213,7 @@ func rebuild_choices_list(expand_idx: int = -1):
 		cond_editor.available_types = available_conditions
 		if api:
 			cond_editor.param_provider = api.get_params_for_type
+			cond_editor.entry_hints = _get_entry_hints()
 		cond_editor.set_actions(choice["conditions"])
 		details.add_child(cond_editor)
 
@@ -218,6 +230,7 @@ func rebuild_choices_list(expand_idx: int = -1):
 		act_editor.available_types = available_actions
 		if api:
 			act_editor.param_provider = api.get_params_for_type
+			act_editor.entry_hints = _get_entry_hints()
 		act_editor.set_actions(choice["actions"])
 		details.add_child(act_editor)
 

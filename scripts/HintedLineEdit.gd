@@ -8,6 +8,9 @@ signal hint_selected(value: String)
 ## Array of strings to match against as the user types.
 var hints: Array[String] = []
 
+## If set, hints only show when text starts with this prefix.
+var hint_prefix: String = ""
+
 var _dropdown: ItemList
 
 
@@ -53,6 +56,9 @@ func _update_dropdown():
 	_dropdown.clear()
 	var query = text.to_lower()
 	if query == "":
+		_dropdown.visible = false
+		return
+	if hint_prefix != "" and not text.begins_with(hint_prefix):
 		_dropdown.visible = false
 		return
 	var matches: Array[String] = []

@@ -14,6 +14,10 @@ var available_types: Array[String] = []
 ## Signature: func(type: String) -> Array[Dictionary]
 var param_provider: Callable
 
+## Entry hints for value fields (e.g. ["@srd_equipment.longsword", ...]).
+## Shown when the user types "@" in a value field.
+var entry_hints: Array[String] = []
+
 var _actions: Array = []
 var _container: VBoxContainer
 
@@ -139,15 +143,20 @@ func rebuild():
 				key_field.focus_exited.connect(_commit_key_rename)
 				key_field.hint_selected.connect(func(_t): _commit_key_rename.call())
 				param_row.add_child(key_field)
-			var val_field = LineEdit.new()
+			var val_field = HintedLineEdit.new()
 			val_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			val_field.text = str(action[key])
 			val_field.placeholder_text = "value"
+			val_field.hints = entry_hints
+			val_field.hint_prefix = "@"
 			val_field.text_changed.connect(func(new_val):
 				if new_val.is_valid_float():
 					_actions[action_idx][original_key] = new_val.to_float()
 				else:
 					_actions[action_idx][original_key] = new_val
+				list_changed.emit())
+			val_field.hint_selected.connect(func(new_val):
+				_actions[action_idx][original_key] = new_val
 				list_changed.emit())
 			param_row.add_child(val_field)
 			if is_mandatory:
