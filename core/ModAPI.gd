@@ -207,11 +207,11 @@ func _resolve_and_dispatch(plugin, action_name: String, data: Dictionary, contex
 			_raw_refs[key] = val
 		if val is String and val.begins_with("$$"):
 			# Read from context and evaluate the result
-			var resolved = _get_context_path(context, val.substr(2))
+			var resolved = get_context_path(context, val.substr(2))
 			data[key] = evaluate(resolved) if resolved is String else resolved
 		elif val is String and val.begins_with("$"):
 			# Read from context (raw)
-			data[key] = _get_context_path(context, val.substr(1))
+			data[key] = get_context_path(context, val.substr(1))
 		else:
 			data[key] = evaluate(val)
 	data["_raw_refs"] = _raw_refs
@@ -224,11 +224,11 @@ func _resolve_and_dispatch(plugin, action_name: String, data: Dictionary, contex
 	# Write output params to context at their dot-paths
 	for key in output_paths:
 		if data.has(key):
-			_set_context_path(context, output_paths[key], data[key])
+			set_context_path(context, output_paths[key], data[key])
 
 
 ## Write a value into context at a dot-separated path, creating nested dicts as needed.
-func _set_context_path(context: Dictionary, path: String, value):
+func set_context_path(context: Dictionary, path: String, value):
 	var keys = path.split(".")
 	var current = context
 	for i in keys.size() - 1:
@@ -241,7 +241,7 @@ func _set_context_path(context: Dictionary, path: String, value):
 
 ## Read a value from context at a dot-separated path. Resolves _ref wrappers
 ## transparently. Returns null and warns if the path does not exist.
-func _get_context_path(context: Dictionary, path: String) -> Variant:
+func get_context_path(context: Dictionary, path: String) -> Variant:
 	var keys = path.split(".")
 	var current: Variant = context
 	for k in keys:
@@ -254,6 +254,19 @@ func _get_context_path(context: Dictionary, path: String) -> Variant:
 	if current is Dictionary and current.has("_ref"):
 		current = evaluate(current["_ref"])
 	return current
+
+
+## Remove a key from context at a dot-separated path. No-op if path doesn't exist.
+func erase_context_path(context: Dictionary, path: String):
+	var keys = path.split(".")
+	var current: Variant = context
+	for i in keys.size() - 1:
+		var k = keys[i]
+		if not current is Dictionary or not current.has(k):
+			return
+		current = current[k]
+	if current is Dictionary:
+		current.erase(keys[keys.size() - 1])
 
 
 ## Notify all plugins that a new game has started so they can initialize context.

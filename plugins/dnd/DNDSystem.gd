@@ -89,31 +89,25 @@ func get_condition_params(cond_name: String) -> Array[Dictionary]:
 
 func handle_action(action_name: String, data: Dictionary, context):
 	if action_name == "take_damage":
-		var dmg = data.get("amount", 1)
-		var character = context.get("character", {})
-		character["hp"] = character.get("hp", 10) - dmg
-		context["character"] = character
+		var character = context.get("character")
+		if character == null:
+			return
+		var dmg = data.get("amount", 0)
+		character["hp"] -= dmg
 		data["damage_taken"] = dmg
-		print("Player takes", dmg, "damage. HP:", character["hp"])
+		print("[DND] Player takes ", dmg, " damage. HP: ", character["hp"])
+
 	elif action_name == "equip_item":
-		var item = data.get("item", {})
+		var item = data.get("item")
 		var slot: String = data.get("slot", "")
 		if not item is Dictionary or slot == "":
-			push_warning("[DND] equip_item: invalid item or missing slot")
 			return
-		# Store as reference if the original was an entry ref
+		var character = context.get("character")
+		if character == null:
+			return
 		var raw_refs = data.get("_raw_refs", {})
-		var stored_value
-		if raw_refs.has("item"):
-			stored_value = ModAPI.make_ref(raw_refs["item"])
-		else:
-			stored_value = item
-		# Equip to slot
-		if not context.has("character"):
-			context["character"] = {"hp": 10, "max_hp": 10, "equipment": {"weapon": {}, "armor": {}}}
-		var equipment = context["character"].get("equipment", {})
-		equipment[slot] = stored_value
-		context["character"]["equipment"] = equipment
+		var stored_value = ModAPI.make_ref(raw_refs["item"]) if raw_refs.has("item") else item
+		character["equipment"][slot] = stored_value
 		print("[DND] Equipped ", item.get("name", "unknown"), " to ", slot)
 
 func check_condition(cond_name: String, data: Dictionary, context) -> bool:
