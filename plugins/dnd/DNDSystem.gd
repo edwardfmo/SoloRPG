@@ -76,7 +76,7 @@ func get_action_params(action_name: String) -> Array[Dictionary]:
 	if action_name == "equip_item":
 		return [
 			{"name": "item", "mandatory": true, "direction": "input"},
-			{"name": "slot", "mandatory": true, "direction": "input"},
+			{"name": "slot", "mandatory": true, "direction": "input", "enum": ["weapon", "armor"]},
 		]
 	return []
 

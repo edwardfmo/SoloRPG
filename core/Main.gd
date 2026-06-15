@@ -2,7 +2,7 @@ extends Control
 
 @export var main_menu: Control
 @export var game_view: Control
-@export var node_editor: Control
+@export var content_editor: Control
 @export var module_select: Control
 @export var plugin_list: Control
 
@@ -35,18 +35,18 @@ func _ready():
 	api.restore_state_callback = _restore_state
 
 	# Pass plugin hints to the editor and game view
-	node_editor.set_api(api)
+	content_editor.set_api(api)
 	game_view.set_api(api)
 
 	# Connect UI
 	main_menu.new_game_pressed.connect(_show_module_select)
 	main_menu.continue_pressed.connect(_continue_game)
 	main_menu.load_game_pressed.connect(_load_game)
-	main_menu.node_editor_pressed.connect(_show_node_editor)
+	main_menu.content_editor_pressed.connect(_show_content_editor)
 	main_menu.plugins_pressed.connect(_show_plugin_list)
 	main_menu.exit_pressed.connect(func(): get_tree().quit())
 
-	node_editor.close_pressed.connect(_show_menu)
+	content_editor.close_pressed.connect(_show_menu)
 
 	module_select.module_selected.connect(_on_module_selected)
 	module_select.back_pressed.connect(_show_menu)
@@ -85,7 +85,7 @@ func _reload_plugins():
 			api.register_plugin(entry["id"], entry["plugin"], meta)
 	# Load compendiums after plugins (they depend on plugin templates)
 	_load_compendiums()
-	node_editor.set_api(api)
+	content_editor.set_api(api)
 	game_view.set_api(api)
 	module_select.api = api
 
@@ -104,17 +104,17 @@ func _load_compendiums():
 func _show_menu():
 	main_menu.visible = true
 	game_view.visible = false
-	node_editor.visible = false
+	content_editor.visible = false
 	module_select.visible = false
 	plugin_list.visible = false
 	# Restore plugins to global config state
 	_reload_plugins()
 
 
-func _show_node_editor():
+func _show_content_editor():
 	main_menu.visible = false
 	game_view.visible = false
-	node_editor.visible = true
+	content_editor.visible = true
 	module_select.visible = false
 	plugin_list.visible = false
 
@@ -122,7 +122,7 @@ func _show_node_editor():
 func _show_module_select():
 	main_menu.visible = false
 	game_view.visible = false
-	node_editor.visible = false
+	content_editor.visible = false
 	module_select.visible = true
 	plugin_list.visible = false
 
@@ -130,7 +130,7 @@ func _show_module_select():
 func _show_plugin_list():
 	main_menu.visible = false
 	game_view.visible = false
-	node_editor.visible = false
+	content_editor.visible = false
 	module_select.visible = false
 	plugin_list.visible = true
 
@@ -207,7 +207,7 @@ func _check_module_dependencies(data: Dictionary) -> Dictionary:
 func _start_game(path: String, optional_ids: Array[String] = []):
 	main_menu.visible = false
 	game_view.visible = true
-	node_editor.visible = false
+	content_editor.visible = false
 	module_select.visible = false
 	plugin_list.visible = false
 
@@ -368,7 +368,7 @@ func _apply_load(path: String, data: Dictionary, save_data: Dictionary):
 
 	main_menu.visible = false
 	game_view.visible = true
-	node_editor.visible = false
+	content_editor.visible = false
 	module_select.visible = false
 	plugin_list.visible = false
 

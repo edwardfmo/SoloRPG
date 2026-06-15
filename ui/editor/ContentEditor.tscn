@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://ckpcq3mpgmibx"]
+
+[ext_resource type="Script" uid="uid://0tu2iykcdok2" path="res://ui/editor/ContentEditor.gd" id="1_et"]
+[ext_resource type="PackedScene" uid="uid://lrdis40rf1hj" path="res://ui/editor/NodeEditor.tscn" id="2_ne"]
+[ext_resource type="Script" uid="uid://djs5n74pab65s" path="res://ui/editor/CompendiumEditor.gd" id="3_ce"]
+
+[node name="ContentEditor" type="Control" unique_id=2040792308 node_paths=PackedStringArray("tab_container", "node_editor", "compendium_editor")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_et")
+tab_container = NodePath("TabContainer")
+node_editor = NodePath("TabContainer/Module")
+compendium_editor = NodePath("TabContainer/Compendium")
+
+[node name="TabContainer" type="TabContainer" parent="." unique_id=2146958389]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+current_tab = 0
+
+[node name="Module" parent="TabContainer" unique_id=269471506 instance=ExtResource("2_ne")]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Compendium" type="HSplitContainer" parent="TabContainer" unique_id=1717431911]
+visible = false
+layout_mode = 2
+script = ExtResource("3_ce")
+metadata/_tab_index = 1
+
+[node name="CloseEditorButton" type="Button" parent="." unique_id=863691715]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -50.0
+offset_bottom = 31.0
+grow_horizontal = 0
+size_flags_horizontal = 3
+text = "Close"
+
+[connection signal="pressed" from="CloseEditorButton" to="." method="_on_close_pressed"]

@@ -1,25 +1,91 @@
 {
-	"id": "srd_equipment",
-	"name": "SRD Equipment",
-	"version": "1.0.0",
 	"author": "Community",
 	"dependencies": [
-		{"id": "dnd", "version": "1.0.0"}
+		{
+			"id": "dnd",
+			"version": "1.0.0"
+		}
 	],
 	"entries": {
 		"item": [
-			{"id": "longsword", "name": "Longsword", "weight": 3.0, "damage": "/r1d8", "tags": ["versatile"]},
-			{"id": "greataxe", "name": "Greataxe", "weight": 7.0, "damage": "/r1d12", "tags": ["heavy", "two-handed"]},
-			{"id": "handaxe", "name": "Handaxe", "weight": 2.0, "damage": "/r1d6", "tags": ["light", "thrown"]},
-			{"id": "shield", "name": "Shield", "weight": 6.0, "tags": ["armor"]},
-			{"id": "longbow", "name": "Longbow", "weight": 2.0, "damage": "/r1d8", "tags": ["heavy", "two-handed", "ranged"]}
+			{
+				"damage": "/r1d8",
+				"id": "longsword",
+				"name": "Longsword",
+				"tags": [
+					"versatile"
+				],
+				"weight": 3.0
+			},
+			{
+				"damage": "/r1d12",
+				"id": "greataxe",
+				"name": "Greataxe",
+				"tags": [
+					"heavy",
+					"two-handed"
+				],
+				"weight": 7.0
+			},
+			{
+				"damage": "/r1d6",
+				"id": "handaxe",
+				"name": "Handaxe",
+				"tags": [
+					"light",
+					"thrown"
+				],
+				"weight": 2.0
+			},
+			{
+				"id": "shield",
+				"name": "Shield",
+				"tags": [
+					"armor"
+				],
+				"weight": 6.0
+			},
+			{
+				"damage": "/r1d8",
+				"id": "longbow",
+				"name": "Longbow",
+				"tags": [
+					"heavy",
+					"two-handed",
+					"ranged"
+				],
+				"weight": 2.0
+			}
 		],
 		"skill": [
-			{"id": "arcana", "name": "Arcana", "ability": "int"},
-			{"id": "history", "name": "History", "ability": "int"},
-			{"id": "nature", "name": "Nature", "ability": "int"},
-			{"id": "religion", "name": "Religion", "ability": "int"},
-			{"id": "stealth", "name": "Stealth", "ability": "dex"}
+			{
+				"ability": "int",
+				"id": "arcana",
+				"name": "Arcana"
+			},
+			{
+				"ability": "int",
+				"id": "history",
+				"name": "History"
+			},
+			{
+				"ability": "int",
+				"id": "nature",
+				"name": "Nature"
+			},
+			{
+				"ability": "int",
+				"id": "religion",
+				"name": "Religion"
+			},
+			{
+				"ability": "dex",
+				"id": "stealth",
+				"name": "Stealth"
+			}
 		]
-	}
+	},
+	"id": "srd_equipment",
+	"name": "SRD Equipment",
+	"version": "1.0.0"
 }

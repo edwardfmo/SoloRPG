@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d0oatn5pkkbt7" path="res://ui/menus/MainMenu.gd" id="1_yqorp"]
 
-[node name="MainMenu" type="Control" unique_id=1600743337 node_paths=PackedStringArray("new_game_button", "continue_button", "load_game_button", "node_editor_button", "plugins_button", "exit_button")]
+[node name="MainMenu" type="Control" unique_id=1600743337 node_paths=PackedStringArray("new_game_button", "continue_button", "load_game_button", "content_editor_button", "plugins_button", "exit_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,7 +15,7 @@ script = ExtResource("1_yqorp")
 new_game_button = NodePath("CenterContainer/VBoxContainer/NewGame")
 continue_button = NodePath("CenterContainer/VBoxContainer/Continue")
 load_game_button = NodePath("CenterContainer/VBoxContainer/LoadGame")
-node_editor_button = NodePath("CenterContainer/VBoxContainer/ModuleEditor")
+content_editor_button = NodePath("CenterContainer/VBoxContainer/ContentEditor")
 plugins_button = NodePath("CenterContainer/VBoxContainer/Plugins")
 exit_button = NodePath("CenterContainer/VBoxContainer/Exit")
 
@@ -51,9 +51,9 @@ text = "Continue"
 layout_mode = 2
 text = "Load Game"
 
-[node name="ModuleEditor" type="Button" parent="CenterContainer/VBoxContainer" unique_id=311297330]
+[node name="ContentEditor" type="Button" parent="CenterContainer/VBoxContainer" unique_id=311297330]
 layout_mode = 2
-text = "Module Editor"
+text = "Content Editor"
 
 [node name="Plugins" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1122193966]
 layout_mode = 2

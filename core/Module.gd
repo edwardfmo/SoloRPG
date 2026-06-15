@@ -77,8 +77,25 @@ func _execute_action(action: Dictionary, context):
 
 
 func are_conditions_met(conditions: Array, context) -> bool:
+	# Group conditions into OR-clauses using "or_above" field.
+	# Each group is OR-ed internally, groups are AND-ed together.
+	var groups: Array[Array] = []
 	for cond in conditions:
-		if not _check_condition(cond, context):
+		if cond.get("or_above", false) and not groups.is_empty():
+			groups[groups.size() - 1].append(cond)
+		else:
+			groups.append([cond])
+
+	for group in groups:
+		var group_passed := false
+		for cond in group:
+			var result = _check_condition(cond, context)
+			if cond.get("negate", false):
+				result = not result
+			if result:
+				group_passed = true
+				break
+		if not group_passed:
 			return false
 	return true
 

@@ -27,7 +27,7 @@ func _init():
 
 ## Checks module nodes against available plugins and shows the result.
 ## Returns true if there are issues, false if everything is clean (auto-saves).
-func check_and_show(module_nodes: Array, api: ModAPI) -> bool:
+func check_and_show(module_nodes: Array, api: ModAPI, module_id: String = "", module_entries: Dictionary = {}) -> bool:
 	var provider_map = api.get_provider_map()
 	var all_actions = api.get_all_actions()
 	var all_conditions = api.get_all_conditions()
@@ -180,8 +180,24 @@ func check_and_show(module_nodes: Array, api: ModAPI) -> bool:
 			# Skip plugin-seeded entries
 			if loaded_plugins.has(comp_id):
 				continue
+			var is_module_local = (comp_id == module_id and module_id != "")
 			if not comp_groups.has(comp_id):
-				comp_groups[comp_id] = {"entries_ok": [], "entries_warn": [], "installed": installed_comps.has(comp_id)}
+				comp_groups[comp_id] = {"entries_ok": [], "entries_warn": [], "installed": installed_comps.has(comp_id) or is_module_local, "is_module_local": is_module_local}
+			# Module-local entries: check against module's own entries (yellow if missing, never red)
+			if is_module_local:
+				var found_in_module = false
+				for tmpl_id in module_entries:
+					for e in module_entries[tmpl_id]:
+						if e.get("id", "") == entry_id:
+							found_in_module = true
+							break
+					if found_in_module:
+						break
+				if found_in_module:
+					comp_groups[comp_id]["entries_ok"].append(entry_id)
+				else:
+					comp_groups[comp_id]["entries_warn"].append(entry_id)
+				continue
 			# Check if entry exists in the registry
 			var full_id = comp_id + "." + entry_id
 			var found = false
@@ -214,22 +230,30 @@ func check_and_show(module_nodes: Array, api: ModAPI) -> bool:
 		for comp_id in sorted_comps:
 			var info = comp_groups[comp_id]
 			var is_installed = info["installed"]
+			var is_module_local = info.get("is_module_local", false)
 
 			if is_installed:
-				var version = installed_comps[comp_id].get("version", "")
+				var version = ""
+				if not is_module_local and installed_comps.has(comp_id):
+					version = installed_comps[comp_id].get("version", "")
 				var has_warn = info["entries_warn"].size() > 0
 				if has_warn:
 					text += "[color=yellow]⚠[/color] [b]" + comp_id + "[/b]"
-					if version != "":
+					if is_module_local:
+						text += " [color=yellow](module-local)[/color]"
+					elif version != "":
 						text += " [color=yellow]v" + version + "[/color]"
 					text += "\n"
 					has_issues = true
 				else:
 					text += "[color=green]✓[/color] [b]" + comp_id + "[/b]"
-					if version != "":
+					if is_module_local:
+						text += " [color=green](module-local)[/color]"
+					elif version != "":
 						text += " [color=green]v" + version + "[/color]"
 					text += "\n"
 			else:
+				# Never show module-local as red/missing
 				text += "[color=red]✗[/color] [b]" + comp_id + "[/b] [color=red](missing)[/color]\n"
 				has_issues = true
 

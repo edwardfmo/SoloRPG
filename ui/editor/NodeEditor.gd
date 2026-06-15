@@ -1,7 +1,5 @@
 extends Control
 
-signal close_pressed
-
 @export var graph: GraphEdit
 @export var module_id_edit: LineEdit
 @export var module_name_edit: LineEdit
@@ -26,6 +24,8 @@ var frames = []          # GraphFrame instances
 var _api: ModAPI = null
 var _dep_dialog: AcceptDialog = null
 var _pending_save_path: String = ""
+var _module_entries: Dictionary = {}  # template_id → [entry dicts]
+var _module_active: bool = false
 
 func set_api(api: ModAPI):
 	_api = api
@@ -33,23 +33,37 @@ func set_api(api: ModAPI):
 	node_inspector.available_conditions = api.get_all_conditions()
 	node_inspector.api = api
 
+
+func get_module_entries() -> Dictionary:
+	return _module_entries
+
+
+func get_module_id() -> String:
+	if module_id_edit.text != "":
+		return module_id_edit.text
+	return "editor_module"
+
+
+func is_module_loaded() -> bool:
+	return _module_active
+
 func _ready() -> void:
 	graph.connection_request.connect(_on_connection_request)
 	graph.disconnection_request.connect(_on_disconnection_request)
 	graph.delete_nodes_request.connect(_on_delete_nodes_request)
 	node_inspector.visible = false
-	visibility_changed.connect(_on_visibility_changed)
 
 
-func _on_visibility_changed():
-	if visible:
-		_clear_editor()
-		module_id_edit.text = ""
-		module_name_edit.text = ""
-		module_version_edit.text = ""
-		module_author_edit.text = ""
-		_last_export_path = ""
-		_set_module_controls_enabled(false)
+func reset():
+	_clear_editor()
+	module_id_edit.text = ""
+	module_name_edit.text = ""
+	module_version_edit.text = ""
+	module_author_edit.text = ""
+	_last_export_path = ""
+	_module_entries = {}
+	_module_active = false
+	_set_module_controls_enabled(false)
 
 
 func _set_module_controls_enabled(enabled: bool):
@@ -254,6 +268,9 @@ func export_module(path: String):
 		"nodes": {}
 	}
 
+	if not _module_entries.is_empty():
+		module["entries"] = _module_entries
+
 	for n in nodes:
 		module["nodes"][n.data["id"]] = n.data
 
@@ -357,9 +374,12 @@ func _scan_entry_refs(data: Dictionary, out_compendiums: Dictionary):
 		if val is String and val.begins_with("@"):
 			var parsed = ModAPI.parse_entry_ref(val)
 			var namespace_id = parsed["namespace"]
-			# Only add if it's actually a compendium (not a plugin seed)
-			if not _api.plugins.has(namespace_id):
-				out_compendiums[namespace_id] = true
+			# Skip plugin-seeded and module-local entries
+			if _api.plugins.has(namespace_id):
+				continue
+			if namespace_id == module_id_edit.text:
+				continue
+			out_compendiums[namespace_id] = true
 
 func _on_save_pressed():
 	if _last_export_path != "":
@@ -404,7 +424,7 @@ func _check_dependencies() -> bool:
 	add_child(dialog)
 	_dep_dialog = dialog
 
-	var has_issues = dialog.check_and_show(module_nodes, _api)
+	var has_issues = dialog.check_and_show(module_nodes, _api, module_id_edit.text, _module_entries)
 	if not has_issues:
 		_dep_dialog.queue_free()
 		_dep_dialog = null
@@ -430,9 +450,6 @@ func _on_dep_cancelled():
 		_dep_dialog.queue_free()
 		_dep_dialog = null
 
-func _on_close_pressed():
-	close_pressed.emit()
-
 func _on_new_pressed():
 	_clear_editor()
 	module_id_edit.text = ""
@@ -440,6 +457,8 @@ func _on_new_pressed():
 	module_version_edit.text = ""
 	module_author_edit.text = ""
 	_last_export_path = ""
+	_module_entries = {}
+	_module_active = true
 	_set_module_controls_enabled(true)
 	_create_start_node()
 
@@ -458,6 +477,7 @@ func load_module(path: String):
 
 	# Clear existing state
 	_clear_editor()
+	_module_active = true
 	_set_module_controls_enabled(true)
 
 	# Set module ID
@@ -466,6 +486,7 @@ func load_module(path: String):
 	module_version_edit.text = data.get("version", "")
 	module_author_edit.text = data.get("author", "")
 	_last_export_path = path
+	_module_entries = data.get("entries", {})
 
 	# Create nodes
 	var node_data_map = data.get("nodes", {})

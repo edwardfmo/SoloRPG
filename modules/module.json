@@ -6,6 +6,10 @@
 			"version": "1.0.0"
 		},
 		{
+			"id": "system",
+			"version": "1.0.0"
+		},
+		{
 			"id": "srd_equipment",
 			"type": "compendium",
 			"version": "1.0.0"
@@ -91,6 +95,14 @@
 						{
 							"type": "dnd.hp_above",
 							"value": 8.0
+						},
+						{
+							"negate": true,
+							"op": "=",
+							"or_above": true,
+							"path": "blabla",
+							"type": "system.check",
+							"value": 12.0
 						}
 					],
 					"id": "c1",

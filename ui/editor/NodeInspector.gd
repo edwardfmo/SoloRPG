@@ -210,6 +210,7 @@ func rebuild_choices_list(expand_idx: int = -1):
 		details.add_child(cond_label)
 
 		var cond_editor = ActionListEditor.new()
+		cond_editor.is_condition_editor = true
 		cond_editor.available_types = available_conditions
 		if api:
 			cond_editor.param_provider = api.get_params_for_type

@@ -18,6 +18,9 @@ var param_provider: Callable
 ## Shown when the user types "@" in a value field.
 var entry_hints: Array[String] = []
 
+## When true, shows OR/NOT toggles for condition-specific fields.
+var is_condition_editor: bool = false
+
 var _actions: Array = []
 var _container: VBoxContainer
 
@@ -59,8 +62,35 @@ func rebuild():
 
 		var action_box = VBoxContainer.new()
 
+		# Condition mode: OR toggle between rows
+		if is_condition_editor and ai > 0:
+			var or_btn = CheckButton.new()
+			or_btn.text = "OR with above"
+			or_btn.button_pressed = action.get("or_above", false)
+			or_btn.toggled.connect(func(pressed):
+				if pressed:
+					_actions[action_idx]["or_above"] = true
+				else:
+					_actions[action_idx].erase("or_above")
+				list_changed.emit())
+			action_box.add_child(or_btn)
+
 		# Type row
 		var type_row = HBoxContainer.new()
+
+		# Condition mode: NOT toggle
+		if is_condition_editor:
+			var not_btn = CheckButton.new()
+			not_btn.text = "NOT"
+			not_btn.button_pressed = action.get("negate", false)
+			not_btn.toggled.connect(func(pressed):
+				if pressed:
+					_actions[action_idx]["negate"] = true
+				else:
+					_actions[action_idx].erase("negate")
+				list_changed.emit())
+			type_row.add_child(not_btn)
+
 		var type_field = HintedLineEdit.new()
 		type_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		type_field.text = action.get("type", "")
@@ -94,9 +124,12 @@ func rebuild():
 		var mandatory_keys = _get_mandatory_keys(action.get("type", ""))
 		var optional_hints = _get_optional_keys(action.get("type", ""))
 		var param_directions = _get_param_directions(action.get("type", ""))
+		var param_enums = _get_param_enums(action.get("type", ""))
 		var params_container = VBoxContainer.new()
 		for key in action:
 			if key == "type":
+				continue
+			if key == "or_above" or key == "negate":
 				continue
 			var is_mandatory = mandatory_keys.has(key)
 			var param_row = HBoxContainer.new()
@@ -143,22 +176,38 @@ func rebuild():
 				key_field.focus_exited.connect(_commit_key_rename)
 				key_field.hint_selected.connect(func(_t): _commit_key_rename.call())
 				param_row.add_child(key_field)
-			var val_field = HintedLineEdit.new()
-			val_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			val_field.text = str(action[key])
-			val_field.placeholder_text = "value"
-			val_field.hints = entry_hints
-			val_field.hint_prefix = "@"
-			val_field.text_changed.connect(func(new_val):
-				if new_val.is_valid_float():
-					_actions[action_idx][original_key] = new_val.to_float()
-				else:
+			# Value field: enum dropdown or text input
+			if param_enums.has(original_key):
+				var enum_btn = OptionButton.new()
+				enum_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				var enum_values = param_enums[original_key]
+				for ev in enum_values:
+					enum_btn.add_item(ev)
+				var current_val = str(action[key])
+				var idx = enum_values.find(current_val)
+				if idx >= 0:
+					enum_btn.selected = idx
+				enum_btn.item_selected.connect(func(sel_idx):
+					_actions[action_idx][original_key] = enum_values[sel_idx]
+					list_changed.emit())
+				param_row.add_child(enum_btn)
+			else:
+				var val_field = HintedLineEdit.new()
+				val_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				val_field.text = str(action[key])
+				val_field.placeholder_text = "value"
+				val_field.hints = entry_hints
+				val_field.hint_prefix = "@"
+				val_field.text_changed.connect(func(new_val):
+					if new_val.is_valid_float():
+						_actions[action_idx][original_key] = new_val.to_float()
+					else:
+						_actions[action_idx][original_key] = new_val
+					list_changed.emit())
+				val_field.hint_selected.connect(func(new_val):
 					_actions[action_idx][original_key] = new_val
-				list_changed.emit())
-			val_field.hint_selected.connect(func(new_val):
-				_actions[action_idx][original_key] = new_val
-				list_changed.emit())
-			param_row.add_child(val_field)
+					list_changed.emit())
+				param_row.add_child(val_field)
 			if is_mandatory:
 				# Spacer to keep alignment but no delete button
 				var spacer = Control.new()
@@ -224,6 +273,17 @@ func _get_param_directions(type: String) -> Dictionary:
 	var params = param_provider.call(type)
 	for p in params:
 		result[p["name"]] = p.get("direction", "input")
+	return result
+
+
+func _get_param_enums(type: String) -> Dictionary:
+	var result: Dictionary = {}
+	if not param_provider.is_valid() or type == "":
+		return result
+	var params = param_provider.call(type)
+	for p in params:
+		if p.has("enum"):
+			result[p["name"]] = p["enum"]
 	return result
 
 
