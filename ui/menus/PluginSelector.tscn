@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://d0itde05ia6em"]
+
+[ext_resource type="Script" uid="uid://covdf4boyd7cd" path="res://ui/menus/PluginSelector.gd" id="1_ps"]
+
+[node name="PluginSelector" type="Control" unique_id=352951775 node_paths=PackedStringArray("_plugin_list", "_title_label")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ps")
+_plugin_list = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ScrollContainer/PluginList")
+_title_label = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TitleLabel")
+
+[node name="Overlay" type="ColorRect" parent="." unique_id=427138311]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1198895353]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=96625533]
+custom_minimum_size = Vector2(500, 400)
+layout_mode = 2
+theme_type_variation = &"Frame"
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=2013708076]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=1837917619]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1733382741]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Select Optional Plugins"
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1169711430]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1950310873]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PluginList" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ScrollContainer" unique_id=2099296175]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ButtonBar" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1267422808]
+layout_mode = 2
+alignment = 2
+
+[node name="CancelButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonBar" unique_id=1438186257]
+layout_mode = 2
+text = "Cancel"
+
+[node name="StartButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonBar" unique_id=1792836790]
+layout_mode = 2
+text = "Start"
+
+[connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonBar/CancelButton" to="." method="_on_cancel"]
+[connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonBar/StartButton" to="." method="_on_confirmed"]

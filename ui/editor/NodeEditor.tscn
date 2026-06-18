@@ -12,13 +12,13 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_x53ir")
 graph = NodePath("HBoxContainer/GraphEdit")
-module_id_edit = NodePath("HBoxContainer/Panel/VBoxContainer/ModuleIDContainer/ModuleIDEdit")
-module_name_edit = NodePath("HBoxContainer/Panel/VBoxContainer/ModuleNameContainer/ModuleNameEdit")
-module_version_edit = NodePath("HBoxContainer/Panel/VBoxContainer/ModuleVersionContainer/ModuleVersionEdit")
-module_author_edit = NodePath("HBoxContainer/Panel/VBoxContainer/ModuleAuthorContainer/ModuleAuthorEdit")
-node_inspector = NodePath("HBoxContainer/Panel/VBoxContainer/NodeInspector")
-save_button = NodePath("HBoxContainer/Panel/VBoxContainer/ButtonBar/SaveModuleButton")
-save_as_button = NodePath("HBoxContainer/Panel/VBoxContainer/ButtonBar/SaveAsButton")
+module_id_edit = NodePath("HBoxContainer/Panel/MarginContainer/VBoxContainer/ModuleIDContainer/ModuleIDEdit")
+module_name_edit = NodePath("HBoxContainer/Panel/MarginContainer/VBoxContainer/ModuleNameContainer/ModuleNameEdit")
+module_version_edit = NodePath("HBoxContainer/Panel/MarginContainer/VBoxContainer/ModuleVersionContainer/ModuleVersionEdit")
+module_author_edit = NodePath("HBoxContainer/Panel/MarginContainer/VBoxContainer/ModuleAuthorContainer/ModuleAuthorEdit")
+node_inspector = NodePath("HBoxContainer/Panel/MarginContainer/VBoxContainer/NodeInspector")
+save_button = NodePath("HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/SaveModuleButton")
+save_as_button = NodePath("HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/SaveAsButton")
 save_file_dialog = NodePath("SaveFileDialog")
 open_file_dialog = NodePath("OpenFileDialog")
 
@@ -39,98 +39,105 @@ right_disconnects = true
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Panel" unique_id=1360885557]
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/Panel" unique_id=269293694]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
 
-[node name="ButtonBar" type="HBoxContainer" parent="HBoxContainer/Panel/VBoxContainer" unique_id=1073806748]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Panel/MarginContainer" unique_id=1360885557]
 layout_mode = 2
 
-[node name="NewButton" type="Button" parent="HBoxContainer/Panel/VBoxContainer/ButtonBar" unique_id=1770487408]
+[node name="ButtonBar" type="HBoxContainer" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer" unique_id=1073806748]
+layout_mode = 2
+
+[node name="NewButton" type="Button" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar" unique_id=1770487408]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "New"
 
-[node name="OpenButton" type="Button" parent="HBoxContainer/Panel/VBoxContainer/ButtonBar" unique_id=1729525929]
+[node name="OpenButton" type="Button" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar" unique_id=1729525929]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Open"
 
-[node name="SaveModuleButton" type="Button" parent="HBoxContainer/Panel/VBoxContainer/ButtonBar" unique_id=1068253700]
+[node name="SaveModuleButton" type="Button" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar" unique_id=1068253700]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Export"
 
-[node name="SaveAsButton" type="Button" parent="HBoxContainer/Panel/VBoxContainer/ButtonBar" unique_id=1486733745]
+[node name="SaveAsButton" type="Button" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar" unique_id=1486733745]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Export As"
 
-[node name="ModuleIDContainer" type="HBoxContainer" parent="HBoxContainer/Panel/VBoxContainer" unique_id=1996179878]
+[node name="ModuleIDContainer" type="HBoxContainer" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer" unique_id=1996179878]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/Panel/VBoxContainer/ModuleIDContainer" unique_id=416277103]
+[node name="Label" type="Label" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer/ModuleIDContainer" unique_id=416277103]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Module ID"
 
-[node name="ModuleIDEdit" type="LineEdit" parent="HBoxContainer/Panel/VBoxContainer/ModuleIDContainer" unique_id=1919825063]
+[node name="ModuleIDEdit" type="LineEdit" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer/ModuleIDContainer" unique_id=1919825063]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Module ID"
 
-[node name="ModuleNameContainer" type="HBoxContainer" parent="HBoxContainer/Panel/VBoxContainer" unique_id=1089670214]
+[node name="ModuleNameContainer" type="HBoxContainer" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer" unique_id=1089670214]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/Panel/VBoxContainer/ModuleNameContainer" unique_id=312062493]
+[node name="Label" type="Label" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer/ModuleNameContainer" unique_id=312062493]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Display Name"
 
-[node name="ModuleNameEdit" type="LineEdit" parent="HBoxContainer/Panel/VBoxContainer/ModuleNameContainer" unique_id=952747359]
+[node name="ModuleNameEdit" type="LineEdit" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer/ModuleNameContainer" unique_id=952747359]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Module Display Name"
 
-[node name="ModuleVersionContainer" type="HBoxContainer" parent="HBoxContainer/Panel/VBoxContainer" unique_id=268761611]
+[node name="ModuleVersionContainer" type="HBoxContainer" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer" unique_id=268761611]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/Panel/VBoxContainer/ModuleVersionContainer" unique_id=1485427026]
+[node name="Label" type="Label" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer/ModuleVersionContainer" unique_id=1485427026]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Version"
 
-[node name="ModuleVersionEdit" type="LineEdit" parent="HBoxContainer/Panel/VBoxContainer/ModuleVersionContainer" unique_id=1930142004]
+[node name="ModuleVersionEdit" type="LineEdit" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer/ModuleVersionContainer" unique_id=1930142004]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "e.g. 1.0.0"
 
-[node name="ModuleAuthorContainer" type="HBoxContainer" parent="HBoxContainer/Panel/VBoxContainer" unique_id=1505292141]
+[node name="ModuleAuthorContainer" type="HBoxContainer" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer" unique_id=1505292141]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/Panel/VBoxContainer/ModuleAuthorContainer" unique_id=1580914506]
+[node name="Label" type="Label" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer/ModuleAuthorContainer" unique_id=1580914506]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Author"
 
-[node name="ModuleAuthorEdit" type="LineEdit" parent="HBoxContainer/Panel/VBoxContainer/ModuleAuthorContainer" unique_id=338147871]
+[node name="ModuleAuthorEdit" type="LineEdit" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer/ModuleAuthorContainer" unique_id=338147871]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Author name"
 
-[node name="HSeparator" type="HSeparator" parent="HBoxContainer/Panel/VBoxContainer" unique_id=1695174402]
+[node name="HSeparator" type="HSeparator" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer" unique_id=1695174402]
 layout_mode = 2
 
-[node name="Label3" type="Label" parent="HBoxContainer/Panel/VBoxContainer" unique_id=2018286604]
+[node name="Label3" type="Label" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer" unique_id=2018286604]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Selected Node"
 
-[node name="NodeInspector" parent="HBoxContainer/Panel/VBoxContainer" unique_id=1828225823 instance=ExtResource("2_ninsp")]
+[node name="NodeInspector" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer" unique_id=1828225823 instance=ExtResource("2_ninsp")]
 
 [node name="SaveFileDialog" type="FileDialog" parent="." unique_id=1032222101]
 title = "Save Module"
@@ -143,9 +150,9 @@ size = Vector2i(600, 400)
 file_mode = 0
 filters = PackedStringArray("*.json ; JSON Files")
 
-[connection signal="pressed" from="HBoxContainer/Panel/VBoxContainer/ButtonBar/NewButton" to="." method="_on_new_pressed"]
-[connection signal="pressed" from="HBoxContainer/Panel/VBoxContainer/ButtonBar/OpenButton" to="." method="_on_open_pressed"]
-[connection signal="pressed" from="HBoxContainer/Panel/VBoxContainer/ButtonBar/SaveModuleButton" to="." method="_on_save_pressed"]
-[connection signal="pressed" from="HBoxContainer/Panel/VBoxContainer/ButtonBar/SaveAsButton" to="." method="_on_save_as_pressed"]
+[connection signal="pressed" from="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/NewButton" to="." method="_on_new_pressed"]
+[connection signal="pressed" from="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/OpenButton" to="." method="_on_open_pressed"]
+[connection signal="pressed" from="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/SaveModuleButton" to="." method="_on_save_pressed"]
+[connection signal="pressed" from="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/SaveAsButton" to="." method="_on_save_as_pressed"]
 [connection signal="file_selected" from="SaveFileDialog" to="." method="_on_file_selected"]
 [connection signal="file_selected" from="OpenFileDialog" to="." method="_on_open_file_selected"]

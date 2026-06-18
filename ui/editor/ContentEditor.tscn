@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://0tu2iykcdok2" path="res://ui/editor/ContentEditor.gd" id="1_et"]
 [ext_resource type="PackedScene" uid="uid://lrdis40rf1hj" path="res://ui/editor/NodeEditor.tscn" id="2_ne"]
-[ext_resource type="Script" uid="uid://djs5n74pab65s" path="res://ui/editor/CompendiumEditor.gd" id="3_ce"]
+[ext_resource type="PackedScene" path="res://ui/editor/CompendiumEditor.tscn" id="3_ce"]
 
 [node name="ContentEditor" type="Control" unique_id=2040792308 node_paths=PackedStringArray("tab_container", "node_editor", "compendium_editor")]
 layout_mode = 3
@@ -29,10 +29,9 @@ current_tab = 0
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="Compendium" type="HSplitContainer" parent="TabContainer" unique_id=1717431911]
+[node name="Compendium" parent="TabContainer" unique_id=1717431911 instance=ExtResource("3_ce")]
 visible = false
 layout_mode = 2
-script = ExtResource("3_ce")
 metadata/_tab_index = 1
 
 [node name="CloseEditorButton" type="Button" parent="." unique_id=863691715]

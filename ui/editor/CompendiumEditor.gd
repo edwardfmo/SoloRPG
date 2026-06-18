@@ -13,105 +13,26 @@ var _is_editor_mode: bool = true  # true = res://, false = user://
 var _module_id: String = ""
 var _module_entries: Dictionary = {}  # template_id → [entry dicts] from current module
 
-# UI nodes
-var _tree: Tree
-var _new_comp_btn: Button
-var _new_entry_btn: MenuButton
-var _detail_panel: VBoxContainer
-var _detail_scroll: ScrollContainer
-var _entry_fields: VBoxContainer
-var _delete_btn: Button
-var _duplicate_btn: Button
-var _copy_btn: Button
-var _paste_btn: Button
-var _save_btn: Button
+# UI nodes (assigned via scene)
+@export var _tree: Tree
+@export var _new_comp_btn: Button
+@export var _new_entry_btn: MenuButton
+@export var _detail_scroll: ScrollContainer
+@export var _entry_fields: VBoxContainer
+@export var _delete_btn: Button
+@export var _duplicate_btn: Button
+@export var _copy_btn: Button
+@export var _paste_btn: Button
+@export var _save_btn: Button
+@export var _header_label: Label
 var _clipboard: Dictionary = {}  # empty = nothing copied
-var _header_label: Label
 
 
 func _ready():
 	# Determine mode based on whether running from editor
 	_is_editor_mode = OS.has_feature("editor")
 
-	# Left panel
-	var left_panel = VBoxContainer.new()
-	left_panel.custom_minimum_size = Vector2(250, 0)
-
-	_new_comp_btn = Button.new()
-	_new_comp_btn.text = "+ New Compendium"
-	_new_comp_btn.pressed.connect(_on_new_compendium)
-	left_panel.add_child(_new_comp_btn)
-
-	_tree = Tree.new()
-	_tree.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_tree.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_tree.item_selected.connect(_on_tree_item_selected)
-	_tree.hide_root = true
-	left_panel.add_child(_tree)
-
-	add_child(left_panel)
-
-	# Right panel
-	var right_panel = VBoxContainer.new()
-	right_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-
-	# Top bar: new entry + actions
-	var top_bar = HBoxContainer.new()
-	_new_entry_btn = MenuButton.new()
-	_new_entry_btn.text = "+ New Entry"
-	_new_entry_btn.disabled = true
 	_new_entry_btn.get_popup().id_pressed.connect(_on_new_entry_type_selected)
-	top_bar.add_child(_new_entry_btn)
-
-	_duplicate_btn = Button.new()
-	_duplicate_btn.text = "Duplicate"
-	_duplicate_btn.disabled = true
-	_duplicate_btn.pressed.connect(_on_duplicate)
-	top_bar.add_child(_duplicate_btn)
-
-	_copy_btn = Button.new()
-	_copy_btn.text = "Copy"
-	_copy_btn.disabled = true
-	_copy_btn.pressed.connect(_on_copy)
-	top_bar.add_child(_copy_btn)
-
-	_paste_btn = Button.new()
-	_paste_btn.text = "Paste"
-	_paste_btn.disabled = true
-	_paste_btn.pressed.connect(_on_paste)
-	top_bar.add_child(_paste_btn)
-
-	_delete_btn = Button.new()
-	_delete_btn.text = "Delete"
-	_delete_btn.disabled = true
-	_delete_btn.pressed.connect(_on_delete)
-	top_bar.add_child(_delete_btn)
-
-	var save_btn = Button.new()
-	save_btn.text = "Save"
-	save_btn.disabled = true
-	save_btn.pressed.connect(_save_selected)
-	top_bar.add_child(save_btn)
-	_save_btn = save_btn
-
-	right_panel.add_child(top_bar)
-
-	# Header
-	_header_label = Label.new()
-	_header_label.text = "Select an entry"
-	right_panel.add_child(_header_label)
-
-	# Scrollable entry fields
-	_detail_scroll = ScrollContainer.new()
-	_detail_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_detail_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-
-	_entry_fields = VBoxContainer.new()
-	_entry_fields.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_detail_scroll.add_child(_entry_fields)
-	right_panel.add_child(_detail_scroll)
-
-	add_child(right_panel)
 
 
 func set_api(api: ModAPI):

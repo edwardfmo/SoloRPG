@@ -1,28 +1,21 @@
 ## Popup dialog that shows plugin dependencies before saving a module.
 ## Displays required plugins and flags missing ones or unresolved actions/conditions.
-extends AcceptDialog
+extends Control
 
 signal confirmed_save
 signal cancelled_save
 
-var _content: RichTextLabel
+@export var _content: RichTextLabel
+@export var _title_label: Label
+@export var _ok_button: Button
 
 
-func _init():
-	title = "Plugin Dependencies"
-	size = Vector2(500, 400)
-	exclusive = false
-	get_ok_button().text = "Save Anyway"
-	add_cancel_button("Cancel")
+func _on_confirmed():
+	confirmed_save.emit()
 
-	_content = RichTextLabel.new()
-	_content.bbcode_enabled = true
-	_content.custom_minimum_size = Vector2(480, 300)
-	_content.fit_content = true
-	add_child(_content)
 
-	confirmed.connect(func(): confirmed_save.emit())
-	canceled.connect(func(): cancelled_save.emit())
+func _on_cancel():
+	cancelled_save.emit()
 
 
 ## Checks module nodes against available plugins and shows the result.
@@ -274,12 +267,12 @@ func check_and_show(module_nodes: Array, api: ModAPI, module_id: String = "", mo
 
 	if not has_issues:
 		text += "[color=green]All dependencies satisfied.[/color]"
-		get_ok_button().text = "Save"
+		_ok_button.text = "Save"
 	else:
-		get_ok_button().text = "Save Anyway"
+		_ok_button.text = "Save Anyway"
 
 	_content.text = text
-	popup_centered()
+	show()
 	return true
 
 

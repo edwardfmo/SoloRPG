@@ -1,8 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://i86den3ygyrd"]
 
-[ext_resource type="Script" path="res://ui/menus/ModuleSelect.gd" id="1_ms"]
+[ext_resource type="Script" uid="uid://d0s0wxmhxfdf3" path="res://ui/menus/ModuleSelect.gd" id="1_ms"]
 
-[node name="ModuleSelect" type="Control" node_paths=PackedStringArray("module_list", "back_button")]
+[node name="ModuleSelect" type="Control" unique_id=713144270 node_paths=PackedStringArray("module_list", "back_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,10 +10,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ms")
-module_list = NodePath("CenterContainer/VBoxContainer/ScrollContainer/ModuleList")
-back_button = NodePath("CenterContainer/VBoxContainer/BackButton")
+module_list = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ScrollContainer/ModuleList")
+back_button = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/BackButton")
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1634668040]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,30 +21,41 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=118173873]
 layout_mode = 2
-custom_minimum_size = Vector2(400, 0)
+theme_type_variation = &"Frame"
 
-[node name="Title" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=1990913663]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=1064198015]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+
+[node name="Title" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1369298765]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Select Module"
 horizontal_alignment = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=2066174197]
 layout_mode = 2
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/VBoxContainer"]
-layout_mode = 2
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1836898131]
 custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
 
-[node name="ModuleList" type="VBoxContainer" parent="CenterContainer/VBoxContainer/ScrollContainer"]
+[node name="ModuleList" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ScrollContainer" unique_id=321494388]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="BackButton" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="BackButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1903538190]
 layout_mode = 2
 text = "Back"

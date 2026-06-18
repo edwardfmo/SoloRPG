@@ -1,34 +1,17 @@
 ## Popup dialog for selecting optional plugins before starting a game.
 ## Reuses PluginEntry scene for each plugin row.
-extends AcceptDialog
+extends Control
 
 signal confirmed_selection(enabled_ids: Array)
+signal canceled
 
 var PluginEntryScene = preload("res://ui/menus/PluginEntry.tscn")
-var _plugin_list: VBoxContainer
+@export var _plugin_list: VBoxContainer
+@export var _title_label: Label
 var _selections := {}  # plugin_id → bool
 
 
-func _init():
-	title = "Select Optional Plugins"
-	ok_button_text = "Start"
-	min_size = Vector2i(500, 400)
-	exclusive = false
-
-
 func _ready():
-	var scroll = ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(500, 400)
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_plugin_list = VBoxContainer.new()
-	_plugin_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_plugin_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.add_child(_plugin_list)
-	add_child(scroll)
-
-	confirmed.connect(_on_confirmed)
-
 	_refresh_list()
 
 
@@ -71,4 +54,9 @@ func _on_confirmed():
 		if _selections[id]:
 			enabled_ids.append(id)
 	confirmed_selection.emit(enabled_ids)
+	queue_free()
+
+
+func _on_cancel():
+	canceled.emit()
 	queue_free()

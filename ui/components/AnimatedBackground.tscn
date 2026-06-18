@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://c16et65egv758"]
+
+[ext_resource type="Script" uid="uid://c7fsmh0ta427m" path="res://ui/components/AnimatedBackground.gd" id="1_ab"]
+[ext_resource type="Texture2D" uid="uid://cvh3ohbpf0o38" path="res://assets/theme/backgrounds/z1Ht7P.webp" id="2_bg1"]
+[ext_resource type="Texture2D" uid="uid://b2kisxdxnn64g" path="res://assets/theme/backgrounds/122577.jpg" id="3_bg2"]
+
+[node name="AnimatedBackground" type="Control" unique_id=1330554268]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_ab")
+backgrounds = Array[Texture2D]([ExtResource("2_bg1"), ExtResource("3_bg2")])

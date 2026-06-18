@@ -22,7 +22,7 @@ var _last_export_path: String = ""
 var start_node_gn: GraphNode = null
 var frames = []          # GraphFrame instances
 var _api: ModAPI = null
-var _dep_dialog: AcceptDialog = null
+var _dep_dialog: Control = null
 var _pending_save_path: String = ""
 var _module_entries: Dictionary = {}  # template_id → [entry dicts]
 var _module_active: bool = false
@@ -420,7 +420,7 @@ func _check_dependencies() -> bool:
 	if _dep_dialog:
 		_dep_dialog.queue_free()
 
-	var dialog = load("res://ui/editor/DependencyCheckDialog.gd").new()
+	var dialog = load("res://ui/editor/DependencyCheckDialog.tscn").instantiate()
 	add_child(dialog)
 	_dep_dialog = dialog
 

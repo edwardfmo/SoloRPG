@@ -141,7 +141,7 @@ func _continue_game():
 		_load_save_file(last_save)
 
 
-const PluginSelector = preload("res://ui/menus/PluginSelector.gd")
+const PluginSelectorScene = preload("res://ui/menus/PluginSelector.tscn")
 
 func _on_module_selected(path: String):
 	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
@@ -179,12 +179,11 @@ func _on_module_selected(path: String):
 
 
 func _show_plugin_selector(path: String):
-	var selector = PluginSelector.new()
+	var selector = PluginSelectorScene.instantiate()
 	add_child(selector)
 	selector.confirmed_selection.connect(func(enabled_ids):
 		_start_game(path, enabled_ids))
 	selector.canceled.connect(func(): selector.queue_free())
-	selector.popup_centered()
 
 
 func _check_module_dependencies(data: Dictionary) -> Dictionary:

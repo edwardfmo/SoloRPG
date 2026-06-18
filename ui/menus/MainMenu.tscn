@@ -12,12 +12,12 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_yqorp")
-new_game_button = NodePath("CenterContainer/VBoxContainer/NewGame")
-continue_button = NodePath("CenterContainer/VBoxContainer/Continue")
-load_game_button = NodePath("CenterContainer/VBoxContainer/LoadGame")
-content_editor_button = NodePath("CenterContainer/VBoxContainer/ContentEditor")
-plugins_button = NodePath("CenterContainer/VBoxContainer/Plugins")
-exit_button = NodePath("CenterContainer/VBoxContainer/Exit")
+new_game_button = NodePath("CenterContainer/VBoxContainer/VBoxContainer/NewGame")
+continue_button = NodePath("CenterContainer/VBoxContainer/VBoxContainer/Continue")
+load_game_button = NodePath("CenterContainer/VBoxContainer/VBoxContainer/LoadGame")
+content_editor_button = NodePath("CenterContainer/VBoxContainer/VBoxContainer/ContentEditor")
+plugins_button = NodePath("CenterContainer/VBoxContainer/VBoxContainer/Plugins")
+exit_button = NodePath("CenterContainer/VBoxContainer/VBoxContainer/Exit")
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=849504732]
 layout_mode = 1
@@ -39,26 +39,35 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Solo RPG"
 
-[node name="NewGame" type="Button" parent="CenterContainer/VBoxContainer" unique_id=401252196]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1053082428]
 layout_mode = 2
+
+[node name="NewGame" type="Button" parent="CenterContainer/VBoxContainer/VBoxContainer" unique_id=401252196]
+layout_mode = 2
+theme_type_variation = &"MainMenuButton"
 text = "New Game"
 
-[node name="Continue" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1232530236]
+[node name="Continue" type="Button" parent="CenterContainer/VBoxContainer/VBoxContainer" unique_id=1232530236]
 layout_mode = 2
+theme_type_variation = &"MainMenuButton"
 text = "Continue"
 
-[node name="LoadGame" type="Button" parent="CenterContainer/VBoxContainer" unique_id=927382111]
+[node name="LoadGame" type="Button" parent="CenterContainer/VBoxContainer/VBoxContainer" unique_id=927382111]
 layout_mode = 2
+theme_type_variation = &"MainMenuButton"
 text = "Load Game"
 
-[node name="ContentEditor" type="Button" parent="CenterContainer/VBoxContainer" unique_id=311297330]
+[node name="ContentEditor" type="Button" parent="CenterContainer/VBoxContainer/VBoxContainer" unique_id=311297330]
 layout_mode = 2
+theme_type_variation = &"MainMenuButton"
 text = "Content Editor"
 
-[node name="Plugins" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1122193966]
+[node name="Plugins" type="Button" parent="CenterContainer/VBoxContainer/VBoxContainer" unique_id=1122193966]
 layout_mode = 2
+theme_type_variation = &"MainMenuButton"
 text = "Plugins"
 
-[node name="Exit" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1332089248]
+[node name="Exit" type="Button" parent="CenterContainer/VBoxContainer/VBoxContainer" unique_id=1332089248]
 layout_mode = 2
+theme_type_variation = &"MainMenuButton"
 text = "Exit"
