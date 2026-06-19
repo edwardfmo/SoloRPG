@@ -1,5 +1,6 @@
 extends Control
 
+@export var background: Control
 @export var main_menu: Control
 @export var game_view: Control
 @export var content_editor: Control
@@ -103,6 +104,7 @@ func _load_compendiums():
 
 func _show_menu():
 	main_menu.visible = true
+	background.visible = true
 	game_view.visible = false
 	content_editor.visible = false
 	module_select.visible = false
@@ -113,6 +115,7 @@ func _show_menu():
 
 func _show_content_editor():
 	main_menu.visible = false
+	background.visible = false
 	game_view.visible = false
 	content_editor.visible = true
 	module_select.visible = false
@@ -121,6 +124,7 @@ func _show_content_editor():
 
 func _show_module_select():
 	main_menu.visible = false
+	background.visible = true
 	game_view.visible = false
 	content_editor.visible = false
 	module_select.visible = true
@@ -129,6 +133,7 @@ func _show_module_select():
 
 func _show_plugin_list():
 	main_menu.visible = false
+	background.visible = true
 	game_view.visible = false
 	content_editor.visible = false
 	module_select.visible = false
@@ -205,6 +210,7 @@ func _check_module_dependencies(data: Dictionary) -> Dictionary:
 
 func _start_game(path: String, optional_ids: Array[String] = []):
 	main_menu.visible = false
+	background.visible = false
 	game_view.visible = true
 	content_editor.visible = false
 	module_select.visible = false
@@ -366,6 +372,7 @@ func _apply_load(path: String, data: Dictionary, save_data: Dictionary):
 	current_node_id = context.get("_current_node_id", save_data.get("node_id", module.start_node))
 
 	main_menu.visible = false
+	background.visible = false
 	game_view.visible = true
 	content_editor.visible = false
 	module_select.visible = false

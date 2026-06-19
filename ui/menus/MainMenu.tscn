@@ -43,31 +43,37 @@ text = "Solo RPG"
 layout_mode = 2
 
 [node name="NewGame" type="Button" parent="CenterContainer/VBoxContainer/VBoxContainer" unique_id=401252196]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_type_variation = &"MainMenuButton"
 text = "New Game"
 
 [node name="Continue" type="Button" parent="CenterContainer/VBoxContainer/VBoxContainer" unique_id=1232530236]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_type_variation = &"MainMenuButton"
 text = "Continue"
 
 [node name="LoadGame" type="Button" parent="CenterContainer/VBoxContainer/VBoxContainer" unique_id=927382111]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_type_variation = &"MainMenuButton"
 text = "Load Game"
 
 [node name="ContentEditor" type="Button" parent="CenterContainer/VBoxContainer/VBoxContainer" unique_id=311297330]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_type_variation = &"MainMenuButton"
 text = "Content Editor"
 
 [node name="Plugins" type="Button" parent="CenterContainer/VBoxContainer/VBoxContainer" unique_id=1122193966]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_type_variation = &"MainMenuButton"
 text = "Plugins"
 
 [node name="Exit" type="Button" parent="CenterContainer/VBoxContainer/VBoxContainer" unique_id=1332089248]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_type_variation = &"MainMenuButton"
 text = "Exit"

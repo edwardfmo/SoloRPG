@@ -1,6 +1,14 @@
 [gd_scene format=3 uid="uid://oyo0xpmfxk62"]
 
 [ext_resource type="Script" uid="uid://w4w2lfbjpyrt" path="res://ui/game/GameView.gd" id="1_mddrd"]
+[ext_resource type="Texture2D" uid="uid://cvh3ohbpf0o38" path="res://assets/theme/backgrounds/z1Ht7P.webp" id="2_3ngdl"]
+
+[sub_resource type="Gradient" id="Gradient_vk1so"]
+offsets = PackedFloat32Array(0.5371179)
+colors = PackedColorArray(1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ej1ch"]
+gradient = SubResource("Gradient_vk1so")
 
 [node name="GameView" type="Control" unique_id=1105955654 node_paths=PackedStringArray("image", "text", "choices_container", "hud_container", "overlay_container", "sidebar_container")]
 layout_mode = 3
@@ -10,43 +18,12 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_mddrd")
-image = NodePath("MarginContainer/VBoxContainer/NodeImage")
-text = NodePath("MarginContainer/VBoxContainer/ScrollContainer/StoryText")
-choices_container = NodePath("MarginContainer/VBoxContainer/Choices")
-hud_container = NodePath("MarginContainer/VBoxContainer/HudContainer")
+image = NodePath("PanelContainerRight/TextureRectMask/CenterContainer/TextureRectImage")
+text = NodePath("PanelContainerLeft/MarginContainer/VBoxContainer/ScrollContainer/StoryText")
+choices_container = NodePath("Panel/CenterContainer/Choices")
+hud_container = NodePath("PanelContainerLeft/MarginContainer/VBoxContainer/HudContainer")
 overlay_container = NodePath("OverlayContainer")
 sidebar_container = NodePath("SidebarContainer")
-
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1996532331]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 50
-theme_override_constants/margin_top = 50
-theme_override_constants/margin_right = 50
-theme_override_constants/margin_bottom = 50
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=722931036]
-layout_mode = 2
-
-[node name="NodeImage" type="TextureRect" parent="MarginContainer/VBoxContainer" unique_id=138876129]
-layout_mode = 2
-
-[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer" unique_id=1460627133]
-custom_minimum_size = Vector2(400, 200)
-layout_mode = 2
-
-[node name="StoryText" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer" unique_id=331410830]
-layout_mode = 2
-
-[node name="Choices" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1658738680]
-layout_mode = 2
-
-[node name="HudContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=845796673]
-layout_mode = 2
 
 [node name="OverlayContainer" type="Control" parent="." unique_id=464997425]
 layout_mode = 1
@@ -57,15 +34,101 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
+[node name="PanelContainerRight" type="PanelContainer" parent="." unique_id=1171763663]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 550.0
+offset_top = 30.0
+offset_right = -30.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"Frame"
+
+[node name="TextureRectMask" type="TextureRect" parent="PanelContainerRight" unique_id=894661672]
+clip_children = 1
+clip_contents = true
+layout_mode = 2
+texture = SubResource("GradientTexture2D_ej1ch")
+expand_mode = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="PanelContainerRight/TextureRectMask" unique_id=1073078219]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRectImage" type="TextureRect" parent="PanelContainerRight/TextureRectMask/CenterContainer" unique_id=734281664]
+layout_mode = 2
+texture = ExtResource("2_3ngdl")
+stretch_mode = 3
+
+[node name="PanelContainerLeft" type="PanelContainer" parent="." unique_id=1851227213]
+layout_mode = 1
+anchors_preset = -1
+anchor_bottom = 1.0
+offset_left = 80.0
+offset_top = 50.0
+offset_right = 600.0
+offset_bottom = -50.0
+grow_vertical = 2
+theme_type_variation = &"LightContentFrame"
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainerLeft" unique_id=1996532331]
+layout_mode = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainerLeft/MarginContainer" unique_id=722931036]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainerLeft/MarginContainer/VBoxContainer" unique_id=1460627133]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="StoryText" type="Label" parent="PanelContainerLeft/MarginContainer/VBoxContainer/ScrollContainer" unique_id=331410830]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+
+[node name="HudContainer" type="VBoxContainer" parent="PanelContainerLeft/MarginContainer/VBoxContainer" unique_id=845796673]
+layout_mode = 2
+
 [node name="SidebarContainer" type="VBoxContainer" parent="." unique_id=271388106]
 layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -50.0
-offset_top = -100.0
-offset_bottom = 100.0
-grow_horizontal = 0
+anchors_preset = -1
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 70.0
+offset_right = 100.0
+offset_bottom = -70.0
 grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="." unique_id=1843745450]
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 600.0
+offset_top = 30.0
+offset_right = -30.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="Panel" unique_id=37516159]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Choices" type="VBoxContainer" parent="Panel/CenterContainer" unique_id=1879344560]
+layout_mode = 2

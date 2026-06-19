@@ -23,6 +23,7 @@ grow_vertical = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=1687510373]
 layout_mode = 2
+theme_type_variation = &"Frame"
 
 [node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=1014929005]
 layout_mode = 2

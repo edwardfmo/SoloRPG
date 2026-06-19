@@ -29,12 +29,12 @@ func evaluate(code: String) -> Variant:
 		if entry.is_empty():
 			push_warning("[EntryEvaluator] Entry not found: " + code)
 			return code
-		return entry
+		return entry.duplicate(true)
 	else:
 		# Search all templates for this entry_key
 		for tmpl_id in api._entries:
 			var map = api._entries[tmpl_id]
 			if map.has(entry_key):
-				return map[entry_key]
+				return map[entry_key].duplicate(true)
 		push_warning("[EntryEvaluator] Entry not found in any template: " + code)
 		return code

@@ -100,11 +100,29 @@ atlas = ExtResource("1_1exxx")
 region = Rect2(29, 88, 1336, 369)
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_1exxx"]
-content_margin_left = 12.0
-content_margin_top = 12.0
-content_margin_right = 12.0
-content_margin_bottom = 12.0
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
 texture = SubResource("frame_tex")
+texture_margin_left = 16.0
+texture_margin_top = 16.0
+texture_margin_right = 16.0
+texture_margin_bottom = 16.0
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_8pjfb"]
+load_path = "res://.godot/imported/Dialogue border simple.png-db3b98bec6283136574c3075032d12b8.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lfa24"]
+atlas = SubResource("CompressedTexture2D_8pjfb")
+region = Rect2(37, 528, 1342, 370)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_skdtr"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+texture = SubResource("AtlasTexture_lfa24")
 texture_margin_left = 16.0
 texture_margin_top = 16.0
 texture_margin_right = 16.0
@@ -195,8 +213,10 @@ Button/styles/hover = SubResource("StyleBoxTexture_3hhkj")
 Button/styles/hover_pressed = SubResource("StyleBoxTexture_6opeu")
 Button/styles/normal = SubResource("StyleBoxTexture_upc6k")
 Button/styles/pressed = SubResource("StyleBoxTexture_2g5q2")
-Frame/base_type = &"PanelContainer"
+Frame/base_type = &"LightContentFrame"
 Frame/styles/panel = SubResource("StyleBoxTexture_1exxx")
+LightContentFrame/base_type = &"PanelContainer"
+LightContentFrame/styles/panel = SubResource("StyleBoxTexture_skdtr")
 MainMenuButton/base_type = &"Button"
 MainMenuButton/styles/disabled = SubResource("StyleBoxTexture_8pjfb")
 MainMenuButton/styles/hover = SubResource("StyleBoxTexture_emww3")

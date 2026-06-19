@@ -181,8 +181,9 @@ func dispatch_action(type: String, data: Dictionary = {}, context: Dictionary = 
 	if plugin == null:
 		push_warning("[ModAPI] Plugin not found for action: ", type)
 		return
-	data["type"] = type
-	_resolve_and_dispatch(plugin, action_name, data, context)
+	var copy = data.duplicate(true)
+	copy["type"] = type
+	_resolve_and_dispatch(plugin, action_name, copy, context)
 
 
 ## Shared action resolution: resolve inputs, dispatch to plugin, write outputs.

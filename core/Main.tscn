@@ -9,7 +9,7 @@
 [ext_resource type="Theme" uid="uid://hh1g6jekwx2x" path="res://assets/theme/ui_theme.tres" id="8_theme"]
 [ext_resource type="PackedScene" uid="uid://c16et65egv758" path="res://ui/components/AnimatedBackground.tscn" id="9_abg"]
 
-[node name="Main" type="Control" unique_id=900668806 node_paths=PackedStringArray("main_menu", "game_view", "content_editor", "module_select", "plugin_list")]
+[node name="Main" type="Control" unique_id=900668806 node_paths=PackedStringArray("background", "main_menu", "game_view", "content_editor", "module_select", "plugin_list")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,13 +18,14 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("8_theme")
 script = ExtResource("1_elqb8")
+background = NodePath("Background")
 main_menu = NodePath("MainMenu")
 game_view = NodePath("GameView")
 content_editor = NodePath("ContentEditor")
 module_select = NodePath("ModuleSelect")
 plugin_list = NodePath("PluginList")
 
-[node name="Background" parent="." unique_id=637398459 instance=ExtResource("9_abg")]
+[node name="Background" parent="." unique_id=1330554268 instance=ExtResource("9_abg")]
 layout_mode = 1
 zoom = 0.9
 pan_duration = 10.0
