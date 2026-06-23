@@ -148,6 +148,7 @@ func show_overlay(overlay_id: String, params: Dictionary = {}):
 	if overlay is PluginOverlay:
 		overlay.update_context(_last_context)
 		overlay.open(params)
+		overlay_container.move_to_front()
 
 
 func _on_context_changed(context: Dictionary):

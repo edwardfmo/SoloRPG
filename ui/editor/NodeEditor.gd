@@ -15,27 +15,31 @@ extends Control
 @export var open_file_dialog: FileDialog
 
 var nodes = []
-var node_map = {}        # name → node
-var id_map = {}          # id → node
+var node_map = {}
+var id_map = {}
+var frames = []
 var selected_node: StoryNode = null
-var _last_export_path: String = ""
-var start_node_gn: GraphNode = null
-var frames = []          # GraphFrame instances
+
 var _api: ModAPI = null
+var _last_export_path: String = ""
+var _module_entries: Dictionary = {}
+var _module_active: bool = false
 var _dep_dialog: Control = null
 var _pending_save_path: String = ""
-var _module_entries: Dictionary = {}  # template_id → [entry dicts]
-var _module_active: bool = false
-var _attaching_frame: bool = false
-var _drag_detach_set: Dictionary = {}  # node name → true, elements detached at drag start
 var _context_menu: PopupMenu = null
 var _context_menu_position: Vector2 = Vector2.ZERO
+
+var _frame_manager: GraphFrameManager
+var _node_factory: GraphNodeFactory
+var _serializer: ModuleSerializer
+
 
 func set_api(api: ModAPI):
 	_api = api
 	node_inspector.available_actions = api.get_all_actions()
 	node_inspector.available_conditions = api.get_all_conditions()
 	node_inspector.api = api
+	_serializer.set_api(api)
 
 
 func get_module_entries() -> Dictionary:
@@ -51,7 +55,18 @@ func get_module_id() -> String:
 func is_module_loaded() -> bool:
 	return _module_active
 
+
 func _ready() -> void:
+	_frame_manager = GraphFrameManager.new()
+	_frame_manager.setup(graph, nodes, frames)
+
+	_node_factory = GraphNodeFactory.new()
+	_node_factory.setup(graph, nodes, node_map, id_map, _frame_manager)
+	_node_factory.node_selected.connect(_on_node_selected)
+
+	_serializer = ModuleSerializer.new()
+	_serializer.setup(graph, nodes, frames, _frame_manager)
+
 	graph.connection_request.connect(_on_connection_request)
 	graph.disconnection_request.connect(_on_disconnection_request)
 	graph.delete_nodes_request.connect(_on_delete_nodes_request)
@@ -81,6 +96,9 @@ func _set_module_controls_enabled(enabled: bool):
 	save_button.disabled = not enabled
 	save_as_button.disabled = not enabled
 
+
+# --- Input & Context Menu ---
+
 func _on_graph_gui_input(event):
 	if graph.process_mode == Node.PROCESS_MODE_DISABLED:
 		return
@@ -88,9 +106,9 @@ func _on_graph_gui_input(event):
 		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 			_show_context_menu()
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed and event.ctrl_pressed:
-			_detach_selected_elements()
+			_frame_manager.detach_selected_elements()
 		if event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
-			_drag_detach_set.clear()
+			_frame_manager.clear_drag_detach()
 
 
 func _show_context_menu():
@@ -109,369 +127,43 @@ func _show_context_menu():
 
 func _on_context_menu_selected(id: int):
 	match id:
-		0: create_node_at(_context_menu_position)
-		1: create_frame_at(_context_menu_position)
+		0: _node_factory.create_node_at(_context_menu_position)
+		1: _frame_manager.create_frame_at(_context_menu_position)
 
 
-func _detach_selected_elements():
-	for node in nodes:
-		if node.selected:
-			var current_frame = graph.get_element_frame(node.name)
-			if current_frame:
-				_attaching_frame = true
-				graph.detach_graph_element_from_frame(node.name)
-				_attaching_frame = false
-			_drag_detach_set[node.name] = true
-	for frame in frames:
-		if frame.selected:
-			var current_frame = graph.get_element_frame(frame.name)
-			if current_frame:
-				_attaching_frame = true
-				graph.detach_graph_element_from_frame(frame.name)
-				_attaching_frame = false
-			_drag_detach_set[frame.name] = true
+# --- Node Selection ---
 
-func create_node_at_mouse():
-	create_node_at((graph.get_local_mouse_position() + graph.scroll_offset) / graph.zoom)
-
-
-func create_node_at(pos: Vector2):
-	var node = StoryNode.new()
-
-	node.name = "node_" + str(nodes.size())
-
-	node.position_offset = pos
-	node.data["offset"] = [pos.x, pos.y]
-
-	graph.add_child(node)
-	nodes.append(node)
-	
-	node_map[node.name] = node
-
-	# assign unique id
-	var new_id = _generate_unique_id("node")
-	node.id = new_id
-
-	id_map[new_id] = node
-
-	# listen to id changes
-	node.id_changed.connect(_on_node_id_changed.bind(node))
-
-	# update data offset when dragged
-	node.dragged.connect(func(_from, to):
-		node.data["offset"] = [to.x, to.y])
-
-	node.gui_input.connect(func(event):
-		if event is InputEventMouseButton and event.pressed:
-			selected_node = node
-			_load_into_inspector(node))
-
-	# Auto-attach to frame if dropped inside one
-	node.dragged.connect(func(_from, _to):
-		_auto_attach_to_frame(node))
-	_auto_attach_to_frame(node, pos)
-
-func _generate_unique_id(base: String) -> String:
-	var id = base
-	var i = 1
-
-	while id_map.has(id):
-		id = base + "_" + str(i)
-		i += 1
-
-	return id
-
-
-func create_frame_at_mouse():
-	create_frame_at((graph.get_local_mouse_position() + graph.scroll_offset) / graph.zoom)
-
-
-func create_frame_at(pos: Vector2):
-	var frame = GraphFrame.new()
-	frame.name = "frame_" + str(frames.size())
-	frame.title = "Group"
-	frame.tint_color_enabled = true
-	frame.autoshrink_enabled = true
-	frame.position_offset = pos
-	frame.custom_minimum_size = Vector2(300, 200)
-	graph.add_child(frame)
-	frames.append(frame)
-	_setup_frame_rename(frame)
-	frame.dragged.connect(func(_from, _to):
-		_auto_attach_to_frame(frame))
-	_auto_attach_to_frame(frame, pos)
-
-
-func _setup_frame_rename(frame: GraphFrame):
-	var titlebar = frame.get_titlebar_hbox()
-	titlebar.gui_input.connect(func(event):
-		if event is InputEventMouseButton and event.double_click:
-			# Find the title label
-			var label: Label = null
-			for child in titlebar.get_children():
-				if child is Label:
-					label = child
-					break
-			if not label:
-				return
-			# Replace label with LineEdit
-			label.visible = false
-			var edit = LineEdit.new()
-			edit.text = frame.title
-			edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			titlebar.add_child(edit)
-			edit.grab_focus()
-			edit.select_all()
-			var _commit = func():
-				frame.title = edit.text
-				label.visible = true
-				edit.queue_free()
-			edit.text_submitted.connect(func(_t): _commit.call())
-			edit.focus_exited.connect(_commit))
-
-
-func _is_descendant_frame(ancestor: GraphFrame, descendant: GraphFrame) -> bool:
-	# Check if 'ancestor' is nested inside 'descendant' (which would make it circular)
-	var current = graph.get_element_frame(ancestor.name)
-	while current:
-		if current == descendant:
-			return true
-		current = graph.get_element_frame(current.name)
-	return false
-
-
-func _auto_attach_to_frame(node: GraphElement, check_pos: Vector2 = Vector2.INF):
-	if _attaching_frame:
-		return
-
-	# Element was detached via Ctrl at drag start; skip re-attachment until drop
-	if _drag_detach_set.has(node.name):
-		return
-
-	var mouse_pos = check_pos if check_pos != Vector2.INF else (graph.get_local_mouse_position() + graph.scroll_offset) / graph.zoom
-	var best_frame: GraphFrame = null
-	var best_area: float = INF
-
-	for frame in frames:
-		if frame == node:
-			continue
-		# Skip frames that are descendants of node (prevent circular nesting)
-		if node is GraphFrame and _is_descendant_frame(frame, node):
-			continue
-		var frame_rect = Rect2(frame.position_offset, frame.size)
-		if frame_rect.has_point(mouse_pos):
-			var area = frame_rect.get_area()
-			if area < best_area:
-				best_area = area
-				best_frame = frame
-
-	# Detach from current frame if outside
-	var current_frame = graph.get_element_frame(node.name)
-	if current_frame and current_frame != best_frame:
-		_attaching_frame = true
-		graph.detach_graph_element_from_frame(node.name)
-		_attaching_frame = false
-
-	# Attach to new frame
-	if best_frame and graph.get_element_frame(node.name) != best_frame:
-		_attaching_frame = true
-		graph.attach_graph_element_to_frame(node.name, best_frame.name)
-		_attaching_frame = false
-
-
-func _on_node_id_changed(old_id, new_id, node):
-	# Remove old
-	if old_id != "":
-		id_map.erase(old_id)
-
-	# Enforce uniqueness
-	if id_map.has(new_id):
-		var fixed = _generate_unique_id(new_id)
-		node.set_id(fixed)
-		return
-
-	# Register new
-	id_map[new_id] = node
-
-	_update_all_references(old_id, new_id)
-
-func _update_all_references(old_id: String, new_id: String):
-	if old_id == "":
-		return
-
-	for node in nodes:
-		for choice in node.data.get("choices", []):
-			if choice.get("next", "") == old_id:
-				choice["next"] = new_id
-
-func _load_into_inspector(node):
+func _on_node_selected(node: StoryNode):
+	selected_node = node
 	node_inspector.load_node(node)
 
+
+# --- Connections ---
+
 func _on_connection_request(from, from_port, to, to_port):
-	# Remove existing connections from this port (max 1 connection per output)
-	for conn in graph.get_connection_list():
-		if conn["from_node"] == from and conn["from_port"] == from_port:
-			graph.disconnect_node(conn["from_node"], conn["from_port"], conn["to_node"], conn["to_port"])
-			var existing_from = graph.get_node(NodePath(conn["from_node"]))
-			if existing_from != start_node_gn and existing_from is StoryNode:
-				existing_from.data["choices"][conn["from_port"]]["next"] = ""
-
-	var from_node = graph.get_node(NodePath(from))
-	var to_node = graph.get_node(NodePath(to))
-
-	if from_node != start_node_gn:
-		from_node.data["choices"][from_port]["next"] = to_node.data["id"]
-
-	graph.connect_node(from, from_port, to, to_port)
+	_node_factory.handle_connection(from, from_port, to, to_port)
 	node_inspector.rebuild_choices_list()
+
 
 func _on_disconnection_request(from, from_port, to, to_port):
-	var from_node = graph.get_node(NodePath(from))
-
-	if from_node != start_node_gn:
-		from_node.data["choices"][from_port]["next"] = ""
-
-	graph.disconnect_node(from, from_port, to, to_port)
+	_node_factory.handle_disconnection(from, from_port, to, to_port)
 	node_inspector.rebuild_choices_list()
 
-func export_module(path: String):
-	# Determine start node from Start connector
-	var start_id = ""
-	for conn in graph.get_connection_list():
-		if conn["from_node"] == start_node_gn.name:
-			var target = graph.get_node(NodePath(conn["to_node"]))
-			if target is StoryNode:
-				start_id = target.data["id"]
-			break
 
-	var module = {
-		"id": module_id_edit.text if module_id_edit.text != "" else "editor_module",
-		"name": module_name_edit.text,
-		"version": module_version_edit.text,
-		"author": module_author_edit.text,
-		"start_node": start_id,
-		"nodes": {}
-	}
+# --- Delete ---
 
-	if not _module_entries.is_empty():
-		module["entries"] = _module_entries
-
-	for n in nodes:
-		module["nodes"][n.data["id"]] = n.data
-
-	# Serialize frames
-	var frames_data = []
-	var frame_index_map = {}
-	for i in frames.size():
-		frame_index_map[frames[i]] = i
-	for frame in frames:
-		var frame_info = {
-			"title": frame.title,
-			"offset": [frame.position_offset.x, frame.position_offset.y],
-			"size": [frame.size.x, frame.size.y],
-			"attached_nodes": []
-		}
-		for node in nodes:
-			if graph.get_element_frame(node.name) == frame:
-				frame_info["attached_nodes"].append(node.data["id"])
-		# Save parent frame index for nesting
-		var pf = graph.get_element_frame(frame.name)
-		if pf and frame_index_map.has(pf):
-			frame_info["parent_frame"] = frame_index_map[pf]
-		frames_data.append(frame_info)
-	if frames_data.size() > 0:
-		module["frames"] = frames_data
-
-	# Save plugin dependencies (only found/loaded plugins)
-	if _api:
-		var deps = _build_dependencies()
-		if deps.size() > 0:
-			module["dependencies"] = deps
-
-	var json = JSON.stringify(module, "\t")
-
-	var file = FileAccess.open(path, FileAccess.WRITE)
-	file.store_string(json)
-
-	print("Exported to: " + path)
-
-
-func _build_dependencies() -> Array:
-	var all_actions = _api.get_all_actions()
-	var all_conditions = _api.get_all_conditions()
-	var provider_map = _api.get_provider_map()
-	var loaded_plugins = _api.plugins.keys()
-
-	# Collect used types
-	var used_types: Array[String] = []
-	var used_compendiums: Dictionary = {}  # compendium_id → true
-	for n in nodes:
-		for action in n.data.get("on_enter", []):
-			var t = action.get("type", "")
-			if t != "" and not used_types.has(t):
-				used_types.append(t)
-			_scan_entry_refs(action, used_compendiums)
-		for choice in n.data.get("choices", []):
-			for action in choice.get("actions", []):
-				var t = action.get("type", "")
-				if t != "" and not used_types.has(t):
-					used_types.append(t)
-				_scan_entry_refs(action, used_compendiums)
-			for cond in choice.get("conditions", []):
-				var t = cond.get("type", "")
-				if t != "" and not used_types.has(t):
-					used_types.append(t)
-				_scan_entry_refs(cond, used_compendiums)
-
-	# Group by plugin, only include loaded plugins
-	var plugin_deps := {}  # plugin_id → version
-	for type_str in used_types:
-		if provider_map.has(type_str):
-			var pname = provider_map[type_str]
-			if not plugin_deps.has(pname):
-				var meta = _api.plugin_metadata.get(pname, {})
-				plugin_deps[pname] = meta.get("version", "")
-
-	# Build array
-	var result := []
-	var sorted_keys = plugin_deps.keys()
-	sorted_keys.sort()
-	for pname in sorted_keys:
-		result.append({"id": pname, "version": plugin_deps[pname]})
-
-	# Add compendium dependencies
-	var comp_loader = CompendiumLoader.new()
-	var all_comps = comp_loader.scan_metadata()
-	var comp_meta_map := {}
-	for meta in all_comps:
-		comp_meta_map[meta.get("id", "")] = meta
-
-	var sorted_comps = used_compendiums.keys()
-	sorted_comps.sort()
-	for comp_id in sorted_comps:
-		var version = ""
-		if comp_meta_map.has(comp_id):
-			version = comp_meta_map[comp_id].get("version", "")
-		result.append({"id": comp_id, "type": "compendium", "version": version})
-
-	return result
-
-
-## Scans a dict's values for @entry references and collects compendium IDs.
-func _scan_entry_refs(data: Dictionary, out_compendiums: Dictionary):
-	for key in data:
-		if key == "type":
+func _on_delete_nodes_request(node_names: Array[StringName]):
+	for node_name in node_names:
+		if str(node_name) == "__start__":
 			continue
-		var val = data[key]
-		if val is String and val.begins_with("@"):
-			var parsed = ModAPI.parse_entry_ref(val)
-			var namespace_id = parsed["namespace"]
-			# Skip plugin-seeded and module-local entries
-			if _api.plugins.has(namespace_id):
-				continue
-			if namespace_id == module_id_edit.text:
-				continue
-			out_compendiums[namespace_id] = true
+		var node = graph.get_node(NodePath(str(node_name)))
+		if node is GraphFrame:
+			_frame_manager.delete_frame(node)
+		elif node is StoryNode:
+			_node_factory.delete_node(node)
+
+
+# --- Save / Load ---
 
 func _on_save_pressed():
 	if _last_export_path != "":
@@ -479,18 +171,20 @@ func _on_save_pressed():
 	else:
 		_validate_then_pick_file()
 
+
 func _on_save_as_pressed():
 	_validate_then_pick_file()
 
+
 func _on_file_selected(path: String):
 	_last_export_path = path
-	export_module(path)
+	_do_export(path)
 
 
 func _validate_then_save(path: String):
 	_pending_save_path = path
 	if _check_dependencies():
-		export_module(path)
+		_do_export(path)
 
 
 func _validate_then_pick_file():
@@ -499,8 +193,16 @@ func _validate_then_pick_file():
 		save_file_dialog.popup_centered()
 
 
-## Runs the dependency check. Returns true if no issues (caller can proceed).
-## If issues exist, shows the dialog and returns false (caller waits for signal).
+func _do_export(path: String):
+	var metadata = {
+		"id": module_id_edit.text if module_id_edit.text != "" else "editor_module",
+		"name": module_name_edit.text,
+		"version": module_version_edit.text,
+		"author": module_author_edit.text,
+	}
+	_serializer.export_module(path, metadata, _node_factory.start_node_gn, _module_entries)
+
+
 func _check_dependencies() -> bool:
 	if _api == null:
 		return true
@@ -532,7 +234,7 @@ func _on_dep_confirmed():
 		_dep_dialog.queue_free()
 		_dep_dialog = null
 	if _pending_save_path != "":
-		export_module(_pending_save_path)
+		_do_export(_pending_save_path)
 	else:
 		save_file_dialog.popup_centered()
 
@@ -541,6 +243,9 @@ func _on_dep_cancelled():
 	if _dep_dialog:
 		_dep_dialog.queue_free()
 		_dep_dialog = null
+
+
+# --- New / Open ---
 
 func _on_new_pressed():
 	_clear_editor()
@@ -552,27 +257,26 @@ func _on_new_pressed():
 	_module_entries = {}
 	_module_active = true
 	_set_module_controls_enabled(true)
-	_create_start_node()
+	_node_factory.create_start_node()
+
 
 func _on_open_pressed():
 	open_file_dialog.popup_centered()
 
+
 func _on_open_file_selected(path: String):
 	load_module(path)
 
+
 func load_module(path: String):
-	var json_text = FileAccess.get_file_as_string(path)
-	var data = JSON.parse_string(json_text)
-	if data == null:
-		print("Failed to parse module file.")
+	var data = _serializer.load_module(path)
+	if data.is_empty():
 		return
 
-	# Clear existing state
 	_clear_editor()
 	_module_active = true
 	_set_module_controls_enabled(true)
 
-	# Set module ID
 	module_id_edit.text = data.get("id", "")
 	module_name_edit.text = data.get("name", "")
 	module_version_edit.text = data.get("version", "")
@@ -580,160 +284,28 @@ func load_module(path: String):
 	_last_export_path = path
 	_module_entries = data.get("entries", {})
 
-	# Create nodes
+	# Create nodes from data
 	var node_data_map = data.get("nodes", {})
 	for node_id in node_data_map:
-		var nd = node_data_map[node_id]
-		var node = StoryNode.new()
-		node.name = "node_" + str(nodes.size())
+		_node_factory.create_node_from_data(node_id, node_data_map[node_id])
 
-		# Set position from offset
-		var offset = nd.get("offset", [0, 0])
-		if (offset.size() == 2):
-			node.position_offset = Vector2(offset[0], offset[1])
-
-		graph.add_child(node)
-		nodes.append(node)
-		node_map[node.name] = node
-
-		# Set id
-		node.id = node_id
-		id_map[node_id] = node
-
-		# Set data fields
-		node.data["text"] = nd.get("text", "")
-		node.data["image"] = nd.get("image", "")
-		node.data["on_enter"] = nd.get("on_enter", [])
-		node.data["choices"] = nd.get("choices", [])
-		node.data["offset"] = offset
-
-		node.rebuild_ports()
-
-		# Connect signals
-		node.id_changed.connect(_on_node_id_changed.bind(node))
-		node.dragged.connect(func(_from, to):
-			node.data["offset"] = [to.x, to.y]
-			_auto_attach_to_frame(node))
-		node.gui_input.connect(func(event):
-			if event is InputEventMouseButton and event.pressed:
-				selected_node = node
-				_load_into_inspector(node))
-
-	# Restore connections
-	for node in nodes:
-		for i in node.data["choices"].size():
-			var next_id = node.data["choices"][i].get("next", "")
-			if next_id != "" and id_map.has(next_id):
-				var target = id_map[next_id]
-				graph.connect_node(node.name, i, target.name, 0)
+	_node_factory.restore_connections()
 
 	# Select start node
 	var start_id = data.get("start_node", "")
 	if id_map.has(start_id):
 		selected_node = id_map[start_id]
-		_load_into_inspector(selected_node)
+		node_inspector.load_node(selected_node)
 
-	# Create the Start connector and link it to the start node
-	_create_start_node()
-	if id_map.has(start_id):
-		var target = id_map[start_id]
-		graph.connect_node(start_node_gn.name, 0, target.name, 0)
+	_node_factory.create_start_node()
+	_node_factory.connect_start_to(start_id)
 
 	# Restore frames
-	var frames_data = data.get("frames", [])
-	for fd in frames_data:
-		var frame = GraphFrame.new()
-		frame.name = "frame_" + str(frames.size())
-		frame.title = fd.get("title", "Group")
-		frame.tint_color_enabled = true
-		frame.autoshrink_enabled = true
-		var f_offset = fd.get("offset", [0, 0])
-		frame.position_offset = Vector2(f_offset[0], f_offset[1])
-		var f_size = fd.get("size", [300, 200])
-		frame.custom_minimum_size = Vector2(f_size[0], f_size[1])
-		frame.size = Vector2(f_size[0], f_size[1])
-		graph.add_child(frame)
-		frames.append(frame)
-		_setup_frame_rename(frame)
-		for attached_id in fd.get("attached_nodes", []):
-			if id_map.has(attached_id):
-				var attached_node = id_map[attached_id]
-				graph.attach_graph_element_to_frame(attached_node.name, frame.name)
-	# Restore frame nesting (parent_frame index)
-	for i in frames_data.size():
-		var fd = frames_data[i]
-		var parent_idx = fd.get("parent_frame", -1)
-		if parent_idx >= 0 and parent_idx < frames.size():
-			graph.attach_graph_element_to_frame(frames[i].name, frames[parent_idx].name)
+	_frame_manager.restore_frames(data.get("frames", []), id_map)
+
 
 func _clear_editor():
-	# Disconnect all graph connections
-	graph.clear_connections()
-
-	# Remove start node
-	if start_node_gn:
-		graph.remove_child(start_node_gn)
-		start_node_gn.queue_free()
-		start_node_gn = null
-
-	# Remove all node children
-	for node in nodes:
-		graph.remove_child(node)
-		node.queue_free()
-
-	nodes.clear()
-	node_map.clear()
-	id_map.clear()
+	_node_factory.clear_all()
+	_frame_manager.clear_all()
 	selected_node = null
 	node_inspector.clear()
-
-	# Remove frames
-	for frame in frames:
-		graph.remove_child(frame)
-		frame.queue_free()
-	frames.clear()
-
-
-func _create_start_node():
-	start_node_gn = GraphNode.new()
-	start_node_gn.name = "__start__"
-	start_node_gn.title = "Start"
-	start_node_gn.position_offset = Vector2(0, 0)
-	start_node_gn.custom_minimum_size = Vector2(100, 60)
-	start_node_gn.add_child(Control.new())
-	start_node_gn.set_slot(0, false, 0, Color.GREEN, true, 0, Color.GREEN)
-	graph.add_child(start_node_gn)
-
-
-func _on_delete_nodes_request(node_names: Array[StringName]):
-	for node_name in node_names:
-		if str(node_name) == "__start__":
-			continue
-		var node = graph.get_node(NodePath(str(node_name)))
-		if node is GraphFrame:
-			var parent_frame = graph.get_element_frame(node.name)
-			# Reparent attached nodes to parent frame (or root)
-			for n in nodes:
-				if graph.get_element_frame(n.name) == node:
-					graph.detach_graph_element_from_frame(n.name)
-					if parent_frame:
-						graph.attach_graph_element_to_frame(n.name, parent_frame.name)
-			# Reparent nested frames to parent frame (or root)
-			for f in frames:
-				if f != node and graph.get_element_frame(f.name) == node:
-					graph.detach_graph_element_from_frame(f.name)
-					if parent_frame:
-						graph.attach_graph_element_to_frame(f.name, parent_frame.name)
-			frames.erase(node)
-			graph.remove_child(node)
-			node.queue_free()
-		elif node is StoryNode:
-			# Remove connections involving this node
-			for conn in graph.get_connection_list():
-				if conn["from_node"] == node_name or conn["to_node"] == node_name:
-					graph.disconnect_node(conn["from_node"], conn["from_port"], conn["to_node"], conn["to_port"])
-			nodes.erase(node)
-			node_map.erase(node.name)
-			id_map.erase(node.data["id"])
-			graph.remove_child(node)
-			node.queue_free()
