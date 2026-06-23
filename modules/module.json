@@ -2,11 +2,11 @@
 	"author": "Edwardfmo",
 	"dependencies": [
 		{
-			"id": "dnd",
+			"id": "core",
 			"version": "1.0.0"
 		},
 		{
-			"id": "system",
+			"id": "dnd",
 			"version": "1.0.0"
 		},
 		{
@@ -20,15 +20,16 @@
 			"attached_nodes": [
 				"node",
 				"node_1",
+				"node_2",
 				"start"
 			],
 			"offset": [
-				200.0,
-				100.0
+				220.0,
+				60.0
 			],
 			"size": [
-				760.000122070312,
-				570.0
+				900.0,
+				590.000122070312
 			],
 			"title": "Chapter1"
 		}
@@ -41,8 +42,8 @@
 			"id": "end",
 			"image": "",
 			"offset": [
-				820.0,
-				-20.0
+				740.0,
+				-120.0
 			],
 			"on_enter": [],
 			"text": "You survived."
@@ -54,6 +55,10 @@
 						{
 							"amount": 1.0,
 							"type": "dnd.take_damage"
+						},
+						{
+							"path": "events.iamstupid",
+							"type": "core.set"
 						}
 					],
 					"conditions": [
@@ -65,13 +70,25 @@
 					"id": "choice",
 					"next": "",
 					"text": "Step on it again"
+				},
+				{
+					"actions": [],
+					"conditions": [
+						{
+							"path": "events.iamstupid",
+							"type": "core.exists"
+						}
+					],
+					"id": "choice_1",
+					"next": "node_2",
+					"text": "Bad idea"
 				}
 			],
 			"id": "node",
 			"image": "",
 			"offset": [
-				720.0,
-				300.0
+				600.0,
+				200.0
 			],
 			"on_enter": [],
 			"text": "You survived, but hurt."
@@ -81,11 +98,35 @@
 			"id": "node_1",
 			"image": "",
 			"offset": [
-				540.0,
-				480.0
+				560.0,
+				460.0
 			],
 			"on_enter": [],
 			"text": ""
+		},
+		"node_2": {
+			"choices": [
+				{
+					"actions": [
+						{
+							"path": "events.iamstupid",
+							"type": "core.clear"
+						}
+					],
+					"conditions": [],
+					"id": "choice",
+					"next": "node",
+					"text": "Let's go back..."
+				}
+			],
+			"id": "node_2",
+			"image": "",
+			"offset": [
+				880.0,
+				100.0
+			],
+			"on_enter": [],
+			"text": "I am stupid..."
 		},
 		"start": {
 			"choices": [
@@ -101,7 +142,7 @@
 							"op": "=",
 							"or_above": true,
 							"path": "blabla",
-							"type": "system.check",
+							"type": "core.check",
 							"value": 12.0
 						}
 					],
@@ -133,7 +174,7 @@
 			"id": "start",
 			"image": "",
 			"offset": [
-				240.0,
+				260.0,
 				140.0
 			],
 			"on_enter": [

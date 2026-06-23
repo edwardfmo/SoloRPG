@@ -2,16 +2,20 @@ extends Plugin
 
 
 func get_actions() -> Array[String]:
-	return ["system.show_view"]
+	return ["core.show_view", "core.set", "core.clear"]
 
 
 func get_conditions() -> Array[String]:
-	return ["system.check"]
+	return ["core.check", "core.exists"]
 
 
 func get_action_params(action_name: String) -> Array[Dictionary]:
 	if action_name == "show_view":
 		return [{"name": "view", "mandatory": true}]
+	if action_name == "set":
+		return [{"name": "path", "mandatory": true}, {"name": "value", "mandatory": false}]
+	if action_name == "clear":
+		return [{"name": "path", "mandatory": true}]
 	return []
 
 
@@ -22,6 +26,8 @@ func get_condition_params(cond_name: String) -> Array[Dictionary]:
 			{"name": "op", "mandatory": true, "enum": ["==", "!=", ">", "<", ">=", "<="]},
 			{"name": "value", "mandatory": true},
 		]
+	if cond_name == "exists":
+		return [{"name": "path", "mandatory": true}]
 	return []
 
 
@@ -36,11 +42,26 @@ func handle_action(action_name: String, data: Dictionary, _context):
 				params[key] = data[key]
 		if api:
 			api.show_overlay(view_id, params)
+	elif action_name == "set":
+		var path: String = data.get("path", "")
+		if path == "":
+			return
+		var value = data.get("value", "")
+		if value is String:
+			value = _resolve_value(value, _context)
+		_set_path(_context, path, value)
+	elif action_name == "clear":
+		var path: String = data.get("path", "")
+		if path == "":
+			return
+		_clear_path(_context, path)
 
 
 func check_condition(cond_name: String, data: Dictionary, context) -> bool:
 	if cond_name == "check":
 		return _check(data, context)
+	if cond_name == "exists":
+		return _exists(data, context)
 	return false
 
 
@@ -113,3 +134,42 @@ func _to_num(val) -> float:
 	if val is String and val.is_valid_float():
 		return val.to_float()
 	return 0.0
+
+
+func _exists(data: Dictionary, context) -> bool:
+	var path: String = data.get("path", "")
+	if path == "":
+		return false
+	var keys = path.split(".")
+	var current: Variant = context
+	for k in keys:
+		if not current is Dictionary or not current.has(k):
+			return false
+		current = current[k]
+	return true
+
+
+func _set_path(context, path: String, value) -> void:
+	var keys = path.split(".")
+	var current: Variant = context
+	for i in keys.size() - 1:
+		var k = keys[i]
+		if not current is Dictionary:
+			return
+		if not current.has(k) or not current[k] is Dictionary:
+			current[k] = {}
+		current = current[k]
+	if current is Dictionary:
+		current[keys[keys.size() - 1]] = value
+
+
+func _clear_path(context, path: String) -> void:
+	var keys = path.split(".")
+	var current: Variant = context
+	for i in keys.size() - 1:
+		var k = keys[i]
+		if not current is Dictionary or not current.has(k):
+			return
+		current = current[k]
+	if current is Dictionary:
+		current.erase(keys[keys.size() - 1])

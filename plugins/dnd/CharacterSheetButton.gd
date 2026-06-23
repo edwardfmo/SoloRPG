@@ -16,4 +16,4 @@ func _ready():
 
 func _on_pressed():
 	if _api:
-		_api.dispatch_action("system.show_view", {"view": "dnd_character_sheet"})
+		_api.dispatch_action("core.show_view", {"view": "dnd_character_sheet"})
