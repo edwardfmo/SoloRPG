@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://c3cps3fn1xoi0"]
+
+[ext_resource type="Script" uid="uid://fknm75lg1ior" path="res://ui/editor/ConditionListEditor.gd" id="1_cle"]
+
+[node name="ConditionListEditor" type="VBoxContainer" unique_id=785788483 node_paths=PackedStringArray("_container", "_add_button")]
+script = ExtResource("1_cle")
+_container = NodePath("Container")
+_add_button = NodePath("AddButton")
+
+[node name="Container" type="VBoxContainer" parent="." unique_id=1580338109]
+layout_mode = 2
+
+[node name="AddButton" type="Button" parent="." unique_id=1418179369]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "+ Add"

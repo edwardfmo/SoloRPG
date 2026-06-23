@@ -10,7 +10,7 @@ colors = PackedColorArray(1, 1, 1, 1)
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_ej1ch"]
 gradient = SubResource("Gradient_vk1so")
 
-[node name="GameView" type="Control" unique_id=1105955654 node_paths=PackedStringArray("image", "text", "choices_container", "hud_container", "overlay_container", "sidebar_container")]
+[node name="GameView" type="Control" unique_id=1105955654 node_paths=PackedStringArray("image", "text", "choices_container", "hud_container", "overlay_container", "sidebar_container", "save_button", "quicksave_button", "quickload_button", "load_button", "exit_button")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -24,6 +24,11 @@ choices_container = NodePath("Panel/CenterContainer/Choices")
 hud_container = NodePath("PanelContainerLeft/MarginContainer/VBoxContainer/HudContainer")
 overlay_container = NodePath("OverlayContainer")
 sidebar_container = NodePath("SidebarContainer")
+save_button = NodePath("SidebarContainer/SaveButton")
+quicksave_button = NodePath("SidebarContainer/QuickSaveButton")
+quickload_button = NodePath("SidebarContainer/QuickLoadButton")
+load_button = NodePath("SidebarContainer/LoadButton")
+exit_button = NodePath("SidebarContainer/ExitButton")
 
 [node name="OverlayContainer" type="Control" parent="." unique_id=464997425]
 layout_mode = 1
@@ -108,6 +113,26 @@ offset_top = 70.0
 offset_right = 100.0
 offset_bottom = -70.0
 grow_vertical = 2
+
+[node name="SaveButton" type="Button" parent="SidebarContainer"]
+layout_mode = 2
+text = "Save"
+
+[node name="QuickSaveButton" type="Button" parent="SidebarContainer"]
+layout_mode = 2
+text = "Quick Save"
+
+[node name="QuickLoadButton" type="Button" parent="SidebarContainer"]
+layout_mode = 2
+text = "Quick Load"
+
+[node name="LoadButton" type="Button" parent="SidebarContainer"]
+layout_mode = 2
+text = "Load"
+
+[node name="ExitButton" type="Button" parent="SidebarContainer"]
+layout_mode = 2
+text = "Exit"
 
 [node name="Panel" type="Panel" parent="." unique_id=1843745450]
 self_modulate = Color(1, 1, 1, 0)

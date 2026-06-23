@@ -5,10 +5,10 @@ signal back_pressed
 
 @export var module_list: VBoxContainer
 @export var back_button: Button
+@export var confirm_dialog: ConfirmationDialog
 
 var ModuleEntryScene = preload("res://ui/menus/ModuleEntry.tscn")
 var api: ModAPI = null
-var _confirm_dialog: ConfirmationDialog = null
 var _pending_path: String = ""
 
 func _ready():
@@ -62,31 +62,20 @@ func _on_play_pressed(path: String, entry: ModuleEntry):
 
 
 func _show_dep_confirm(path: String, entry: ModuleEntry):
-	if _confirm_dialog:
-		_confirm_dialog.queue_free()
-
 	_pending_path = path
-	_confirm_dialog = ConfirmationDialog.new()
-	_confirm_dialog.title = "Plugin Issues"
-	_confirm_dialog.dialog_text = "This module has plugin issues:\n\n" + entry.dep_issues_label.get_parsed_text() + "\n\nProceed anyway?"
-	_confirm_dialog.ok_button_text = "Play Anyway"
-	_confirm_dialog.cancel_button_text = "Cancel"
-	add_child(_confirm_dialog)
-
-	_confirm_dialog.confirmed.connect(_on_confirm_play)
-	_confirm_dialog.canceled.connect(_on_cancel_play)
-	_confirm_dialog.popup_centered()
+	confirm_dialog.dialog_text = "This module has plugin issues:\n\n" + entry.dep_issues_label.get_parsed_text() + "\n\nProceed anyway?"
+	if not confirm_dialog.confirmed.is_connected(_on_confirm_play):
+		confirm_dialog.confirmed.connect(_on_confirm_play)
+	if not confirm_dialog.canceled.is_connected(_on_cancel_play):
+		confirm_dialog.canceled.connect(_on_cancel_play)
+	confirm_dialog.popup_centered()
 
 
 func _on_confirm_play():
 	var path = _pending_path
-	if _confirm_dialog:
-		_confirm_dialog.queue_free()
-		_confirm_dialog = null
+	confirm_dialog.hide()
 	module_selected.emit(path)
 
 
 func _on_cancel_play():
-	if _confirm_dialog:
-		_confirm_dialog.queue_free()
-		_confirm_dialog = null
+	confirm_dialog.hide()

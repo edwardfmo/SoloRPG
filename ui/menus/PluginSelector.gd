@@ -6,6 +6,7 @@ signal confirmed_selection(enabled_ids: Array)
 signal canceled
 
 var PluginEntryScene = preload("res://ui/menus/PluginEntry.tscn")
+var _section_label_scene = preload("res://ui/shared/SectionLabel.tscn")
 @export var _plugin_list: VBoxContainer
 @export var _title_label: Label
 var _selections := {}  # plugin_id → bool
@@ -38,7 +39,7 @@ func _refresh_list():
 			entry.toggled.connect(_on_plugin_toggled)
 
 	if not has_optional:
-		var label = Label.new()
+		var label = _section_label_scene.instantiate()
 		label.text = "No optional plugins installed"
 		label.modulate = Color(0.5, 0.5, 0.5)
 		_plugin_list.add_child(label)

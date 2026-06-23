@@ -8,6 +8,7 @@ var id_map: Dictionary = {}
 var start_node_gn: GraphNode = null
 
 var _frame_manager: GraphFrameManager = null
+var _start_node_scene = preload("res://ui/editor/StartNode.tscn")
 
 signal node_selected(node: StoryNode)
 
@@ -79,12 +80,8 @@ func restore_connections():
 
 
 func create_start_node():
-	start_node_gn = GraphNode.new()
+	start_node_gn = _start_node_scene.instantiate()
 	start_node_gn.name = "__start__"
-	start_node_gn.title = "Start"
-	start_node_gn.position_offset = Vector2(0, 0)
-	start_node_gn.custom_minimum_size = Vector2(100, 60)
-	start_node_gn.add_child(Control.new())
 	start_node_gn.set_slot(0, false, 0, Color.GREEN, true, 0, Color.GREEN)
 	graph.add_child(start_node_gn)
 

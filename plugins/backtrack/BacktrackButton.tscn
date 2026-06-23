@@ -1,6 +1,7 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bubrxnglf0bqv"]
 
-[ext_resource type="Script" path="res://plugins/backtrack/BacktrackButton.gd" id="1_bb"]
+[ext_resource type="Script" uid="uid://bwmysmloql1wf" path="res://plugins/backtrack/BacktrackButton.gd" id="1_bb"]
 
-[node name="BacktrackButton" type="Button"]
+[node name="BacktrackButton" type="Button" unique_id=1767096177]
+custom_minimum_size = Vector2(40, 40)
 script = ExtResource("1_bb")

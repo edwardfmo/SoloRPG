@@ -11,6 +11,8 @@ var selected_node: StoryNode = null
 var _expanded_choices: Array = []
 var _on_enter_editor: VBoxContainer = null
 var _choice_scene: PackedScene = preload("res://ui/editor/CollapsibleChoiceItem.tscn")
+var _action_list_scene: PackedScene = preload("res://ui/editor/ActionListEditor.tscn")
+var _condition_list_scene: PackedScene = preload("res://ui/editor/ConditionListEditor.tscn")
 
 ## Published action types for on_enter autocomplete
 var available_actions: Array[String] = []
@@ -78,7 +80,7 @@ func rebuild_on_enter_list():
 	if not selected_node.data.has("on_enter"):
 		selected_node.data["on_enter"] = []
 
-	_on_enter_editor = ActionListEditor.new()
+	_on_enter_editor = _action_list_scene.instantiate()
 	_on_enter_editor.available_types = available_actions
 	if api:
 		_on_enter_editor.param_provider = api.get_params_for_type
@@ -154,8 +156,7 @@ func rebuild_choices_list(expand_idx: int = -1):
 		if not choice.has("conditions"):
 			choice["conditions"] = []
 
-		var cond_editor = ActionListEditor.new()
-		cond_editor.is_condition_editor = true
+		var cond_editor = _condition_list_scene.instantiate()
 		cond_editor.available_types = available_conditions
 		if api:
 			cond_editor.param_provider = api.get_params_for_type
@@ -169,7 +170,7 @@ func rebuild_choices_list(expand_idx: int = -1):
 		if not choice.has("actions"):
 			choice["actions"] = []
 
-		var act_editor = ActionListEditor.new()
+		var act_editor = _action_list_scene.instantiate()
 		act_editor.available_types = available_actions
 		if api:
 			act_editor.param_provider = api.get_params_for_type

@@ -7,6 +7,7 @@ var nodes: Array = []  # reference to NodeEditor's nodes array
 
 var _attaching_frame: bool = false
 var _drag_detach_set: Dictionary = {}
+var _inline_edit_scene = preload("res://ui/editor/InlineRenameEdit.tscn")
 
 
 func setup(p_graph: GraphEdit, p_nodes: Array, p_frames: Array):
@@ -189,9 +190,8 @@ func _setup_frame_rename(frame: GraphFrame):
 			if not label:
 				return
 			label.visible = false
-			var edit = LineEdit.new()
+			var edit = _inline_edit_scene.instantiate()
 			edit.text = frame.title
-			edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			titlebar.add_child(edit)
 			edit.grab_focus()
 			edit.select_all()

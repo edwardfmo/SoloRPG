@@ -15,6 +15,7 @@ var offset: Vector2
 signal id_changed(old_id, new_id)
 
 var _id: String = ""
+var _port_scene = preload("res://ui/editor/StoryNodePort.tscn")
 
 var id: String:
 	set(value):
@@ -49,16 +50,12 @@ func rebuild_ports():
 		set_slot(0, true, 0, Color.GREEN, false, 0, Color.GREEN)
 	else:
 		for i in data["choices"].size():
-			# 1. Create a row UI element
-			var row = HBoxContainer.new()
-
-			var label = Label.new()
+			var row = _port_scene.instantiate()
+			var label: Label = row.get_node("Label")
 			label.text = data["choices"][i]["text"]
 
-			row.add_child(label)
 			add_child(row)
 
-			# 2. Attach slot to THIS row index
 			set_slot(
 				i,
 				i == 0, 0, Color.GREEN,

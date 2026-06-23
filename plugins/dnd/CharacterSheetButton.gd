@@ -10,7 +10,6 @@ func set_api(api: ModAPI):
 func _ready():
 	text = "📋"
 	tooltip_text = "Character Sheet"
-	custom_minimum_size = Vector2(40, 40)
 	pressed.connect(_on_pressed)
 
 

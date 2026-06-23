@@ -1,0 +1,24 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/editor/CollapsibleConditionDisplay.gd" id="1_ccd"]
+
+[node name="CollapsibleConditionDisplay" type="VBoxContainer" node_paths=PackedStringArray("_header_button", "_margin", "_content")]
+script = ExtResource("1_ccd")
+_header_button = NodePath("HeaderButton")
+_margin = NodePath("Margin")
+_content = NodePath("Margin/Content")
+
+[node name="HeaderButton" type="Button" parent="."]
+layout_mode = 2
+text = "▶ (empty)"
+flat = true
+alignment = 0
+
+[node name="Margin" type="MarginContainer" parent="."]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 12
+
+[node name="Content" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+size_flags_horizontal = 3

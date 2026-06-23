@@ -13,7 +13,6 @@ func set_api(api: ModAPI):
 func _ready():
 	text = "↩"
 	tooltip_text = "Back"
-	custom_minimum_size = Vector2(40, 40)
 	disabled = true
 	pressed.connect(_on_pressed)
 

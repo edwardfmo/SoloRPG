@@ -13,6 +13,7 @@ extends Control
 
 @export var save_file_dialog: FileDialog
 @export var open_file_dialog: FileDialog
+@export var context_menu: PopupMenu
 
 var nodes = []
 var node_map = {}
@@ -26,7 +27,6 @@ var _module_entries: Dictionary = {}
 var _module_active: bool = false
 var _dep_dialog: Control = null
 var _pending_save_path: String = ""
-var _context_menu: PopupMenu = null
 var _context_menu_position: Vector2 = Vector2.ZERO
 
 var _frame_manager: GraphFrameManager
@@ -113,16 +113,14 @@ func _on_graph_gui_input(event):
 
 func _show_context_menu():
 	_context_menu_position = (graph.get_local_mouse_position() + graph.scroll_offset) / graph.zoom
-	if _context_menu:
-		_context_menu.queue_free()
-	_context_menu = PopupMenu.new()
-	_context_menu.add_item("Create Node", 0)
-	_context_menu.add_item("Create Group", 1)
-	_context_menu.id_pressed.connect(_on_context_menu_selected)
-	add_child(_context_menu)
+	context_menu.clear()
+	context_menu.add_item("Create Node", 0)
+	context_menu.add_item("Create Group", 1)
+	if not context_menu.id_pressed.is_connected(_on_context_menu_selected):
+		context_menu.id_pressed.connect(_on_context_menu_selected)
 	var mouse_screen = get_viewport().get_mouse_position()
-	_context_menu.position = Vector2i(mouse_screen)
-	_context_menu.popup()
+	context_menu.position = Vector2i(mouse_screen)
+	context_menu.popup()
 
 
 func _on_context_menu_selected(id: int):

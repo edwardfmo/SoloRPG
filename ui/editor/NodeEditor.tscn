@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://ch8us7x0jvc5p" path="res://ui/editor/NodeEditor.gd" id="1_x53ir"]
 [ext_resource type="PackedScene" path="res://ui/editor/NodeInspector.tscn" id="2_ninsp"]
 
-[node name="NodeEditor" type="Control" unique_id=1289184025 node_paths=PackedStringArray("graph", "module_id_edit", "module_name_edit", "module_version_edit", "module_author_edit", "node_inspector", "save_button", "save_as_button", "save_file_dialog", "open_file_dialog")]
+[node name="NodeEditor" type="Control" unique_id=1289184025 node_paths=PackedStringArray("graph", "module_id_edit", "module_name_edit", "module_version_edit", "module_author_edit", "node_inspector", "save_button", "save_as_button", "save_file_dialog", "open_file_dialog", "context_menu")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,6 +21,7 @@ save_button = NodePath("HBoxContainer/Panel/MarginContainer/VBoxContainer/Button
 save_as_button = NodePath("HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/SaveAsButton")
 save_file_dialog = NodePath("SaveFileDialog")
 open_file_dialog = NodePath("OpenFileDialog")
+context_menu = NodePath("ContextMenu")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=680604682]
 layout_mode = 1
@@ -149,6 +150,8 @@ title = "Open a File"
 size = Vector2i(600, 400)
 file_mode = 0
 filters = PackedStringArray("*.json ; JSON Files")
+
+[node name="ContextMenu" type="PopupMenu" parent="."]
 
 [connection signal="pressed" from="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/NewButton" to="." method="_on_new_pressed"]
 [connection signal="pressed" from="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/OpenButton" to="." method="_on_open_pressed"]

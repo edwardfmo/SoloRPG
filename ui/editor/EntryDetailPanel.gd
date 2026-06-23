@@ -5,6 +5,9 @@ var _entry_fields: VBoxContainer
 var _header_label: Label
 var _storage: CompendiumStorage
 
+var _field_row_scene = preload("res://ui/editor/EntryFieldRow.tscn")
+var _add_field_row_scene = preload("res://ui/editor/AddFieldRow.tscn")
+
 signal entry_field_changed(comp_id: String, template_id: String, entry_id: String)
 signal refresh_requested()
 
@@ -51,27 +54,21 @@ func _clear():
 
 func _render_fields(entry: Dictionary, comp_id: String, template_id: String, entry_id: String, editable: bool):
 	for key in entry:
-		var row = HBoxContainer.new()
+		var row = _field_row_scene.instantiate()
+		var key_label: Label = row.get_node("KeyLabel")
+		var val_field: LineEdit = row.get_node("ValueField")
 
-		var key_label = Label.new()
 		key_label.text = key
-		key_label.custom_minimum_size = Vector2(100, 0)
-		row.add_child(key_label)
 
 		var val = entry[key]
 		if val is Array:
-			var val_field = LineEdit.new()
-			val_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			val_field.text = ", ".join(val.map(func(v): return str(v)))
 			val_field.editable = editable
 			if editable:
 				val_field.text_changed.connect(func(new_text):
 					entry[key] = new_text.split(", ")
 					_on_field_changed(comp_id, template_id, entry_id))
-			row.add_child(val_field)
 		else:
-			var val_field = LineEdit.new()
-			val_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			val_field.text = str(val)
 			val_field.editable = editable
 			if editable:
@@ -81,19 +78,14 @@ func _render_fields(entry: Dictionary, comp_id: String, template_id: String, ent
 					else:
 						entry[key] = new_text
 					_on_field_changed(comp_id, template_id, entry_id))
-			row.add_child(val_field)
 
 		_entry_fields.add_child(row)
 
 	if editable:
-		var add_field_row = HBoxContainer.new()
-		var new_key_field = LineEdit.new()
-		new_key_field.placeholder_text = "new field name"
-		new_key_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		add_field_row.add_child(new_key_field)
+		var add_field_row = _add_field_row_scene.instantiate()
+		var new_key_field: LineEdit = add_field_row.get_node("NewKeyField")
+		var add_field_btn: Button = add_field_row.get_node("AddButton")
 
-		var add_field_btn = Button.new()
-		add_field_btn.text = "+ Field"
 		add_field_btn.pressed.connect(func():
 			var new_key = new_key_field.text.strip_edges()
 			if new_key == "" or entry.has(new_key):
@@ -101,7 +93,6 @@ func _render_fields(entry: Dictionary, comp_id: String, template_id: String, ent
 			entry[new_key] = ""
 			_on_field_changed(comp_id, template_id, entry_id)
 			refresh_requested.emit())
-		add_field_row.add_child(add_field_btn)
 		_entry_fields.add_child(add_field_row)
 
 

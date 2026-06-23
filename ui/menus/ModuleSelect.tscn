@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d0s0wxmhxfdf3" path="res://ui/menus/ModuleSelect.gd" id="1_ms"]
 
-[node name="ModuleSelect" type="Control" unique_id=713144270 node_paths=PackedStringArray("module_list", "back_button")]
+[node name="ModuleSelect" type="Control" unique_id=713144270 node_paths=PackedStringArray("module_list", "back_button", "confirm_dialog")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,6 +12,7 @@ grow_vertical = 2
 script = ExtResource("1_ms")
 module_list = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ScrollContainer/ModuleList")
 back_button = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/BackButton")
+confirm_dialog = NodePath("ConfirmDialog")
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=1634668040]
 layout_mode = 1
@@ -59,3 +60,7 @@ size_flags_vertical = 3
 [node name="BackButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1903538190]
 layout_mode = 2
 text = "Back"
+
+[node name="ConfirmDialog" type="ConfirmationDialog" parent="." unique_id=1464166594]
+title = "Plugin Issues"
+ok_button_text = "Play Anyway"

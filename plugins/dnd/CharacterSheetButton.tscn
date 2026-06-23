@@ -1,9 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cmekv7mtp1yrf"]
 
-[ext_resource type="Script" path="res://plugins/dnd/CharacterSheetButton.gd" id="1_csb"]
+[ext_resource type="Script" uid="uid://by4poj0o0beak" path="res://plugins/dnd/CharacterSheetButton.gd" id="1_csb"]
 
-[node name="CharacterSheetButton" type="Button"]
-layout_mode = 2
+[node name="CharacterSheetButton" type="Button" unique_id=586496062]
 custom_minimum_size = Vector2(40, 40)
 tooltip_text = "Character Sheet"
 text = "📋"

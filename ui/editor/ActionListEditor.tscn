@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://1bwc4pfqddax"]
+
+[ext_resource type="Script" uid="uid://clhpumd7cwn1u" path="res://ui/editor/ActionListEditor.gd" id="1_ale"]
+
+[node name="ActionListEditor" type="VBoxContainer" unique_id=1600863718 node_paths=PackedStringArray("_container", "_add_button")]
+script = ExtResource("1_ale")
+_container = NodePath("Container")
+_add_button = NodePath("AddButton")
+
+[node name="Container" type="VBoxContainer" parent="." unique_id=790922911]
+layout_mode = 2
+
+[node name="AddButton" type="Button" parent="." unique_id=816769670]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "+ Add"

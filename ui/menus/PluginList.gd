@@ -7,6 +7,7 @@ signal plugins_changed
 @export var back_button: Button
 
 var PluginEntryScene = preload("res://ui/menus/PluginEntry.tscn")
+var _section_label_scene = preload("res://ui/shared/SectionLabel.tscn")
 var config := PluginConfig.new()
 
 
@@ -63,15 +64,13 @@ func _refresh_list():
 
 
 func _add_section_label(text: String):
-	var label = Label.new()
+	var label = _section_label_scene.instantiate()
 	label.text = text
-	label.add_theme_font_size_override("font_size", 14)
-	label.modulate = Color(0.7, 0.7, 0.7)
 	plugin_list.add_child(label)
 
 
 func _add_empty_label():
-	var label = Label.new()
+	var label = _section_label_scene.instantiate()
 	label.text = "None installed"
 	label.add_theme_font_size_override("font_size", 12)
 	label.modulate = Color(0.5, 0.5, 0.5)

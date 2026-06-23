@@ -1,0 +1,13 @@
+[gd_scene format=3]
+
+[node name="AddFieldRow" type="HBoxContainer"]
+layout_mode = 2
+
+[node name="NewKeyField" type="LineEdit" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "new field name"
+
+[node name="AddButton" type="Button" parent="."]
+layout_mode = 2
+text = "+ Field"
