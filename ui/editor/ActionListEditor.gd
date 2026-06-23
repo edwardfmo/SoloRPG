@@ -23,6 +23,8 @@ var is_condition_editor: bool = false
 
 var _actions: Array = []
 var _container: VBoxContainer
+var _collapsed_state: Dictionary = {}  # action_idx → bool (true = collapsed)
+var _collapsible_scene = preload("res://ui/editor/CollapsibleActionItem.tscn")
 
 
 func _ready():
@@ -60,7 +62,16 @@ func rebuild():
 		var action = _actions[ai] if _actions[ai] is Dictionary else {"type": str(_actions[ai])}
 		_actions[ai] = action
 
-		var action_box = VBoxContainer.new()
+		var type_name = action.get("type", "")
+		var is_collapsed = _collapsed_state.get(ai, true)
+
+		var collapsible: CollapsibleActionItem = _collapsible_scene.instantiate()
+		collapsible.init_data(ai, type_name, is_collapsed)
+		collapsible.toggle_collapsed.connect(func(idx, collapsed):
+			_collapsed_state[idx] = collapsed)
+		_container.add_child(collapsible)
+
+		var action_box = collapsible.get_content_container()
 
 		# Condition mode: OR toggle between rows
 		if is_condition_editor and ai > 0:
@@ -99,6 +110,7 @@ func rebuild():
 
 		type_field.text_changed.connect(func(new_text):
 			_actions[action_idx]["type"] = new_text
+			collapsible.update_label(new_text)
 			list_changed.emit())
 
 		type_field.text_submitted.connect(func(new_text):
@@ -115,6 +127,7 @@ func rebuild():
 		remove_btn.text = "X"
 		remove_btn.pressed.connect(func():
 			_actions.remove_at(action_idx)
+			_collapsed_state.erase(action_idx)
 			list_changed.emit()
 			rebuild())
 		type_row.add_child(remove_btn)
@@ -235,11 +248,11 @@ func rebuild():
 
 		var sep = HSeparator.new()
 		action_box.add_child(sep)
-		_container.add_child(action_box)
 
 
 func _on_add():
 	_actions.append({"type": ""})
+	_collapsed_state[_actions.size() - 1] = false
 	list_changed.emit()
 	rebuild()
 

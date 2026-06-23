@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://csp6dkc85uox2"]
+
+[ext_resource type="Script" uid="uid://deextyb4c7eoy" path="res://ui/editor/CollapsibleActionItem.gd" id="1_cai"]
+
+[node name="CollapsibleActionItem" type="VBoxContainer" unique_id=1851798132 node_paths=PackedStringArray("_header_button", "_margin", "_content")]
+script = ExtResource("1_cai")
+_header_button = NodePath("HeaderButton")
+_margin = NodePath("Margin")
+_content = NodePath("Margin/Content")
+
+[node name="HeaderButton" type="Button" parent="." unique_id=578549624]
+layout_mode = 2
+text = "▶ (empty)"
+flat = true
+alignment = 0
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=813918165]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 12
+
+[node name="Content" type="VBoxContainer" parent="Margin" unique_id=401604299]
+layout_mode = 2
+size_flags_horizontal = 3

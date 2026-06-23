@@ -1,9 +1,10 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://kwh35v6gac82"]
 
-[ext_resource type="Script" path="res://ui/editor/NodeInspector.gd" id="1_ni"]
+[ext_resource type="Script" uid="uid://bdle7pnqio0nd" path="res://ui/editor/NodeInspector.gd" id="1_ni"]
 
-[node name="NodeInspector" type="ScrollContainer" node_paths=PackedStringArray("id_edit", "text_edit", "image_edit", "on_enter_container", "choices_container", "add_choice_button")]
-layout_mode = 2
+[node name="NodeInspector" type="ScrollContainer" unique_id=795922947 node_paths=PackedStringArray("id_edit", "text_edit", "image_edit", "on_enter_container", "choices_container", "add_choice_button")]
+offset_right = 300.0
+offset_bottom = 800.0
 size_flags_vertical = 3
 script = ExtResource("1_ni")
 id_edit = NodePath("VBoxContainer/HBoxContainer/NodeIDEdit")
@@ -13,67 +14,67 @@ on_enter_container = NodePath("VBoxContainer/OnEnterContainer")
 choices_container = NodePath("VBoxContainer/ChoicesContainer")
 add_choice_button = NodePath("VBoxContainer/AddChoiceButton")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=638343574]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=322833550]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer" unique_id=219801817]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Node ID"
 
-[node name="NodeIDEdit" type="LineEdit" parent="VBoxContainer/HBoxContainer"]
+[node name="NodeIDEdit" type="LineEdit" parent="VBoxContainer/HBoxContainer" unique_id=1705178777]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label2" type="Label" parent="VBoxContainer"]
+[node name="Label2" type="Label" parent="VBoxContainer" unique_id=1304566691]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Text"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer" unique_id=1343919140]
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="NodeTextEdit" type="TextEdit" parent="VBoxContainer/ScrollContainer"]
+[node name="NodeTextEdit" type="TextEdit" parent="VBoxContainer/ScrollContainer" unique_id=1117704179]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer" unique_id=1174365630]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer2"]
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer2" unique_id=1363178187]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Image Path"
 
-[node name="ImagePathEdit" type="LineEdit" parent="VBoxContainer/HBoxContainer2"]
+[node name="ImagePathEdit" type="LineEdit" parent="VBoxContainer/HBoxContainer2" unique_id=1910363021]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="OnEnterLabel" type="Label" parent="VBoxContainer"]
+[node name="OnEnterLabel" type="Label" parent="VBoxContainer" unique_id=415197414]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "On Enter Actions"
 
-[node name="OnEnterContainer" type="VBoxContainer" parent="VBoxContainer"]
+[node name="OnEnterContainer" type="VBoxContainer" parent="VBoxContainer" unique_id=1490981056]
 layout_mode = 2
 
-[node name="ChoicesLabel" type="Label" parent="VBoxContainer"]
+[node name="ChoicesLabel" type="Label" parent="VBoxContainer" unique_id=1289217256]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Choices"
 
-[node name="ChoicesContainer" type="VBoxContainer" parent="VBoxContainer"]
+[node name="ChoicesContainer" type="VBoxContainer" parent="VBoxContainer" unique_id=1773998666]
 layout_mode = 2
 
-[node name="AddChoiceButton" type="Button" parent="VBoxContainer"]
+[node name="AddChoiceButton" type="Button" parent="VBoxContainer" unique_id=1624798695]
 layout_mode = 2
 text = "Add Choice"
 

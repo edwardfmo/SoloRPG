@@ -1,0 +1,79 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/editor/CollapsibleChoiceItem.gd" id="1_cci"]
+
+[node name="CollapsibleChoiceItem" type="VBoxContainer" node_paths=PackedStringArray("_header_button", "_margin", "_content", "_id_field", "_text_field", "_next_field", "_cond_label", "_act_label")]
+script = ExtResource("1_cci")
+_header_button = NodePath("HeaderButton")
+_margin = NodePath("Margin")
+_content = NodePath("Margin/Content")
+_id_field = NodePath("Margin/Content/IDRow/IDField")
+_text_field = NodePath("Margin/Content/TextRow/TextField")
+_next_field = NodePath("Margin/Content/NextRow/NextField")
+_cond_label = NodePath("Margin/Content/CondLabel")
+_act_label = NodePath("Margin/Content/ActLabel")
+
+[node name="HeaderButton" type="Button" parent="."]
+layout_mode = 2
+text = "▶ (empty)"
+flat = true
+alignment = 0
+
+[node name="Margin" type="MarginContainer" parent="."]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 12
+
+[node name="Content" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="IDRow" type="HBoxContainer" parent="Margin/Content"]
+layout_mode = 2
+
+[node name="IDLabel" type="Label" parent="Margin/Content/IDRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "ID"
+
+[node name="IDField" type="LineEdit" parent="Margin/Content/IDRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TextRow" type="HBoxContainer" parent="Margin/Content"]
+layout_mode = 2
+
+[node name="TextLabel" type="Label" parent="Margin/Content/TextRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Text"
+
+[node name="TextField" type="LineEdit" parent="Margin/Content/TextRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NextRow" type="HBoxContainer" parent="Margin/Content"]
+layout_mode = 2
+
+[node name="NextLabel" type="Label" parent="Margin/Content/NextRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Next"
+
+[node name="NextField" type="LineEdit" parent="Margin/Content/NextRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="CondLabel" type="Label" parent="Margin/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Conditions"
+
+[node name="ActLabel" type="Label" parent="Margin/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "Actions"
+
+[node name="Separator" type="HSeparator" parent="Margin/Content"]
+layout_mode = 2

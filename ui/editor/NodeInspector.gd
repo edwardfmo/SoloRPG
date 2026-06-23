@@ -10,6 +10,7 @@ extends ScrollContainer
 var selected_node: StoryNode = null
 var _expanded_choices: Array = []
 var _on_enter_editor: VBoxContainer = null
+var _choice_scene: PackedScene = preload("res://ui/editor/CollapsibleChoiceItem.tscn")
 
 ## Published action types for on_enter autocomplete
 var available_actions: Array[String] = []
@@ -131,83 +132,27 @@ func rebuild_choices_list(expand_idx: int = -1):
 
 	for i in selected_node.data["choices"].size():
 		var choice = selected_node.data["choices"][i]
-		var row = VBoxContainer.new()
 		var idx = i
+		var is_expanded = idx in prev_expanded
 
-		# Collapsed header button
-		var next_id = choice.get("next", "")
-		var header_text = choice.get("id", "") + " -> " + (next_id if next_id != "" else "Self")
-		var header = Button.new()
-		header.text = header_text
-		header.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		header.flat = true
-		row.add_child(header)
-
-		# Expanded details container (restore previous state)
-		var details = VBoxContainer.new()
-		details.visible = idx in prev_expanded
-		if details.visible:
-			_expanded_choices.append(idx)
-		header.pressed.connect(func():
-			details.visible = not details.visible
-			if details.visible:
-				if idx not in _expanded_choices:
-					_expanded_choices.append(idx)
+		var item: CollapsibleChoiceItem = _choice_scene.instantiate()
+		item.init_data(idx, choice, not is_expanded)
+		item.toggle_collapsed.connect(func(ci, collapsed):
+			if not collapsed:
+				if ci not in _expanded_choices:
+					_expanded_choices.append(ci)
 			else:
-				_expanded_choices.erase(idx))
-
-		# Choice ID row
-		var id_row = HBoxContainer.new()
-		var id_label = Label.new()
-		id_label.text = "ID"
-		id_label.add_theme_font_size_override("font_size", 11)
-		var id_field = LineEdit.new()
-		id_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		id_field.text = choice.get("id", "")
-		id_field.text_changed.connect(func(new_text):
-			selected_node.data["choices"][idx]["id"] = new_text
-			var n = selected_node.data["choices"][idx].get("next", "")
-			header.text = new_text + " -> " + (n if n != "" else "Self"))
-		id_row.add_child(id_label)
-		id_row.add_child(id_field)
-		details.add_child(id_row)
-
-		# Choice Text row
-		var text_row = HBoxContainer.new()
-		var text_label = Label.new()
-		text_label.text = "Text"
-		text_label.add_theme_font_size_override("font_size", 11)
-		var text_field = LineEdit.new()
-		text_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		text_field.text = choice.get("text", "")
-		text_field.text_changed.connect(func(new_text):
-			selected_node.data["choices"][idx]["text"] = new_text
+				_expanded_choices.erase(ci))
+		item.choice_text_changed.connect(func(_ci, _new_text):
 			selected_node.rebuild_ports())
-		text_row.add_child(text_label)
-		text_row.add_child(text_field)
-		details.add_child(text_row)
+		choices_container.add_child(item)
 
-		# Next node row (read-only)
-		var next_row = HBoxContainer.new()
-		var next_label = Label.new()
-		next_label.text = "Next"
-		next_label.add_theme_font_size_override("font_size", 11)
-		var next_field = LineEdit.new()
-		next_field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		next_field.text = choice.get("next", "") if choice.get("next", "") != "" else "Self"
-		next_field.editable = false
-		next_row.add_child(next_label)
-		next_row.add_child(next_field)
-		details.add_child(next_row)
+		if is_expanded:
+			_expanded_choices.append(idx)
 
-		# Conditions section using ActionListEditor
+		# Conditions section
 		if not choice.has("conditions"):
 			choice["conditions"] = []
-
-		var cond_label = Label.new()
-		cond_label.text = "Conditions"
-		cond_label.add_theme_font_size_override("font_size", 11)
-		details.add_child(cond_label)
 
 		var cond_editor = ActionListEditor.new()
 		cond_editor.is_condition_editor = true
@@ -216,16 +161,13 @@ func rebuild_choices_list(expand_idx: int = -1):
 			cond_editor.param_provider = api.get_params_for_type
 			cond_editor.entry_hints = _get_entry_hints()
 		cond_editor.set_actions(choice["conditions"])
-		details.add_child(cond_editor)
+		var content = item.get_content_container()
+		content.add_child(cond_editor)
+		content.move_child(cond_editor, item.get_conditions_insert_point().get_index() + 1)
 
-		# Actions section using ActionListEditor
+		# Actions section
 		if not choice.has("actions"):
 			choice["actions"] = []
-
-		var act_label = Label.new()
-		act_label.text = "Actions"
-		act_label.add_theme_font_size_override("font_size", 11)
-		details.add_child(act_label)
 
 		var act_editor = ActionListEditor.new()
 		act_editor.available_types = available_actions
@@ -233,13 +175,5 @@ func rebuild_choices_list(expand_idx: int = -1):
 			act_editor.param_provider = api.get_params_for_type
 			act_editor.entry_hints = _get_entry_hints()
 		act_editor.set_actions(choice["actions"])
-		details.add_child(act_editor)
-
-		details.add_child(HSeparator.new())
-		row.add_child(details)
-
-		# Separator
-		var sep = HSeparator.new()
-		row.add_child(sep)
-
-		choices_container.add_child(row)
+		content.add_child(act_editor)
+		content.move_child(act_editor, item.get_actions_insert_point().get_index() + 1)
