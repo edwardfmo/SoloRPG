@@ -26,6 +26,10 @@ var _dep_dialog: Control = null
 var _pending_save_path: String = ""
 var _module_entries: Dictionary = {}  # template_id → [entry dicts]
 var _module_active: bool = false
+var _attaching_frame: bool = false
+var _drag_detach_set: Dictionary = {}  # node name → true, elements detached at drag start
+var _context_menu: PopupMenu = null
+var _context_menu_position: Vector2 = Vector2.ZERO
 
 func set_api(api: ModAPI):
 	_api = api
@@ -51,6 +55,7 @@ func _ready() -> void:
 	graph.connection_request.connect(_on_connection_request)
 	graph.disconnection_request.connect(_on_disconnection_request)
 	graph.delete_nodes_request.connect(_on_delete_nodes_request)
+	graph.gui_input.connect(_on_graph_gui_input)
 	node_inspector.visible = false
 
 
@@ -76,24 +81,67 @@ func _set_module_controls_enabled(enabled: bool):
 	save_button.disabled = not enabled
 	save_as_button.disabled = not enabled
 
-func _input(event):
+func _on_graph_gui_input(event):
 	if graph.process_mode == Node.PROCESS_MODE_DISABLED:
 		return
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-			create_node_at_mouse()
-	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_G and event.ctrl_pressed:
-			create_frame_at_mouse()
+			_show_context_menu()
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed and event.ctrl_pressed:
+			_detach_selected_elements()
+		if event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+			_drag_detach_set.clear()
+
+
+func _show_context_menu():
+	_context_menu_position = (graph.get_local_mouse_position() + graph.scroll_offset) / graph.zoom
+	if _context_menu:
+		_context_menu.queue_free()
+	_context_menu = PopupMenu.new()
+	_context_menu.add_item("Create Node", 0)
+	_context_menu.add_item("Create Group", 1)
+	_context_menu.id_pressed.connect(_on_context_menu_selected)
+	add_child(_context_menu)
+	var mouse_screen = get_viewport().get_mouse_position()
+	_context_menu.position = Vector2i(mouse_screen)
+	_context_menu.popup()
+
+
+func _on_context_menu_selected(id: int):
+	match id:
+		0: create_node_at(_context_menu_position)
+		1: create_frame_at(_context_menu_position)
+
+
+func _detach_selected_elements():
+	for node in nodes:
+		if node.selected:
+			var current_frame = graph.get_element_frame(node.name)
+			if current_frame:
+				_attaching_frame = true
+				graph.detach_graph_element_from_frame(node.name)
+				_attaching_frame = false
+			_drag_detach_set[node.name] = true
+	for frame in frames:
+		if frame.selected:
+			var current_frame = graph.get_element_frame(frame.name)
+			if current_frame:
+				_attaching_frame = true
+				graph.detach_graph_element_from_frame(frame.name)
+				_attaching_frame = false
+			_drag_detach_set[frame.name] = true
 
 func create_node_at_mouse():
+	create_node_at((graph.get_local_mouse_position() + graph.scroll_offset) / graph.zoom)
+
+
+func create_node_at(pos: Vector2):
 	var node = StoryNode.new()
 
 	node.name = "node_" + str(nodes.size())
 
-	# Convert screen → graph space
-	node.position_offset = graph.get_local_mouse_position() + graph.scroll_offset
-	node.data["offset"] = [node.position_offset.x, node.position_offset.y]
+	node.position_offset = pos
+	node.data["offset"] = [pos.x, pos.y]
 
 	graph.add_child(node)
 	nodes.append(node)
@@ -121,7 +169,7 @@ func create_node_at_mouse():
 	# Auto-attach to frame if dropped inside one
 	node.dragged.connect(func(_from, _to):
 		_auto_attach_to_frame(node))
-	_auto_attach_to_frame(node)
+	_auto_attach_to_frame(node, pos)
 
 func _generate_unique_id(base: String) -> String:
 	var id = base
@@ -135,16 +183,23 @@ func _generate_unique_id(base: String) -> String:
 
 
 func create_frame_at_mouse():
+	create_frame_at((graph.get_local_mouse_position() + graph.scroll_offset) / graph.zoom)
+
+
+func create_frame_at(pos: Vector2):
 	var frame = GraphFrame.new()
 	frame.name = "frame_" + str(frames.size())
 	frame.title = "Group"
 	frame.tint_color_enabled = true
 	frame.autoshrink_enabled = true
-	frame.position_offset = graph.get_local_mouse_position() + graph.scroll_offset
+	frame.position_offset = pos
 	frame.custom_minimum_size = Vector2(300, 200)
 	graph.add_child(frame)
 	frames.append(frame)
 	_setup_frame_rename(frame)
+	frame.dragged.connect(func(_from, _to):
+		_auto_attach_to_frame(frame))
+	_auto_attach_to_frame(frame, pos)
 
 
 func _setup_frame_rename(frame: GraphFrame):
@@ -175,23 +230,53 @@ func _setup_frame_rename(frame: GraphFrame):
 			edit.focus_exited.connect(_commit))
 
 
-func _auto_attach_to_frame(node: GraphNode):
-	var node_rect = Rect2(node.position_offset, node.size)
+func _is_descendant_frame(ancestor: GraphFrame, descendant: GraphFrame) -> bool:
+	# Check if 'ancestor' is nested inside 'descendant' (which would make it circular)
+	var current = graph.get_element_frame(ancestor.name)
+	while current:
+		if current == descendant:
+			return true
+		current = graph.get_element_frame(current.name)
+	return false
+
+
+func _auto_attach_to_frame(node: GraphElement, check_pos: Vector2 = Vector2.INF):
+	if _attaching_frame:
+		return
+
+	# Element was detached via Ctrl at drag start; skip re-attachment until drop
+	if _drag_detach_set.has(node.name):
+		return
+
+	var mouse_pos = check_pos if check_pos != Vector2.INF else (graph.get_local_mouse_position() + graph.scroll_offset) / graph.zoom
 	var best_frame: GraphFrame = null
+	var best_area: float = INF
 
 	for frame in frames:
+		if frame == node:
+			continue
+		# Skip frames that are descendants of node (prevent circular nesting)
+		if node is GraphFrame and _is_descendant_frame(frame, node):
+			continue
 		var frame_rect = Rect2(frame.position_offset, frame.size)
-		if frame_rect.encloses(node_rect):
-			best_frame = frame
+		if frame_rect.has_point(mouse_pos):
+			var area = frame_rect.get_area()
+			if area < best_area:
+				best_area = area
+				best_frame = frame
 
 	# Detach from current frame if outside
 	var current_frame = graph.get_element_frame(node.name)
 	if current_frame and current_frame != best_frame:
+		_attaching_frame = true
 		graph.detach_graph_element_from_frame(node.name)
+		_attaching_frame = false
 
 	# Attach to new frame
 	if best_frame and graph.get_element_frame(node.name) != best_frame:
+		_attaching_frame = true
 		graph.attach_graph_element_to_frame(node.name, best_frame.name)
+		_attaching_frame = false
 
 
 func _on_node_id_changed(old_id, new_id, node):
@@ -276,6 +361,9 @@ func export_module(path: String):
 
 	# Serialize frames
 	var frames_data = []
+	var frame_index_map = {}
+	for i in frames.size():
+		frame_index_map[frames[i]] = i
 	for frame in frames:
 		var frame_info = {
 			"title": frame.title,
@@ -286,6 +374,10 @@ func export_module(path: String):
 		for node in nodes:
 			if graph.get_element_frame(node.name) == frame:
 				frame_info["attached_nodes"].append(node.data["id"])
+		# Save parent frame index for nesting
+		var pf = graph.get_element_frame(frame.name)
+		if pf and frame_index_map.has(pf):
+			frame_info["parent_frame"] = frame_index_map[pf]
 		frames_data.append(frame_info)
 	if frames_data.size() > 0:
 		module["frames"] = frames_data
@@ -567,6 +659,12 @@ func load_module(path: String):
 			if id_map.has(attached_id):
 				var attached_node = id_map[attached_id]
 				graph.attach_graph_element_to_frame(attached_node.name, frame.name)
+	# Restore frame nesting (parent_frame index)
+	for i in frames_data.size():
+		var fd = frames_data[i]
+		var parent_idx = fd.get("parent_frame", -1)
+		if parent_idx >= 0 and parent_idx < frames.size():
+			graph.attach_graph_element_to_frame(frames[i].name, frames[parent_idx].name)
 
 func _clear_editor():
 	# Disconnect all graph connections
@@ -613,6 +711,19 @@ func _on_delete_nodes_request(node_names: Array[StringName]):
 			continue
 		var node = graph.get_node(NodePath(str(node_name)))
 		if node is GraphFrame:
+			var parent_frame = graph.get_element_frame(node.name)
+			# Reparent attached nodes to parent frame (or root)
+			for n in nodes:
+				if graph.get_element_frame(n.name) == node:
+					graph.detach_graph_element_from_frame(n.name)
+					if parent_frame:
+						graph.attach_graph_element_to_frame(n.name, parent_frame.name)
+			# Reparent nested frames to parent frame (or root)
+			for f in frames:
+				if f != node and graph.get_element_frame(f.name) == node:
+					graph.detach_graph_element_from_frame(f.name)
+					if parent_frame:
+						graph.attach_graph_element_to_frame(f.name, parent_frame.name)
 			frames.erase(node)
 			graph.remove_child(node)
 			node.queue_free()
