@@ -17,12 +17,12 @@ func get_ui_panels() -> Array[Dictionary]:
 	]
 
 
-func on_game_start(context: Dictionary):
-	context.erase(BACKTRACK_KEY)
+func on_game_start():
+	api.erase_value(BACKTRACK_KEY)
 
 
-func on_pre_choice(context: Dictionary):
+func on_pre_choice():
 	# Save current context (without the backtrack entry itself to avoid nesting)
-	var snapshot = context.duplicate(true)
+	var snapshot = api.context.duplicate(true)
 	snapshot.erase(BACKTRACK_KEY)
-	context[BACKTRACK_KEY] = snapshot
+	api.set_value(BACKTRACK_KEY, snapshot)

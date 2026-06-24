@@ -8,8 +8,10 @@ var _evaluator_instances := []  # keeps RefCounted evaluators alive
 var _templates := {}  # template_id → {id, name, fields, source_plugin}
 var _entries := {}  # template_id → {namespace.entry_id → entry_dict}
 var _compendium_metadata := {}  # compendium_id → {name, version, author, ...}
+var context := {}               # live game context — single source of truth
 var context_changed_callback: Callable  # set by GameView to notify UI of context updates
 var show_overlay_callback: Callable     # set by GameView to show overlay views
+var get_overlay_node_callback: Callable  # set by GameView: func(id: String) -> PluginOverlay
 var save_to_path_callback: Callable     # set by Main to allow plugins to trigger saves
 var load_from_path_callback: Callable   # set by Main to allow plugins to trigger loads
 var restore_state_callback: Callable    # set by Main: func(context: Dictionary)
@@ -155,10 +157,10 @@ func get_params_for_type(type: String) -> Array[Dictionary]:
 
 
 ## Notify plugin UI that context has changed.
-func notify_context_changed(context: Dictionary):
+func notify_context_changed():
 	for plugin in plugins.values():
 		if plugin is Plugin:
-			plugin.on_context_changed(context)
+			plugin.on_context_changed()
 	if context_changed_callback.is_valid():
 		context_changed_callback.call(context)
 
@@ -169,8 +171,15 @@ func show_overlay(overlay_id: String, params: Dictionary = {}):
 		show_overlay_callback.call(overlay_id, params)
 
 
+## Get a reference to an overlay node by id. Returns null if not found.
+func get_overlay_node(overlay_id: String) -> PluginOverlay:
+	if get_overlay_node_callback.is_valid():
+		return get_overlay_node_callback.call(overlay_id)
+	return null
+
+
 ## Dispatch an action to the appropriate plugin based on type prefix.
-func dispatch_action(type: String, data: Dictionary = {}, context: Dictionary = {}):
+func dispatch_action(type: String, data: Dictionary = {}):
 	var dot_idx = type.find(".")
 	if dot_idx <= 0:
 		push_warning("[ModAPI] Invalid action type: ", type)
@@ -183,11 +192,11 @@ func dispatch_action(type: String, data: Dictionary = {}, context: Dictionary = 
 		return
 	var copy = data.duplicate(true)
 	copy["type"] = type
-	_resolve_and_dispatch(plugin, action_name, copy, context)
+	_resolve_and_dispatch(plugin, action_name, copy)
 
 
 ## Shared action resolution: resolve inputs, dispatch to plugin, write outputs.
-func _resolve_and_dispatch(plugin, action_name: String, data: Dictionary, context: Dictionary):
+func _resolve_and_dispatch(plugin, action_name: String, data: Dictionary):
 	# Save output param paths before handle_action overwrites them
 	var output_paths := {}
 	if plugin.has_method("get_action_params"):
@@ -208,16 +217,16 @@ func _resolve_and_dispatch(plugin, action_name: String, data: Dictionary, contex
 			_raw_refs[key] = val
 		if val is String and val.begins_with("$$"):
 			# Read from context and evaluate the result
-			var resolved = get_context_path(context, val.substr(2))
+			var resolved = _get_context_path(val.substr(2))
 			data[key] = evaluate(resolved) if resolved is String else resolved
 		elif val is String and val.begins_with("$"):
 			# Read from context (raw)
-			data[key] = get_context_path(context, val.substr(1))
+			data[key] = _get_context_path(val.substr(1))
 		else:
 			data[key] = evaluate(val)
 	data["_raw_refs"] = _raw_refs
 
-	plugin.handle_action(action_name, data, context)
+	plugin.handle_action(action_name, data)
 
 	# Clean up internal key
 	data.erase("_raw_refs")
@@ -225,11 +234,11 @@ func _resolve_and_dispatch(plugin, action_name: String, data: Dictionary, contex
 	# Write output params to context at their dot-paths
 	for key in output_paths:
 		if data.has(key):
-			set_context_path(context, output_paths[key], data[key])
+			_set_context_path(output_paths[key], data[key])
 
 
 ## Write a value into context at a dot-separated path, creating nested dicts as needed.
-func set_context_path(context: Dictionary, path: String, value):
+func _set_context_path(path: String, value):
 	var keys = path.split(".")
 	var current = context
 	for i in keys.size() - 1:
@@ -242,7 +251,7 @@ func set_context_path(context: Dictionary, path: String, value):
 
 ## Read a value from context at a dot-separated path. Resolves _ref wrappers
 ## transparently. Returns null and warns if the path does not exist.
-func get_context_path(context: Dictionary, path: String) -> Variant:
+func _get_context_path(path: String) -> Variant:
 	var keys = path.split(".")
 	var current: Variant = context
 	for k in keys:
@@ -258,7 +267,7 @@ func get_context_path(context: Dictionary, path: String) -> Variant:
 
 
 ## Remove a key from context at a dot-separated path. No-op if path doesn't exist.
-func erase_context_path(context: Dictionary, path: String):
+func _erase_context_path(path: String):
 	var keys = path.split(".")
 	var current: Variant = context
 	for i in keys.size() - 1:
@@ -270,18 +279,36 @@ func erase_context_path(context: Dictionary, path: String):
 		current.erase(keys[keys.size() - 1])
 
 
+## Write a value into the live context at a dot-separated path.
+func set_value(path: String, value):
+	_set_context_path(path, value)
+
+
+## Read a value from the live context at a dot-separated path.
+func get_value(path: String) -> Variant:
+	return _get_context_path(path)
+
+
+## Remove a key from the live context at a dot-separated path.
+func erase_value(path: String):
+	_erase_context_path(path)
+
+
 ## Notify all plugins that a new game has started so they can initialize context.
-func notify_game_started(context: Dictionary):
+## Plugins may return a Signal to block until an async operation completes.
+func notify_game_started():
 	for plugin in plugins.values():
 		if plugin is Plugin:
-			plugin.on_game_start(context)
+			var result = plugin.on_game_start()
+			if result is Signal:
+				await result
 
 
 ## Notify all plugins before a choice is executed.
-func notify_pre_choice(context: Dictionary):
+func notify_pre_choice():
 	for plugin in plugins.values():
 		if plugin is Plugin:
-			plugin.on_pre_choice(context)
+			plugin.on_pre_choice()
 
 
 # ─── Compendium / Template API ───────────────────────────────────────────────
@@ -350,6 +377,17 @@ func query_entries(template_id: String, filter: Dictionary) -> Array[Dictionary]
 				break
 		if matches:
 			result.append(entry)
+	return result
+
+
+## Get entry reference hint strings for the given accepted type IDs.
+## Returns strings like "@template_id/namespace.entry_id" for use in HintedLineEdit.
+func get_entry_ref_hints(type_ids: Array) -> Array[String]:
+	var result: Array[String] = []
+	for type_id in type_ids:
+		var map = _entries.get(type_id, {})
+		for namespaced_id in map:
+			result.append("@" + type_id + "/" + namespaced_id)
 	return result
 
 

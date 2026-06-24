@@ -31,6 +31,7 @@ func set_api(api: ModAPI):
 	_api = api
 	api.context_changed_callback = _on_context_changed
 	api.show_overlay_callback = show_overlay
+	api.get_overlay_node_callback = get_overlay_node
 	_load_hud_panels()
 	_load_overlay_panels()
 	_load_sidebar_icons()
@@ -132,6 +133,15 @@ func show_overlay(overlay_id: String, params: Dictionary = {}):
 		overlay.update_context(_last_context)
 		overlay.open(params)
 		overlay_container.move_to_front()
+
+
+func get_overlay_node(overlay_id: String) -> PluginOverlay:
+	if not _overlay_nodes.has(overlay_id):
+		return null
+	var overlay = _overlay_nodes[overlay_id]
+	if overlay is PluginOverlay:
+		return overlay
+	return null
 
 
 func _on_context_changed(context: Dictionary):

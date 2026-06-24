@@ -31,14 +31,14 @@ func get_condition_params(cond_name: String) -> Array[Dictionary]:
 	return []
 
 
-func handle_action(action_name: String, data: Dictionary, _context):
+func handle_action(action_name: String, data: Dictionary):
 	if action_name == "show_view":
 		var view_id = data.get("view", "")
 		if view_id == "":
 			return
 		var params := {}
 		for key in data:
-			if key != "type" and key != "view":
+			if key != "type" and key != "view" and not key.begins_with("_"):
 				params[key] = data[key]
 		if api:
 			api.show_overlay(view_id, params)
@@ -48,24 +48,24 @@ func handle_action(action_name: String, data: Dictionary, _context):
 			return
 		var value = data.get("value", "")
 		if value is String:
-			value = _resolve_value(value, _context)
-		_set_path(_context, path, value)
+			value = _resolve_value(value)
+		api.set_value(path, value)
 	elif action_name == "clear":
 		var path: String = data.get("path", "")
 		if path == "":
 			return
-		_clear_path(_context, path)
+		api.erase_value(path)
 
 
-func check_condition(cond_name: String, data: Dictionary, context) -> bool:
+func check_condition(cond_name: String, data: Dictionary) -> bool:
 	if cond_name == "check":
-		return _check(data, context)
+		return _check(data)
 	if cond_name == "exists":
-		return _exists(data, context)
+		return _exists(data)
 	return false
 
 
-func _check(data: Dictionary, context) -> bool:
+func _check(data: Dictionary) -> bool:
 	var path: String = data.get("path", "")
 	var op: String = data.get("op", "==")
 	var value = data.get("value")
@@ -74,10 +74,10 @@ func _check(data: Dictionary, context) -> bool:
 		return false
 
 	# Read left side from context (raw, no resolve — compare refs directly)
-	var left = _read_path(context, path)
+	var left = _read_path(path)
 
 	# Resolve right side: supports $path, @entry, /r dice, or literal
-	var right = _resolve_value(value, context)
+	var right = _resolve_value(value)
 
 	# If left is a _ref wrapper and right is a string starting with @, compare ref strings
 	if left is Dictionary and left.has("_ref") and right is String and right.begins_with("@"):
@@ -90,9 +90,9 @@ func _check(data: Dictionary, context) -> bool:
 	return _compare(left, op, right)
 
 
-func _read_path(context, path: String) -> Variant:
+func _read_path(path: String) -> Variant:
 	var keys = path.split(".")
-	var current: Variant = context
+	var current: Variant = api.context
 	for k in keys:
 		if not current is Dictionary or not current.has(k):
 			return null
@@ -100,14 +100,14 @@ func _read_path(context, path: String) -> Variant:
 	return current
 
 
-func _resolve_value(value, context) -> Variant:
+func _resolve_value(value) -> Variant:
 	if not value is String:
 		return value
 	if value.begins_with("$$"):
-		var resolved = api.get_context_path(context, value.substr(2))
+		var resolved = api.get_value(value.substr(2))
 		return api.evaluate(resolved) if resolved is String else resolved
 	if value.begins_with("$"):
-		return api.get_context_path(context, value.substr(1))
+		return api.get_value(value.substr(1))
 	return api.evaluate(value)
 
 
@@ -136,40 +136,14 @@ func _to_num(val) -> float:
 	return 0.0
 
 
-func _exists(data: Dictionary, context) -> bool:
+func _exists(data: Dictionary) -> bool:
 	var path: String = data.get("path", "")
 	if path == "":
 		return false
 	var keys = path.split(".")
-	var current: Variant = context
+	var current: Variant = api.context
 	for k in keys:
 		if not current is Dictionary or not current.has(k):
 			return false
 		current = current[k]
 	return true
-
-
-func _set_path(context, path: String, value) -> void:
-	var keys = path.split(".")
-	var current: Variant = context
-	for i in keys.size() - 1:
-		var k = keys[i]
-		if not current is Dictionary:
-			return
-		if not current.has(k) or not current[k] is Dictionary:
-			current[k] = {}
-		current = current[k]
-	if current is Dictionary:
-		current[keys[keys.size() - 1]] = value
-
-
-func _clear_path(context, path: String) -> void:
-	var keys = path.split(".")
-	var current: Variant = context
-	for i in keys.size() - 1:
-		var k = keys[i]
-		if not current is Dictionary or not current.has(k):
-			return
-		current = current[k]
-	if current is Dictionary:
-		current.erase(keys[keys.size() - 1])

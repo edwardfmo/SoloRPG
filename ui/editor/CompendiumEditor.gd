@@ -109,6 +109,25 @@ func _update_new_entry_menu():
 
 # --- Entry Operations ---
 
+func _build_new_entry(template_id: String) -> Dictionary:
+	var entry := {"id": "new_entry", "name": "New Entry"}
+	if _api == null:
+		return entry
+	var tmpl = _api.get_template(template_id)
+	for field in tmpl.get("fields", []):
+		if field.get("mandatory", false) and field["name"] != "id" and field["name"] != "name":
+			match field.get("type", "string"):
+				"float":
+					entry[field["name"]] = 0.0
+				"int":
+					entry[field["name"]] = 0
+				"array":
+					entry[field["name"]] = []
+				_:
+					entry[field["name"]] = ""
+	return entry
+
+
 func _on_new_compendium():
 	_storage.add_compendium()
 	_comp_tree.rebuild()
@@ -126,7 +145,7 @@ func _on_new_entry_type_selected(idx: int):
 	if not comp["entries"].has(template_id):
 		comp["entries"][template_id] = []
 
-	var new_entry = {"id": "new_entry", "name": "New Entry"}
+	var new_entry = _build_new_entry(template_id)
 	comp["entries"][template_id].append(new_entry)
 	_storage.mark_entry_dirty(_selected_comp_id, template_id, "new_entry")
 	_comp_tree.rebuild(_selected_comp_id, template_id, "new_entry")

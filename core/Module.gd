@@ -73,7 +73,7 @@ func _execute_action(action: Dictionary, context):
 		push_warning(plugin_name + " has no handle_action()")
 		return
 
-	api._resolve_and_dispatch(plugin, action_name, action.duplicate(true), context)
+	api._resolve_and_dispatch(plugin, action_name, action.duplicate(true))
 
 
 func are_conditions_met(conditions: Array, context) -> bool:
@@ -118,7 +118,7 @@ func _check_condition(cond: Dictionary, context) -> bool:
 		return false
 
 	if plugin.has_method("check_condition"):
-		return plugin.check_condition(cond_name, cond.duplicate(true), context)
+		return plugin.check_condition(cond_name, cond.duplicate(true))
 
 	push_warning(plugin_name + " has no check_condition()")
 	return false

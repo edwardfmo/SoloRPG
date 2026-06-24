@@ -10,7 +10,6 @@ extends Control
 var module
 var api = ModAPI.new()
 var plugin_config := PluginConfig.new()
-var context = {}
 var current_node_id
 var current_module_path: String = ""
 
@@ -231,40 +230,40 @@ func _start_game(path: String, optional_ids: Array[String] = []):
 	module = Module.new()
 	module.init(data, api)
 
-	context = {}
+	api.context = {}
 	# Snapshot active plugins for this game session
-	context["_plugins"] = _build_plugin_snapshot()
-	api.notify_game_started(context)
+	api.context["_plugins"] = _build_plugin_snapshot()
+	await api.notify_game_started()
 	current_node_id = module.start_node
 
 	_enter_node()
 
 
 func _enter_node():
-	context["_current_node_id"] = current_node_id
-	module.enter_node(current_node_id, context)
-	api.notify_context_changed(context)
+	api.context["_current_node_id"] = current_node_id
+	module.enter_node(current_node_id, api.context)
+	api.notify_context_changed()
 
 	var node = module.get_node(current_node_id)
-	game_view.display_node(node, module, context)
+	game_view.display_node(node, module, api.context)
 
 
 func _restore_state(new_context: Dictionary):
-	context = new_context
-	current_node_id = context.get("_current_node_id", current_node_id)
-	api.notify_context_changed(context)
+	api.context = new_context
+	current_node_id = api.context.get("_current_node_id", current_node_id)
+	api.notify_context_changed()
 	var node = module.get_node(current_node_id)
-	game_view.display_node(node, module, context)
+	game_view.display_node(node, module, api.context)
 
 
 func _on_choice_selected(choice):
 	if choice.get("_end_game", false):
 		_show_menu()
 		return
-	api.notify_pre_choice(context)
+	api.notify_pre_choice()
 	for action in choice.get("actions", []):
-		module._execute_action(action, context)
-	api.notify_context_changed(context)
+		module._execute_action(action, api.context)
+	api.notify_context_changed()
 	var next = choice.get("next", "")
 	if next != "":
 		current_node_id = next
@@ -279,8 +278,8 @@ func _get_save_data() -> Dictionary:
 	return {
 		"module_path": current_module_path,
 		"module_version": module.version if module else "",
-		"context": context,
-		"plugins": context.get("_plugins", {}),
+		"context": api.context,
+		"plugins": api.context.get("_plugins", {}),
 	}
 
 
@@ -365,11 +364,11 @@ func _apply_load(path: String, data: Dictionary, save_data: Dictionary):
 	module = Module.new()
 	module.init(data, api)
 
-	context = save_data.get("context", {})
+	api.context = save_data.get("context", {})
 	# Ensure _plugins is present in context
-	if not context.has("_plugins"):
-		context["_plugins"] = saved_plugins if not saved_plugins.is_empty() else _build_plugin_snapshot()
-	current_node_id = context.get("_current_node_id", save_data.get("node_id", module.start_node))
+	if not api.context.has("_plugins"):
+		api.context["_plugins"] = saved_plugins if not saved_plugins.is_empty() else _build_plugin_snapshot()
+	current_node_id = api.context.get("_current_node_id", save_data.get("node_id", module.start_node))
 
 	main_menu.visible = false
 	background.visible = false
@@ -378,9 +377,9 @@ func _apply_load(path: String, data: Dictionary, save_data: Dictionary):
 	module_select.visible = false
 	plugin_list.visible = false
 
-	api.notify_context_changed(context)
+	api.notify_context_changed()
 	var node = module.get_node(current_node_id)
-	game_view.display_node(node, module, context)
+	game_view.display_node(node, module, api.context)
 
 
 func _build_plugin_snapshot() -> Dictionary:

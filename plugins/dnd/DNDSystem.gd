@@ -1,5 +1,8 @@
 extends Plugin
 
+var _character_entries = preload("res://plugins/dnd/DNDCharacterEntries.gd").new()
+var _item_entries = preload("res://plugins/dnd/DNDItemEntries.gd").new()
+
 
 func get_actions() -> Array[String]:
 	return ["dnd.take_damage", "dnd.equip_item"]
@@ -13,58 +16,38 @@ func get_ui_panels() -> Array[Dictionary]:
 	return [
 		{"slot": "game_hud", "scene": "res://plugins/dnd/HpBar.tscn", "id": "dnd_hp_bar"},
 		{"slot": "game_overlay", "scene": "res://plugins/dnd/CharacterSheet.tscn", "id": "dnd_character_sheet"},
+		{"slot": "game_overlay", "scene": "res://plugins/dnd/CharacterCreator.tscn", "id": "dnd_character_creator"},
 		{"slot": "sidebar_icon", "scene": "res://plugins/dnd/CharacterSheetButton.tscn", "id": "dnd_cs_button"}
 	]
 
 
-func on_game_start(context: Dictionary):
-	context["character"] = {
+func on_game_start():
+	api.set_value("character", {
 		"hp": 10,
 		"max_hp": 10,
 		"equipment": {
 			"weapon": {},
 			"armor": {},
 		}
-	}
+	})
+	api.show_overlay("dnd_character_creator", {"context_path": "character"})
+	var overlay = api.get_overlay_node("dnd_character_creator")
+	if overlay:
+		return overlay.closed
 
 
 func get_templates() -> Array[Dictionary]:
-	return [
-		{
-			"id": "item",
-			"name": "Item",
-			"fields": [
-				{"name": "id", "type": "string", "mandatory": true},
-				{"name": "name", "type": "string", "mandatory": true},
-				{"name": "weight", "type": "float", "mandatory": false},
-				{"name": "damage", "type": "string", "mandatory": false},
-				{"name": "tags", "type": "array", "mandatory": false},
-			]
-		},
-		{
-			"id": "skill",
-			"name": "Skill",
-			"fields": [
-				{"name": "id", "type": "string", "mandatory": true},
-				{"name": "name", "type": "string", "mandatory": true},
-				{"name": "ability", "type": "string", "mandatory": true},
-			]
-		}
-	]
+	var templates: Array[Dictionary] = []
+	templates.append_array(_character_entries.get_templates())
+	templates.append_array(_item_entries.get_templates())
+	return templates
 
 
 func get_template_entries() -> Dictionary:
-	return {
-		"item": [
-			{"id": "dagger", "name": "Dagger", "weight": 1.0, "damage": "/r1d4", "tags": ["light", "finesse"]},
-			{"id": "shortsword", "name": "Shortsword", "weight": 2.0, "damage": "/r1d6", "tags": ["light", "finesse"]},
-		],
-		"skill": [
-			{"id": "athletics", "name": "Athletics", "ability": "str"},
-			{"id": "acrobatics", "name": "Acrobatics", "ability": "dex"},
-			{"id": "perception", "name": "Perception", "ability": "wis"},
-		]
-	}
+	var entries := {}
+	entries.merge(_character_entries.get_template_entries())
+	entries.merge(_item_entries.get_template_entries())
+	return entries
 
 
 func get_action_params(action_name: String) -> Array[Dictionary]:
@@ -87,9 +70,9 @@ func get_condition_params(cond_name: String) -> Array[Dictionary]:
 	return []
 
 
-func handle_action(action_name: String, data: Dictionary, context):
+func handle_action(action_name: String, data: Dictionary):
 	if action_name == "take_damage":
-		var character = context.get("character")
+		var character = api.get_value("character")
 		if character == null:
 			return
 		var dmg = data.get("amount", 0)
@@ -102,7 +85,7 @@ func handle_action(action_name: String, data: Dictionary, context):
 		var slot: String = data.get("slot", "")
 		if not item is Dictionary or slot == "":
 			return
-		var character = context.get("character")
+		var character = api.get_value("character")
 		if character == null:
 			return
 		var raw_refs = data.get("_raw_refs", {})
@@ -110,9 +93,11 @@ func handle_action(action_name: String, data: Dictionary, context):
 		character["equipment"][slot] = stored_value
 		print("[DND] Equipped ", item.get("name", "unknown"), " to ", slot)
 
-func check_condition(cond_name: String, data: Dictionary, context) -> bool:
+func check_condition(cond_name: String, data: Dictionary) -> bool:
 	if cond_name == "hp_above":
-		var character = context.get("character", {})
+		var character = api.get_value("character")
+		if character == null:
+			return false
 		return character.get("hp", 0) > data.get("value", 0)
 	push_warning("[DND_system]: " + cond_name + " is not a supported condition")
 	return true

@@ -28,12 +28,12 @@ func get_ui_panels() -> Array[Dictionary]:
 
 
 ## Handle an action. Override in subclass.
-func handle_action(_action_name: String, _data: Dictionary, _context):
+func handle_action(_action_name: String, _data: Dictionary):
 	pass
 
 
 ## Check a condition. Override in subclass.
-func check_condition(_cond_name: String, _data: Dictionary, _context) -> bool:
+func check_condition(_cond_name: String, _data: Dictionary) -> bool:
 	return true
 
 
@@ -64,15 +64,16 @@ func get_template_entries() -> Dictionary:
 
 
 ## Called when a new game starts. Override to initialize context variables.
-func on_game_start(_context: Dictionary):
+## Return a Signal to block game start until the signal is emitted.
+func on_game_start():
 	pass
 
 
 ## Called when game context changes (after entering a node or choice action).
-func on_context_changed(_context: Dictionary):
+func on_context_changed():
 	pass
 
 
 ## Called just before a choice is executed. Use for pre-choice saves.
-func on_pre_choice(_context: Dictionary):
+func on_pre_choice():
 	pass
