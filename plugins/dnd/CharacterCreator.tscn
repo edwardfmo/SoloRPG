@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://fux7q0ug72kh"]
 
 [ext_resource type="Script" uid="uid://bqq8jy5muqgil" path="res://plugins/dnd/CharacterCreator.gd" id="1_cc"]
+[ext_resource type="PackedScene" uid="uid://b1y3n5k0shchi" path="res://plugins/dnd/AbilityScoreDisplay.tscn" id="2_1br7i"]
 
-[node name="CharacterCreator" type="Control" unique_id=1199675334 node_paths=PackedStringArray("_tab_container", "_str_spin", "_dex_spin", "_con_spin", "_int_spin", "_wis_spin", "_cha_spin", "_next_btn_1", "_background_dropdown", "_next_btn_2", "_species_dropdown", "_next_btn_3", "_class_dropdown", "_finish_btn")]
+[node name="CharacterCreator" type="Control" unique_id=1199675334 node_paths=PackedStringArray("_tab_container", "_class_dropdown", "_class_features_container", "_next_btn_0", "_background_dropdown", "_background_features_container", "_species_dropdown", "_species_features_container", "_next_btn_1", "_str_display", "_dex_display", "_con_display", "_int_display", "_wis_display", "_cha_display", "_points_label", "_next_btn_2", "_name_edit", "_alignment_dropdown", "_finish_btn")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,19 +12,25 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_cc")
 _tab_container = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer")
-_str_spin = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid/StrSpin")
-_dex_spin = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid/DexSpin")
-_con_spin = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid/ConSpin")
-_int_spin = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid/IntSpin")
-_wis_spin = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid/WisSpin")
-_cha_spin = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid/ChaSpin")
-_next_btn_1 = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/NextBtn1")
-_background_dropdown = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Background/BackgroundDropdown")
-_next_btn_2 = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Background/NextBtn2")
-_species_dropdown = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Species/SpeciesDropdown")
-_next_btn_3 = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Species/NextBtn3")
 _class_dropdown = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Class/ClassDropdown")
-_finish_btn = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Class/FinishBtn")
+_class_features_container = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Class/ClassFeaturesContainer")
+_next_btn_0 = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Class/NextBtn0")
+_background_dropdown = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Origin/BackgroundDropdown")
+_background_features_container = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Origin/BackgroundFeaturesContainer")
+_species_dropdown = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Origin/SpeciesDropdown")
+_species_features_container = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Origin/SpeciesFeaturesContainer")
+_next_btn_1 = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Origin/NextBtn1")
+_str_display = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid/StrAbilityScoreDisplay")
+_dex_display = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid/DexAbilityScoreDisplay")
+_con_display = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid/ConAbilityScoreDisplay")
+_int_display = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid/IntAbilityScoreDisplay")
+_wis_display = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid/WisAbilityScoreDisplay")
+_cha_display = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid/ChaAbilityScoreDisplay")
+_points_label = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/PointsLabel")
+_next_btn_2 = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/NextBtn2")
+_name_edit = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Details/NameEdit")
+_alignment_dropdown = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Details/AlignmentDropdown")
+_finish_btn = NodePath("PanelContainer/MarginContainer/VBoxContainer/TabContainer/Details/FinishBtn")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1203235645]
 layout_mode = 1
@@ -72,115 +79,9 @@ layout_mode = 2
 size_flags_vertical = 3
 current_tab = 0
 
-[node name="Characteristics" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer" unique_id=387248640]
+[node name="Class" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer" unique_id=50812400]
 layout_mode = 2
 metadata/_tab_index = 0
-
-[node name="Grid" type="GridContainer" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics" unique_id=528528009]
-layout_mode = 2
-size_flags_vertical = 3
-columns = 2
-
-[node name="StrLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid" unique_id=1992091491]
-layout_mode = 2
-text = "Strength"
-
-[node name="StrSpin" type="SpinBox" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid" unique_id=1224985789]
-layout_mode = 2
-min_value = 1.0
-max_value = 30.0
-value = 10.0
-
-[node name="DexLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid" unique_id=529859828]
-layout_mode = 2
-text = "Dexterity"
-
-[node name="DexSpin" type="SpinBox" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid" unique_id=790439543]
-layout_mode = 2
-min_value = 1.0
-max_value = 30.0
-value = 10.0
-
-[node name="ConLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid" unique_id=876131821]
-layout_mode = 2
-text = "Constitution"
-
-[node name="ConSpin" type="SpinBox" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid" unique_id=742534881]
-layout_mode = 2
-min_value = 1.0
-max_value = 30.0
-value = 10.0
-
-[node name="IntLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid" unique_id=527900760]
-layout_mode = 2
-text = "Intelligence"
-
-[node name="IntSpin" type="SpinBox" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid" unique_id=165263557]
-layout_mode = 2
-min_value = 1.0
-max_value = 30.0
-value = 10.0
-
-[node name="WisLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid" unique_id=182128538]
-layout_mode = 2
-text = "Wisdom"
-
-[node name="WisSpin" type="SpinBox" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid" unique_id=387227918]
-layout_mode = 2
-min_value = 1.0
-max_value = 30.0
-value = 10.0
-
-[node name="ChaLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid" unique_id=1043157889]
-layout_mode = 2
-text = "Charisma"
-
-[node name="ChaSpin" type="SpinBox" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics/Grid" unique_id=1135863346]
-layout_mode = 2
-min_value = 1.0
-max_value = 30.0
-value = 10.0
-
-[node name="NextBtn1" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Characteristics" unique_id=781316592]
-layout_mode = 2
-text = "Next"
-
-[node name="Background" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer" unique_id=1958547026]
-visible = false
-layout_mode = 2
-metadata/_tab_index = 1
-
-[node name="Label" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Background" unique_id=1326257956]
-layout_mode = 2
-text = "Select a Background:"
-
-[node name="BackgroundDropdown" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Background" unique_id=1122058444]
-layout_mode = 2
-
-[node name="NextBtn2" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Background" unique_id=2142011284]
-layout_mode = 2
-text = "Next"
-
-[node name="Species" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer" unique_id=451246413]
-visible = false
-layout_mode = 2
-metadata/_tab_index = 2
-
-[node name="Label" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Species" unique_id=1574426272]
-layout_mode = 2
-text = "Select a Species:"
-
-[node name="SpeciesDropdown" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Species" unique_id=794379123]
-layout_mode = 2
-
-[node name="NextBtn3" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Species" unique_id=125453576]
-layout_mode = 2
-text = "Next"
-
-[node name="Class" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer" unique_id=50812400]
-visible = false
-layout_mode = 2
-metadata/_tab_index = 3
 
 [node name="Label" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Class" unique_id=1442597464]
 layout_mode = 2
@@ -189,6 +90,127 @@ text = "Select a Class:"
 [node name="ClassDropdown" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Class" unique_id=1499272851]
 layout_mode = 2
 
-[node name="FinishBtn" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Class" unique_id=1941564697]
+[node name="ClassFeaturesContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Class"]
+layout_mode = 2
+visible = false
+
+[node name="NextBtn0" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Class"]
+layout_mode = 2
+text = "Next"
+
+[node name="Origin" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="BackgroundLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Origin"]
+layout_mode = 2
+text = "Select a Background:"
+
+[node name="BackgroundDropdown" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Origin"]
+layout_mode = 2
+
+[node name="BackgroundFeaturesContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Origin"]
+layout_mode = 2
+visible = false
+
+[node name="SpeciesLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Origin"]
+layout_mode = 2
+text = "Select a Species:"
+
+[node name="SpeciesDropdown" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Origin"]
+layout_mode = 2
+
+[node name="SpeciesFeaturesContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Origin"]
+layout_mode = 2
+visible = false
+
+[node name="NextBtn1" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Origin"]
+layout_mode = 2
+text = "Next"
+
+[node name="Ability Scores" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer" unique_id=387248640]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="Grid" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores" unique_id=1416657212]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid" unique_id=800868353]
+layout_mode = 2
+
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid/HBoxContainer2" unique_id=1556720395]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+
+[node name="Value" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid/HBoxContainer2" unique_id=1514697049]
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+text = "Value"
+horizontal_alignment = 1
+
+[node name="Modifier" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid/HBoxContainer2" unique_id=837334017]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "Mod"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid/HBoxContainer2" unique_id=63588684]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "Cost"
+horizontal_alignment = 1
+
+[node name="StrAbilityScoreDisplay" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid" unique_id=1735830618 instance=ExtResource("2_1br7i")]
+layout_mode = 2
+
+[node name="DexAbilityScoreDisplay" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid" unique_id=1375354987 instance=ExtResource("2_1br7i")]
+layout_mode = 2
+
+[node name="ConAbilityScoreDisplay" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid" unique_id=1821281751 instance=ExtResource("2_1br7i")]
+layout_mode = 2
+
+[node name="IntAbilityScoreDisplay" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid" unique_id=1963528543 instance=ExtResource("2_1br7i")]
+layout_mode = 2
+
+[node name="WisAbilityScoreDisplay" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid" unique_id=120309756 instance=ExtResource("2_1br7i")]
+layout_mode = 2
+
+[node name="ChaAbilityScoreDisplay" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores/Grid" unique_id=2051319821 instance=ExtResource("2_1br7i")]
+layout_mode = 2
+
+[node name="PointsLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "0 / 27"
+horizontal_alignment = 2
+
+[node name="NextBtn2" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Ability Scores"]
+layout_mode = 2
+text = "Next"
+
+[node name="Details" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 3
+
+[node name="NameLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Details"]
+layout_mode = 2
+text = "Character Name:"
+
+[node name="NameEdit" type="LineEdit" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Details"]
+layout_mode = 2
+placeholder_text = "Enter name..."
+
+[node name="AlignmentLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Details"]
+layout_mode = 2
+text = "Alignment:"
+
+[node name="AlignmentDropdown" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Details"]
+layout_mode = 2
+
+[node name="FinishBtn" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Details" unique_id=1941564697]
 layout_mode = 2
 text = "Finish"

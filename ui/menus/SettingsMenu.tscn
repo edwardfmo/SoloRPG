@@ -1,0 +1,94 @@
+[gd_scene format=3 uid="uid://d1a3m1k5l66ex"]
+
+[ext_resource type="Script" uid="uid://cw82w1g0y2y64" path="res://ui/menus/SettingsMenu.gd" id="1_sm"]
+
+[node name="SettingsMenu" type="Control" unique_id=1905557516 node_paths=PackedStringArray("_tab_container", "_system_settings_container", "_plugin_list", "_back_button")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_sm")
+_tab_container = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer")
+_system_settings_container = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/System/ScrollContainer/SettingsList")
+_plugin_list = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Plugins/ScrollContainer/PluginList")
+_back_button = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/BackButton")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=802680989]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=1674381980]
+layout_mode = 2
+theme_type_variation = &"Frame"
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=313110221]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=1859339655]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+
+[node name="Title" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1142252613]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1958878753]
+layout_mode = 2
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="TabContainer" type="TabContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=333794548]
+custom_minimum_size = Vector2(0, 350)
+layout_mode = 2
+current_tab = 0
+
+[node name="System" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer" unique_id=2091916088]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+metadata/_tab_index = 0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/System"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SettingsList" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/System/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Plugins" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer" unique_id=429962150]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+metadata/_tab_index = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Plugins" unique_id=2039292069]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PluginList" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Plugins/ScrollContainer" unique_id=62114784]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="BackButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1370711409]
+layout_mode = 2
+text = "Back"

@@ -1,0 +1,46 @@
+{
+	"character_feature": [
+		{"id": "defense", "name": "Defense", "description": "While you are wearing armor, you gain a +1 bonus to AC.", "feature_type": "fighting_style"},
+		{"id": "dueling", "name": "Dueling", "description": "When you are wielding a melee weapon in one hand and no other weapons, you gain a +2 bonus to damage rolls with that weapon.", "feature_type": "fighting_style"},
+		{"id": "great_weapon_fighting", "name": "Great Weapon Fighting", "description": "When you roll a 1 or 2 on a damage die for an attack you make with a melee weapon that you are wielding with two hands, you can reroll the die.", "feature_type": "fighting_style"},
+		{"id": "archery", "name": "Archery", "description": "You gain a +2 bonus to attack rolls you make with ranged weapons.", "feature_type": "fighting_style"},
+		{"id": "second_wind", "name": "Second Wind", "description": "You have a limited well of stamina. On your turn, you can use a bonus action to regain hit points equal to 1d10 + your fighter level."},
+		{"id": "sneak_attack", "name": "Sneak Attack", "description": "You know how to strike subtly and exploit a foe's distraction."},
+		{"id": "str_save", "name": "Strength Save", "feature_type": "saving_throw", "ability": "str"},
+		{"id": "dex_save", "name": "Dexterity Save", "feature_type": "saving_throw", "ability": "dex"},
+		{"id": "con_save", "name": "Constitution Save", "feature_type": "saving_throw", "ability": "con"},
+		{"id": "int_save", "name": "Intelligence Save", "feature_type": "saving_throw", "ability": "int"},
+		{"id": "wis_save", "name": "Wisdom Save", "feature_type": "saving_throw", "ability": "wis"},
+		{"id": "cha_save", "name": "Charisma Save", "feature_type": "saving_throw", "ability": "cha"},
+		{"id": "light_armor", "name": "Light Armor", "feature_type": "armor"},
+		{"id": "medium_armor", "name": "Medium Armor", "feature_type": "armor"},
+		{"id": "heavy_armor", "name": "Heavy Armor", "feature_type": "armor"},
+		{"id": "shield", "name": "Shield", "feature_type": "armor"},
+		{"id": "simple_weapons", "name": "Simple Weapons", "feature_type": "weapon"},
+		{"id": "martial_weapons", "name": "Martial Weapons", "feature_type": "weapon"},
+		{"id": "hand_crossbow", "name": "Hand Crossbow", "feature_type": "weapon"},
+		{"id": "longsword", "name": "Longsword", "feature_type": "weapon"},
+		{"id": "rapier", "name": "Rapier", "feature_type": "weapon"},
+		{"id": "shortsword", "name": "Shortsword", "feature_type": "weapon"},
+		{"id": "thieves_tools", "name": "Thieves' Tools", "feature_type": "tool"},
+		{"id": "disguise_kit", "name": "Disguise Kit", "feature_type": "tool"}
+	],
+	"class": [
+		{"id": "fighter", "name": "Fighter", "description": "A master of martial combat.", "hit_die": "d10", "features": [
+			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.str_save", "@character_feature/srd.con_save"], "level": 1, "number_to_choose": 2},
+			{"feature_name": "Armor Proficiencies", "entries": ["@character_feature/srd.light_armor", "@character_feature/srd.medium_armor", "@character_feature/srd.heavy_armor", "@character_feature/srd.shield"], "level": 1, "number_to_choose": 4},
+			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.simple_weapons", "@character_feature/srd.martial_weapons"], "level": 1, "number_to_choose": 2},
+			{"feature_name": "Skill Proficiencies", "entries": ["@character_feature/srd.athletics", "@character_feature/srd.acrobatics", "@character_feature/srd.perception"], "level": 1, "number_to_choose": 2},
+			{"feature_name": "Fighting Style", "types": ["fighting_style"], "level": 1, "number_to_choose": 1},
+			{"entries": ["@character_feature/srd.second_wind"], "level": 1, "number_to_choose": 1}
+		]},
+		{"id": "rogue", "name": "Rogue", "description": "A scoundrel who uses stealth and trickery.", "hit_die": "d8", "features": [
+			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.dex_save", "@character_feature/srd.int_save"], "level": 1, "number_to_choose": 2},
+			{"feature_name": "Armor Proficiencies", "entries": ["@character_feature/srd.light_armor"], "level": 1, "number_to_choose": 1},
+			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.simple_weapons", "@character_feature/srd.hand_crossbow", "@character_feature/srd.longsword", "@character_feature/srd.rapier", "@character_feature/srd.shortsword"], "level": 1, "number_to_choose": 5},
+			{"feature_name": "Tool Proficiencies", "entries": ["@character_feature/srd.thieves_tools"], "level": 1, "number_to_choose": 1},
+			{"feature_name": "Skill Proficiencies", "entries": ["@character_feature/srd.acrobatics", "@character_feature/srd.athletics", "@character_feature/srd.perception"], "level": 1, "number_to_choose": 4},
+			{"entries": ["@character_feature/srd.sneak_attack"], "level": 1, "number_to_choose": 1}
+		]}
+	]
+}

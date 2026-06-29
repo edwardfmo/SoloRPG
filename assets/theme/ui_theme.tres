@@ -95,6 +95,8 @@ texture_margin_right = 4.0
 texture_margin_bottom = 4.0
 modulate_color = Color(0.646029, 0.646029, 0.646029, 1)
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cbl"]
+
 [sub_resource type="AtlasTexture" id="frame_tex"]
 atlas = ExtResource("1_1exxx")
 region = Rect2(29, 88, 1336, 369)
@@ -213,6 +215,13 @@ Button/styles/hover = SubResource("StyleBoxTexture_3hhkj")
 Button/styles/hover_pressed = SubResource("StyleBoxTexture_6opeu")
 Button/styles/normal = SubResource("StyleBoxTexture_upc6k")
 Button/styles/pressed = SubResource("StyleBoxTexture_2g5q2")
+CheckBoxList/base_type = &"CheckBox"
+CheckBoxList/styles/disabled = SubResource("StyleBoxEmpty_cbl")
+CheckBoxList/styles/focus = SubResource("StyleBoxEmpty_cbl")
+CheckBoxList/styles/hover = SubResource("StyleBoxEmpty_cbl")
+CheckBoxList/styles/hover_pressed = SubResource("StyleBoxEmpty_cbl")
+CheckBoxList/styles/normal = SubResource("StyleBoxEmpty_cbl")
+CheckBoxList/styles/pressed = SubResource("StyleBoxEmpty_cbl")
 Frame/base_type = &"LightContentFrame"
 Frame/styles/panel = SubResource("StyleBoxTexture_1exxx")
 LightContentFrame/base_type = &"PanelContainer"

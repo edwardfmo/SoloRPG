@@ -4,14 +4,14 @@ signal new_game_pressed
 signal continue_pressed
 signal load_game_pressed
 signal content_editor_pressed
-signal plugins_pressed
+signal settings_pressed
 signal exit_pressed
 
 @export var new_game_button: Button
 @export var continue_button: Button
 @export var load_game_button: Button
 @export var content_editor_button: Button
-@export var plugins_button: Button
+@export var settings_button: Button
 @export var exit_button: Button
 
 func _ready():
@@ -31,8 +31,8 @@ func _ready():
 		content_editor_pressed.emit()
 	)
 
-	plugins_button.pressed.connect(func():
-		plugins_pressed.emit()
+	settings_button.pressed.connect(func():
+		settings_pressed.emit()
 	)
 
 	exit_button.pressed.connect(func():

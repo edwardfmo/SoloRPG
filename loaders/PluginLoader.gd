@@ -62,10 +62,18 @@ func _load_plugin_from_cfg(cfg_path: String) -> Dictionary:
 		push_warning("[PluginLoader] Failed to parse: ", cfg_path)
 		return {}
 
-	var script_path = data.get("script", "")
-	if script_path == "":
+	var script_rel = data.get("script", "")
+	if script_rel == "":
 		push_warning("[PluginLoader] No script in: ", cfg_path)
 		return {}
+
+	# Resolve script path relative to plugin.cfg directory
+	var base_dir = cfg_path.get_base_dir()
+	var script_path: String
+	if script_rel.begins_with("res://") or script_rel.begins_with("user://"):
+		script_path = script_rel
+	else:
+		script_path = base_dir.path_join(script_rel)
 
 	var script = load(script_path)
 	if script == null:
@@ -76,6 +84,9 @@ func _load_plugin_from_cfg(cfg_path: String) -> Dictionary:
 	if not instance is Plugin:
 		push_warning("[PluginLoader] Script does not extend Plugin: ", script_path)
 		return {}
+
+	# Set the plugin's base directory so it can resolve its own relative paths
+	instance.plugin_dir = base_dir
 
 	var plugin_id = data.get("id", "")
 	print("[PluginLoader] Loaded plugin: ", plugin_id, " (", data.get("name", ""), ")")

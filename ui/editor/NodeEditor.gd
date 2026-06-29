@@ -10,6 +10,8 @@ extends Control
 
 @export var save_button: Button
 @export var save_as_button: Button
+@export var settings_button: Button
+@export var module_settings_panel: Control
 
 @export var save_file_dialog: FileDialog
 @export var open_file_dialog: FileDialog
@@ -24,8 +26,8 @@ var selected_node: StoryNode = null
 var _api: ModAPI = null
 var _last_export_path: String = ""
 var _module_entries: Dictionary = {}
+var _module_settings: Dictionary = {}
 var _module_active: bool = false
-var _dep_dialog: Control = null
 var _pending_save_path: String = ""
 var _context_menu_position: Vector2 = Vector2.ZERO
 
@@ -40,6 +42,7 @@ func set_api(api: ModAPI):
 	node_inspector.available_conditions = api.get_all_conditions()
 	node_inspector.api = api
 	_serializer.set_api(api)
+	module_settings_panel.set_api(api)
 
 
 func get_module_entries() -> Dictionary:
@@ -82,6 +85,7 @@ func reset():
 	module_author_edit.text = ""
 	_last_export_path = ""
 	_module_entries = {}
+	_module_settings = {}
 	_module_active = false
 	_set_module_controls_enabled(false)
 
@@ -95,6 +99,7 @@ func _set_module_controls_enabled(enabled: bool):
 	module_author_edit.editable = enabled
 	save_button.disabled = not enabled
 	save_as_button.disabled = not enabled
+	settings_button.disabled = not enabled
 
 
 # --- Input & Context Menu ---
@@ -174,6 +179,22 @@ func _on_save_as_pressed():
 	_validate_then_pick_file()
 
 
+func _on_settings_pressed():
+	if not _module_active or _api == null:
+		return
+	var module_nodes := []
+	for n in nodes:
+		module_nodes.append(n.data)
+	var mid = module_id_edit.text if module_id_edit.text != "" else "editor_module"
+	module_settings_panel.open(module_nodes, _module_settings, mid, _module_entries)
+	if not module_settings_panel.closed.is_connected(_on_settings_closed):
+		module_settings_panel.closed.connect(_on_settings_closed, CONNECT_ONE_SHOT)
+
+
+func _on_settings_closed():
+	_module_settings = module_settings_panel.get_module_settings()
+
+
 func _on_file_selected(path: String):
 	_last_export_path = path
 	_do_export(path)
@@ -181,14 +202,39 @@ func _on_file_selected(path: String):
 
 func _validate_then_save(path: String):
 	_pending_save_path = path
-	if _check_dependencies():
-		_do_export(path)
+	_show_save_confirm()
 
 
 func _validate_then_pick_file():
 	_pending_save_path = ""
-	if _check_dependencies():
+	_show_save_confirm()
+
+
+func _show_save_confirm():
+	var module_nodes := []
+	for n in nodes:
+		module_nodes.append(n.data)
+	var mid = module_id_edit.text if module_id_edit.text != "" else "editor_module"
+	module_settings_panel.open_confirm(module_nodes, _module_settings, mid, _module_entries)
+	if not module_settings_panel.confirmed_save.is_connected(_on_save_confirmed):
+		module_settings_panel.confirmed_save.connect(_on_save_confirmed, CONNECT_ONE_SHOT)
+	if not module_settings_panel.cancelled_save.is_connected(_on_save_cancelled):
+		module_settings_panel.cancelled_save.connect(_on_save_cancelled, CONNECT_ONE_SHOT)
+
+
+func _on_save_confirmed():
+	_module_settings = module_settings_panel.get_module_settings()
+	if module_settings_panel.cancelled_save.is_connected(_on_save_cancelled):
+		module_settings_panel.cancelled_save.disconnect(_on_save_cancelled)
+	if _pending_save_path != "":
+		_do_export(_pending_save_path)
+	else:
 		save_file_dialog.popup_centered()
+
+
+func _on_save_cancelled():
+	if module_settings_panel.confirmed_save.is_connected(_on_save_confirmed):
+		module_settings_panel.confirmed_save.disconnect(_on_save_confirmed)
 
 
 func _do_export(path: String):
@@ -198,49 +244,7 @@ func _do_export(path: String):
 		"version": module_version_edit.text,
 		"author": module_author_edit.text,
 	}
-	_serializer.export_module(path, metadata, _node_factory.start_node_gn, _module_entries)
-
-
-func _check_dependencies() -> bool:
-	if _api == null:
-		return true
-
-	var module_nodes := []
-	for n in nodes:
-		module_nodes.append(n.data)
-
-	if _dep_dialog:
-		_dep_dialog.queue_free()
-
-	var dialog = load("res://ui/editor/DependencyCheckDialog.tscn").instantiate()
-	add_child(dialog)
-	_dep_dialog = dialog
-
-	var has_issues = dialog.check_and_show(module_nodes, _api, module_id_edit.text, _module_entries)
-	if not has_issues:
-		_dep_dialog.queue_free()
-		_dep_dialog = null
-		return true
-	else:
-		dialog.confirmed_save.connect(_on_dep_confirmed)
-		dialog.cancelled_save.connect(_on_dep_cancelled)
-		return false
-
-
-func _on_dep_confirmed():
-	if _dep_dialog:
-		_dep_dialog.queue_free()
-		_dep_dialog = null
-	if _pending_save_path != "":
-		_do_export(_pending_save_path)
-	else:
-		save_file_dialog.popup_centered()
-
-
-func _on_dep_cancelled():
-	if _dep_dialog:
-		_dep_dialog.queue_free()
-		_dep_dialog = null
+	_serializer.export_module(path, metadata, _node_factory.start_node_gn, _module_entries, _module_settings)
 
 
 # --- New / Open ---
@@ -253,6 +257,7 @@ func _on_new_pressed():
 	module_author_edit.text = ""
 	_last_export_path = ""
 	_module_entries = {}
+	_module_settings = {}
 	_module_active = true
 	_set_module_controls_enabled(true)
 	_node_factory.create_start_node()
@@ -281,6 +286,7 @@ func load_module(path: String):
 	module_author_edit.text = data.get("author", "")
 	_last_export_path = path
 	_module_entries = data.get("entries", {})
+	_module_settings = data.get("settings", {})
 
 	# Create nodes from data
 	var node_data_map = data.get("nodes", {})

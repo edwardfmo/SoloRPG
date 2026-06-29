@@ -187,6 +187,9 @@
 			"text": "You step on a trap!\n\ntook 3 damage."
 		}
 	},
+	"settings": {
+		"dnd.starting_level": 9
+	},
 	"start_node": "start",
 	"version": "0.2"
 }

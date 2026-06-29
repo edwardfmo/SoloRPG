@@ -1,0 +1,20 @@
+{
+	"author": "",
+	"entries": {
+		"background": [
+			{
+				"id": "new_entry",
+				"name": "New Entry"
+			}
+		],
+		"species": [
+			{
+				"id": "new_entry",
+				"name": "New Entry"
+			}
+		]
+	},
+	"id": "test_compendium",
+	"name": "Test Compendium",
+	"version": "1.0.0"
+}

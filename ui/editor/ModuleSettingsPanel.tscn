@@ -1,0 +1,75 @@
+[gd_scene format=3 uid="uid://cqj2u384u3gr6"]
+
+[ext_resource type="Script" uid="uid://clh516ge263el" path="res://ui/editor/ModuleSettingsPanel.gd" id="1_msp"]
+
+[node name="ModuleSettingsPanel" type="Control" unique_id=920530994 node_paths=PackedStringArray("_title_label", "_settings_container", "_close_button", "_save_button", "_cancel_button")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_msp")
+_title_label = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Title")
+_settings_container = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ScrollContainer/SettingsList")
+_close_button = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonBar/CloseButton")
+_save_button = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonBar/SaveButton")
+_cancel_button = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonBar/CancelButton")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=7852189]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=1102024497]
+layout_mode = 2
+theme_type_variation = &"Frame"
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=1927852193]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=580052502]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+
+[node name="Title" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=908120855]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Module Settings"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=632326904]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=537501735]
+custom_minimum_size = Vector2(0, 350)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SettingsList" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ScrollContainer" unique_id=740579188]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ButtonBar" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1528508902]
+layout_mode = 2
+alignment = 2
+
+[node name="SaveButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonBar" unique_id=960465876]
+layout_mode = 2
+text = "Save"
+
+[node name="CancelButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonBar" unique_id=869036848]
+layout_mode = 2
+text = "Cancel"
+
+[node name="CloseButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonBar" unique_id=1275663980]
+layout_mode = 2
+text = "Close"

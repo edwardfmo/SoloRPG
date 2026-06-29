@@ -26,6 +26,11 @@ func show_compendium_info(comp_id: String):
 	_header_label.text = "%s (%s) v%s" % [comp.get("name", ""), comp_id, comp.get("version", "")]
 
 
+func show_file_info(comp_id: String, file_name: String):
+	_clear()
+	_header_label.text = "%s / %s" % [comp_id, file_name]
+
+
 func show_template_info(comp_id: String, template_id: String):
 	_clear()
 	_header_label.text = "%s / %s" % [comp_id, template_id]
@@ -38,6 +43,9 @@ func show_entry(comp_id: String, template_id: String, entry_id: String):
 		_header_label.text = "Entry not found"
 		return
 	_header_label.text = "%s / %s / %s" % [comp_id, template_id, entry_id]
+	var source_file = _storage.get_entry_source_file(comp_id, template_id, entry_id)
+	if source_file != "compendium.json":
+		_header_label.text += "  (%s)" % source_file
 	var writable = _storage.is_compendium_writable(comp_id)
 	var field_schema := _get_field_schema(template_id)
 	_render_fields(entry, comp_id, template_id, entry_id, writable, field_schema)
@@ -131,7 +139,9 @@ func _on_field_changed(comp_id: String, template_id: String, entry_id: String):
 ## Render an array field as multiple rows: one per existing value + a blank "add" row.
 func _render_array_field(key: String, arr: Array, entry: Dictionary, comp_id: String, template_id: String, entry_id: String, editable: bool, ref_types: Array, is_mandatory: bool):
 	var is_ref = ref_types.size() > 0
-	var hints := _get_ref_hints(ref_types) if is_ref else [] as Array[String]
+	var hints: Array[String] = []
+	if is_ref:
+		hints = _get_ref_hints(ref_types)
 
 	# Header label row
 	var header_row = HBoxContainer.new()

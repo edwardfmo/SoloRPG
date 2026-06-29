@@ -1,0 +1,13 @@
+{
+	"id": "srd",
+	"name": "SRD",
+	"author": "Community",
+	"version": "1.0.0",
+	"dependencies": [
+		{
+			"id": "dnd",
+			"version": "1.0.0"
+		}
+	],
+	"entries": {}
+}

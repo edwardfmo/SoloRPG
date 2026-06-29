@@ -1,0 +1,22 @@
+{
+	"character_feature": [
+		{"id": "acrobatics", "name": "Acrobatics", "feature_type": "skill", "ability": "dex"},
+		{"id": "animal_handling", "name": "Animal Handling", "feature_type": "skill", "ability": "wis"},
+		{"id": "arcana", "name": "Arcana", "feature_type": "skill", "ability": "int"},
+		{"id": "athletics", "name": "Athletics", "feature_type": "skill", "ability": "str"},
+		{"id": "deception", "name": "Deception", "feature_type": "skill", "ability": "cha"},
+		{"id": "history", "name": "History", "feature_type": "skill", "ability": "int"},
+		{"id": "insight", "name": "Insight", "feature_type": "skill", "ability": "wis"},
+		{"id": "intimidation", "name": "Intimidation", "feature_type": "skill", "ability": "cha"},
+		{"id": "investigation", "name": "Investigation", "feature_type": "skill", "ability": "int"},
+		{"id": "medicine", "name": "Medicine", "feature_type": "skill", "ability": "wis"},
+		{"id": "nature", "name": "Nature", "feature_type": "skill", "ability": "int"},
+		{"id": "perception", "name": "Perception", "feature_type": "skill", "ability": "wis"},
+		{"id": "performance", "name": "Performance", "feature_type": "skill", "ability": "cha"},
+		{"id": "persuasion", "name": "Persuasion", "feature_type": "skill", "ability": "cha"},
+		{"id": "religion", "name": "Religion", "feature_type": "skill", "ability": "int"},
+		{"id": "sleight_of_hand", "name": "Sleight of Hand", "feature_type": "skill", "ability": "dex"},
+		{"id": "stealth", "name": "Stealth", "feature_type": "skill", "ability": "dex"},
+		{"id": "survival", "name": "Survival", "feature_type": "skill", "ability": "wis"}
+	]
+}

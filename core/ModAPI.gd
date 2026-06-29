@@ -1,6 +1,8 @@
 class_name ModAPI
 extends RefCounted
 
+const SETTINGS_PATH = "user://settings.json"
+
 var plugins := {}
 var plugin_metadata := {}  # plugin_name → {name, version, author, ...}
 var _evaluators := {}  # prefix → Callable(code: String) -> Variant
@@ -8,6 +10,8 @@ var _evaluator_instances := []  # keeps RefCounted evaluators alive
 var _templates := {}  # template_id → {id, name, fields, source_plugin}
 var _entries := {}  # template_id → {namespace.entry_id → entry_dict}
 var _compendium_metadata := {}  # compendium_id → {name, version, author, ...}
+var _settings := {}  # path → {path, label, type, scope, default, options?, plugin?}
+var _setting_values := {}  # path → current value
 var context := {}               # live game context — single source of truth
 var context_changed_callback: Callable  # set by GameView to notify UI of context updates
 var show_overlay_callback: Callable     # set by GameView to show overlay views
@@ -37,6 +41,11 @@ func register_plugin(name: String, plugin: Plugin, metadata: Dictionary = {}):
 			var entry_id = entry.get("id", "")
 			if entry_id != "":
 				_entries[tmpl_id][name + "." + entry_id] = entry
+	# Register settings from this plugin
+	for setting_def in plugin.get_settings():
+		var def_copy = setting_def.duplicate()
+		def_copy["plugin"] = name
+		register_setting(def_copy)
 
 func get_plugin(name: String):
 	return plugins.get(name, null)
@@ -396,4 +405,109 @@ func get_compendium_ids() -> Array[String]:
 	var result: Array[String] = []
 	for key in _compendium_metadata:
 		result.append(key)
+	return result
+
+
+# ─── Settings API ────────────────────────────────────────────────────────────
+
+
+## Register a setting definition.
+## def: {path: String, label: String, type: "int"|"float"|"string"|"bool"|"enum",
+##        scope: "global"|"module", default: Variant, options?: Array[String], plugin?: String}
+func register_setting(def: Dictionary):
+	var path = def.get("path", "")
+	if path == "":
+		return
+	_settings[path] = def
+	if not _setting_values.has(path):
+		_setting_values[path] = def.get("default")
+
+
+## Get the current value of a setting by path.
+func get_setting(path: String) -> Variant:
+	if _setting_values.has(path):
+		return _setting_values[path]
+	var def = _settings.get(path, {})
+	return def.get("default")
+
+
+## Set a setting value and persist.
+func set_setting(path: String, value):
+	_setting_values[path] = value
+	_save_settings()
+
+
+## Get all setting definitions for a given scope.
+## If plugin_id is provided, only returns settings from that plugin.
+func get_settings_for_scope(scope: String, plugin_id: String = "") -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for def in _settings.values():
+		if def.get("scope", "global") != scope:
+			continue
+		if plugin_id != "" and def.get("plugin", "") != plugin_id:
+			continue
+		result.append(def)
+	return result
+
+
+## Get all system settings (path starts with "system.").
+func get_system_settings() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for def in _settings.values():
+		if def.get("path", "").begins_with("system."):
+			result.append(def)
+	return result
+
+
+## Get all global settings owned by a specific plugin (non-system paths).
+func get_plugin_settings(plugin_id: String) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for def in _settings.values():
+		if def.get("plugin", "") == plugin_id and not def.get("path", "").begins_with("system."):
+			result.append(def)
+	return result
+
+
+## Load settings values from disk.
+func load_settings():
+	if not FileAccess.file_exists(SETTINGS_PATH):
+		return
+	var json_text = FileAccess.get_file_as_string(SETTINGS_PATH)
+	var data = JSON.parse_string(json_text)
+	if data is Dictionary:
+		for path in data:
+			_setting_values[path] = data[path]
+
+
+## Save settings values to disk.
+func _save_settings():
+	var file = FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
+	if file:
+		file.store_string(JSON.stringify(_setting_values, "\t"))
+
+
+# ─── Module Settings (runtime) ───────────────────────────────────────────────
+
+var _module_settings := {}  # path → value, loaded from module JSON at game start
+
+
+## Load module-scoped settings for the current game session.
+func load_module_settings(settings: Dictionary):
+	_module_settings = settings.duplicate()
+
+
+## Get the value of a module-scoped setting.
+func get_module_setting(path: String) -> Variant:
+	if _module_settings.has(path):
+		return _module_settings[path]
+	var def = _settings.get(path, {})
+	return def.get("default")
+
+
+## Get all module-scoped setting definitions.
+func get_module_setting_defs() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for def in _settings.values():
+		if def.get("scope", "global") == "module":
+			result.append(def)
 	return result

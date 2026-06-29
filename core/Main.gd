@@ -5,7 +5,7 @@ extends Control
 @export var game_view: Control
 @export var content_editor: Control
 @export var module_select: Control
-@export var plugin_list: Control
+@export var settings_menu: Control
 
 var module
 var api = ModAPI.new()
@@ -26,6 +26,9 @@ func _ready():
 	DirAccess.make_dir_recursive_absolute(SystemUtils.PLUGINS_DIR)
 	DirAccess.make_dir_recursive_absolute(SystemUtils.COMPENDIUMS_DIR)
 
+	# Load persisted settings before plugins register their defaults
+	api.load_settings()
+
 	# Load only enabled plugins
 	_reload_plugins()
 
@@ -37,13 +40,14 @@ func _ready():
 	# Pass plugin hints to the editor and game view
 	content_editor.set_api(api)
 	game_view.set_api(api)
+	settings_menu.set_api(api)
 
 	# Connect UI
 	main_menu.new_game_pressed.connect(_show_module_select)
 	main_menu.continue_pressed.connect(_continue_game)
 	main_menu.load_game_pressed.connect(_load_game)
 	main_menu.content_editor_pressed.connect(_show_content_editor)
-	main_menu.plugins_pressed.connect(_show_plugin_list)
+	main_menu.settings_pressed.connect(_show_settings)
 	main_menu.exit_pressed.connect(func(): get_tree().quit())
 
 	content_editor.close_pressed.connect(_show_menu)
@@ -51,8 +55,8 @@ func _ready():
 	module_select.module_selected.connect(_on_module_selected)
 	module_select.back_pressed.connect(_show_menu)
 
-	plugin_list.back_pressed.connect(_show_menu)
-	plugin_list.plugins_changed.connect(_reload_plugins)
+	settings_menu.back_pressed.connect(_show_menu)
+	settings_menu.plugins_changed.connect(_reload_plugins)
 
 	game_view.choice_selected.connect(_on_choice_selected)
 	game_view.save_requested.connect(_save_game)
@@ -107,7 +111,7 @@ func _show_menu():
 	game_view.visible = false
 	content_editor.visible = false
 	module_select.visible = false
-	plugin_list.visible = false
+	settings_menu.visible = false
 	# Restore plugins to global config state
 	_reload_plugins()
 
@@ -118,7 +122,7 @@ func _show_content_editor():
 	game_view.visible = false
 	content_editor.visible = true
 	module_select.visible = false
-	plugin_list.visible = false
+	settings_menu.visible = false
 
 
 func _show_module_select():
@@ -127,16 +131,16 @@ func _show_module_select():
 	game_view.visible = false
 	content_editor.visible = false
 	module_select.visible = true
-	plugin_list.visible = false
+	settings_menu.visible = false
 
 
-func _show_plugin_list():
+func _show_settings():
 	main_menu.visible = false
 	background.visible = true
 	game_view.visible = false
 	content_editor.visible = false
 	module_select.visible = false
-	plugin_list.visible = true
+	settings_menu.visible = true
 
 
 func _continue_game():
@@ -213,7 +217,7 @@ func _start_game(path: String, optional_ids: Array[String] = []):
 	game_view.visible = true
 	content_editor.visible = false
 	module_select.visible = false
-	plugin_list.visible = false
+	settings_menu.visible = false
 
 	current_module_path = path
 	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
@@ -229,6 +233,9 @@ func _start_game(path: String, optional_ids: Array[String] = []):
 
 	module = Module.new()
 	module.init(data, api)
+
+	# Load module-scoped settings for this session
+	api.load_module_settings(data.get("settings", {}))
 
 	api.context = {}
 	# Snapshot active plugins for this game session
@@ -375,7 +382,7 @@ func _apply_load(path: String, data: Dictionary, save_data: Dictionary):
 	game_view.visible = true
 	content_editor.visible = false
 	module_select.visible = false
-	plugin_list.visible = false
+	settings_menu.visible = false
 
 	api.notify_context_changed()
 	var node = module.get_node(current_node_id)

@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://b1y3n5k0shchi"]
+
+[ext_resource type="Script" uid="uid://du7yddrrcncij" path="res://plugins/dnd/AbilityScoreDisplay.gd" id="1_kcijk"]
+
+[node name="AbilityScoreDisplay" type="HBoxContainer" unique_id=1735830618 node_paths=PackedStringArray("_ability_score_name", "_value", "_modifier", "_cost")]
+script = ExtResource("1_kcijk")
+_ability_score_name = NodePath("Label")
+_value = NodePath("ValueSpin")
+_modifier = NodePath("Modifier")
+_cost = NodePath("Cost")
+
+[node name="Label" type="Label" parent="." unique_id=876708456]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Strength"
+
+[node name="ValueSpin" type="SpinBox" parent="." unique_id=1917755987]
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+min_value = 8.0
+max_value = 18.0
+value = 8.0
+
+[node name="Modifier" type="Label" parent="." unique_id=1525366508]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "Mod"
+horizontal_alignment = 1
+
+[node name="Cost" type="Label" parent="." unique_id=1543514329]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "Cost"
+horizontal_alignment = 1

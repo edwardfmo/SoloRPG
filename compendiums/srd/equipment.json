@@ -1,0 +1,38 @@
+{
+	"item": [
+		{
+			"id": "longsword",
+			"name": "Longsword",
+			"damage": "/r1d8",
+			"weight": 3.0,
+			"tags": ["versatile"]
+		},
+		{
+			"id": "greataxe",
+			"name": "Greataxe",
+			"damage": "/r1d12",
+			"weight": 7.0,
+			"tags": ["heavy", "two-handed"]
+		},
+		{
+			"id": "handaxe",
+			"name": "Handaxe",
+			"damage": "/r1d6",
+			"weight": 2.0,
+			"tags": ["light", "thrown"]
+		},
+		{
+			"id": "shield",
+			"name": "Shield",
+			"weight": 6.0,
+			"tags": ["armor"]
+		},
+		{
+			"id": "longbow",
+			"name": "Longbow",
+			"damage": "/r1d8",
+			"weight": 2.0,
+			"tags": ["heavy", "two-handed", "ranged"]
+		}
+	]
+}

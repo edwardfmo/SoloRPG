@@ -1,0 +1,11 @@
+[gd_resource type="Theme" format=3]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1"]
+
+[resource]
+CheckBox/styles/disabled = SubResource("StyleBoxEmpty_1")
+CheckBox/styles/focus = SubResource("StyleBoxEmpty_1")
+CheckBox/styles/hover = SubResource("StyleBoxEmpty_1")
+CheckBox/styles/hover_pressed = SubResource("StyleBoxEmpty_1")
+CheckBox/styles/normal = SubResource("StyleBoxEmpty_1")
+CheckBox/styles/pressed = SubResource("StyleBoxEmpty_1")

@@ -1,6 +1,19 @@
 extends Plugin
 
 
+func get_settings() -> Array[Dictionary]:
+	return [
+		{
+			"path": "system.text_speed",
+			"label": "Text Speed",
+			"type": "enum",
+			"scope": "global",
+			"default": "Normal",
+			"options": ["Slow", "Normal", "Fast", "Instant"],
+		},
+	]
+
+
 func get_actions() -> Array[String]:
 	return ["core.show_view", "core.set", "core.clear"]
 

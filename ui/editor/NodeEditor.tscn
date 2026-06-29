@@ -2,8 +2,9 @@
 
 [ext_resource type="Script" uid="uid://ch8us7x0jvc5p" path="res://ui/editor/NodeEditor.gd" id="1_x53ir"]
 [ext_resource type="PackedScene" path="res://ui/editor/NodeInspector.tscn" id="2_ninsp"]
+[ext_resource type="PackedScene" path="res://ui/editor/ModuleSettingsPanel.tscn" id="3_msp"]
 
-[node name="NodeEditor" type="Control" unique_id=1289184025 node_paths=PackedStringArray("graph", "module_id_edit", "module_name_edit", "module_version_edit", "module_author_edit", "node_inspector", "save_button", "save_as_button", "save_file_dialog", "open_file_dialog", "context_menu")]
+[node name="NodeEditor" type="Control" unique_id=1289184025 node_paths=PackedStringArray("graph", "module_id_edit", "module_name_edit", "module_version_edit", "module_author_edit", "node_inspector", "save_button", "save_as_button", "settings_button", "module_settings_panel", "save_file_dialog", "open_file_dialog", "context_menu")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,6 +20,8 @@ module_author_edit = NodePath("HBoxContainer/Panel/MarginContainer/VBoxContainer
 node_inspector = NodePath("HBoxContainer/Panel/MarginContainer/VBoxContainer/NodeInspector")
 save_button = NodePath("HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/SaveModuleButton")
 save_as_button = NodePath("HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/SaveAsButton")
+settings_button = NodePath("HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/SettingsButton")
+module_settings_panel = NodePath("ModuleSettingsPanel")
 save_file_dialog = NodePath("SaveFileDialog")
 open_file_dialog = NodePath("OpenFileDialog")
 context_menu = NodePath("ContextMenu")
@@ -77,6 +80,11 @@ text = "Export"
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Export As"
+
+[node name="SettingsButton" type="Button" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Settings"
 
 [node name="ModuleIDContainer" type="HBoxContainer" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer" unique_id=1996179878]
 layout_mode = 2
@@ -153,9 +161,13 @@ filters = PackedStringArray("*.json ; JSON Files")
 
 [node name="ContextMenu" type="PopupMenu" parent="."]
 
+[node name="ModuleSettingsPanel" parent="." instance=ExtResource("3_msp")]
+layout_mode = 1
+
 [connection signal="pressed" from="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/NewButton" to="." method="_on_new_pressed"]
 [connection signal="pressed" from="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/OpenButton" to="." method="_on_open_pressed"]
 [connection signal="pressed" from="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/SaveModuleButton" to="." method="_on_save_pressed"]
 [connection signal="pressed" from="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/SaveAsButton" to="." method="_on_save_as_pressed"]
+[connection signal="pressed" from="HBoxContainer/Panel/MarginContainer/VBoxContainer/ButtonBar/SettingsButton" to="." method="_on_settings_pressed"]
 [connection signal="file_selected" from="SaveFileDialog" to="." method="_on_file_selected"]
 [connection signal="file_selected" from="OpenFileDialog" to="." method="_on_open_file_selected"]

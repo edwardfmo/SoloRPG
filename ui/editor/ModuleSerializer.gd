@@ -19,7 +19,7 @@ func set_api(api: ModAPI):
 	_api = api
 
 
-func export_module(path: String, metadata: Dictionary, start_node_gn: GraphNode, module_entries: Dictionary):
+func export_module(path: String, metadata: Dictionary, start_node_gn: GraphNode, module_entries: Dictionary, module_settings: Dictionary = {}):
 	var start_id = ""
 	for conn in graph.get_connection_list():
 		if conn["from_node"] == start_node_gn.name:
@@ -39,6 +39,9 @@ func export_module(path: String, metadata: Dictionary, start_node_gn: GraphNode,
 
 	if not module_entries.is_empty():
 		module["entries"] = module_entries
+
+	if not module_settings.is_empty():
+		module["settings"] = module_settings
 
 	for n in nodes:
 		module["nodes"][n.data["id"]] = n.data

@@ -1,13 +1,13 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bmktyhngucwsq"]
 
 [ext_resource type="Script" uid="uid://djs5n74pab65s" path="res://ui/editor/CompendiumEditor.gd" id="1_ce"]
 
-[node name="CompendiumEditor" type="HSplitContainer" node_paths=PackedStringArray("_tree", "_new_comp_btn", "_new_entry_btn", "_detail_scroll", "_entry_fields", "_delete_btn", "_duplicate_btn", "_copy_btn", "_paste_btn", "_save_btn", "_header_label")]
+[node name="CompendiumEditor" type="HSplitContainer" unique_id=1444497076 node_paths=PackedStringArray("_tree", "_new_comp_btn", "_new_entry_btn", "_detail_scroll", "_entry_fields", "_delete_btn", "_duplicate_btn", "_copy_btn", "_paste_btn", "_save_btn", "_save_all_btn", "_header_label", "_confirm_dialog")]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_ce")
 _tree = NodePath("LeftPanel/Tree")
-_new_comp_btn = NodePath("LeftPanel/NewCompendiumBtn")
+_new_comp_btn = NodePath("LeftPanel/BtnBar/NewCompendiumBtn")
 _new_entry_btn = NodePath("RightPanel/TopBar/NewEntryBtn")
 _detail_scroll = NodePath("RightPanel/DetailScroll")
 _entry_fields = NodePath("RightPanel/DetailScroll/EntryFields")
@@ -15,77 +15,93 @@ _delete_btn = NodePath("RightPanel/TopBar/DeleteBtn")
 _duplicate_btn = NodePath("RightPanel/TopBar/DuplicateBtn")
 _copy_btn = NodePath("RightPanel/TopBar/CopyBtn")
 _paste_btn = NodePath("RightPanel/TopBar/PasteBtn")
-_save_btn = NodePath("RightPanel/TopBar/SaveBtn")
+_save_btn = NodePath("LeftPanel/BtnBar/SaveBtn")
+_save_all_btn = NodePath("LeftPanel/BtnBar/SaveAllBtn")
 _header_label = NodePath("RightPanel/HeaderLabel")
+_confirm_dialog = NodePath("ConfirmDialog")
 
-[node name="LeftPanel" type="VBoxContainer" parent="."]
+[node name="LeftPanel" type="VBoxContainer" parent="." unique_id=6887189]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 
-[node name="NewCompendiumBtn" type="Button" parent="LeftPanel"]
+[node name="BtnBar" type="HBoxContainer" parent="LeftPanel" unique_id=481182754]
 layout_mode = 2
-text = "+ New Compendium"
 
-[node name="Tree" type="Tree" parent="LeftPanel"]
+[node name="NewCompendiumBtn" type="Button" parent="LeftPanel/BtnBar" unique_id=43860863]
+layout_mode = 2
+text = "New Compendium"
+
+[node name="SaveBtn" type="Button" parent="LeftPanel/BtnBar" unique_id=2083817294]
+layout_mode = 2
+disabled = true
+text = "Save"
+
+[node name="SaveAllBtn" type="Button" parent="LeftPanel/BtnBar" unique_id=989719703]
+layout_mode = 2
+disabled = true
+text = "Save All"
+
+[node name="Tree" type="Tree" parent="LeftPanel" unique_id=1027702688]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 hide_root = true
 
-[node name="RightPanel" type="VBoxContainer" parent="."]
+[node name="RightPanel" type="VBoxContainer" parent="." unique_id=295969639]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TopBar" type="HBoxContainer" parent="RightPanel"]
+[node name="TopBar" type="HBoxContainer" parent="RightPanel" unique_id=1157378870]
 layout_mode = 2
 
-[node name="NewEntryBtn" type="MenuButton" parent="RightPanel/TopBar"]
+[node name="NewEntryBtn" type="MenuButton" parent="RightPanel/TopBar" unique_id=187843778]
 layout_mode = 2
 disabled = true
-text = "+ New Entry"
+text = "New Entry"
+flat = false
 
-[node name="DuplicateBtn" type="Button" parent="RightPanel/TopBar"]
+[node name="DuplicateBtn" type="Button" parent="RightPanel/TopBar" unique_id=478237359]
 layout_mode = 2
 disabled = true
 text = "Duplicate"
 
-[node name="CopyBtn" type="Button" parent="RightPanel/TopBar"]
+[node name="CopyBtn" type="Button" parent="RightPanel/TopBar" unique_id=2015395814]
 layout_mode = 2
 disabled = true
 text = "Copy"
 
-[node name="PasteBtn" type="Button" parent="RightPanel/TopBar"]
+[node name="PasteBtn" type="Button" parent="RightPanel/TopBar" unique_id=1703352223]
 layout_mode = 2
 disabled = true
 text = "Paste"
 
-[node name="DeleteBtn" type="Button" parent="RightPanel/TopBar"]
+[node name="DeleteBtn" type="Button" parent="RightPanel/TopBar" unique_id=315647902]
 layout_mode = 2
 disabled = true
 text = "Delete"
 
-[node name="SaveBtn" type="Button" parent="RightPanel/TopBar"]
-layout_mode = 2
-disabled = true
-text = "Save"
-
-[node name="HeaderLabel" type="Label" parent="RightPanel"]
+[node name="HeaderLabel" type="Label" parent="RightPanel" unique_id=627526183]
 layout_mode = 2
 text = "Select an entry"
 
-[node name="DetailScroll" type="ScrollContainer" parent="RightPanel"]
+[node name="DetailScroll" type="ScrollContainer" parent="RightPanel" unique_id=1999767046]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="EntryFields" type="VBoxContainer" parent="RightPanel/DetailScroll"]
+[node name="EntryFields" type="VBoxContainer" parent="RightPanel/DetailScroll" unique_id=492386235]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[connection signal="pressed" from="LeftPanel/NewCompendiumBtn" to="." method="_on_new_compendium"]
+[node name="ConfirmDialog" type="ConfirmationDialog" parent="." unique_id=616176120]
+title = "Confirm"
+initial_position = 1
+
+[connection signal="pressed" from="LeftPanel/BtnBar/NewCompendiumBtn" to="." method="_on_new_compendium"]
+[connection signal="pressed" from="LeftPanel/BtnBar/SaveBtn" to="." method="_save_selected"]
+[connection signal="pressed" from="LeftPanel/BtnBar/SaveAllBtn" to="." method="_save_all_dirty"]
+[connection signal="item_selected" from="LeftPanel/Tree" to="." method="_on_tree_item_selected"]
 [connection signal="pressed" from="RightPanel/TopBar/DuplicateBtn" to="." method="_on_duplicate"]
 [connection signal="pressed" from="RightPanel/TopBar/CopyBtn" to="." method="_on_copy"]
 [connection signal="pressed" from="RightPanel/TopBar/PasteBtn" to="." method="_on_paste"]
 [connection signal="pressed" from="RightPanel/TopBar/DeleteBtn" to="." method="_on_delete"]
-[connection signal="pressed" from="RightPanel/TopBar/SaveBtn" to="." method="_save_selected"]
-[connection signal="item_selected" from="LeftPanel/Tree" to="." method="_on_tree_item_selected"]

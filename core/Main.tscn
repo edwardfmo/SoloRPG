@@ -5,11 +5,11 @@
 [ext_resource type="PackedScene" uid="uid://oyo0xpmfxk62" path="res://ui/game/GameView.tscn" id="3_vcsgt"]
 [ext_resource type="PackedScene" uid="uid://ckpcq3mpgmibx" path="res://ui/editor/ContentEditor.tscn" id="5_n3dtr"]
 [ext_resource type="PackedScene" uid="uid://i86den3ygyrd" path="res://ui/menus/ModuleSelect.tscn" id="6_mssel"]
-[ext_resource type="PackedScene" uid="uid://brs7hsbyqodl7" path="res://ui/menus/PluginList.tscn" id="7_plgn"]
+[ext_resource type="PackedScene" path="res://ui/menus/SettingsMenu.tscn" id="7_plgn"]
 [ext_resource type="Theme" uid="uid://hh1g6jekwx2x" path="res://assets/theme/ui_theme.tres" id="8_theme"]
 [ext_resource type="PackedScene" uid="uid://c16et65egv758" path="res://ui/components/AnimatedBackground.tscn" id="9_abg"]
 
-[node name="Main" type="Control" unique_id=900668806 node_paths=PackedStringArray("background", "main_menu", "game_view", "content_editor", "module_select", "plugin_list")]
+[node name="Main" type="Control" unique_id=900668806 node_paths=PackedStringArray("background", "main_menu", "game_view", "content_editor", "module_select", "settings_menu")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,7 +23,7 @@ main_menu = NodePath("MainMenu")
 game_view = NodePath("GameView")
 content_editor = NodePath("ContentEditor")
 module_select = NodePath("ModuleSelect")
-plugin_list = NodePath("PluginList")
+settings_menu = NodePath("SettingsMenu")
 
 [node name="Background" parent="." unique_id=1330554268 instance=ExtResource("9_abg")]
 layout_mode = 1
@@ -42,5 +42,5 @@ layout_mode = 1
 [node name="ModuleSelect" parent="." unique_id=1050997787 instance=ExtResource("6_mssel")]
 layout_mode = 1
 
-[node name="PluginList" parent="." unique_id=857744542 instance=ExtResource("7_plgn")]
+[node name="SettingsMenu" parent="." instance=ExtResource("7_plgn")]
 layout_mode = 1

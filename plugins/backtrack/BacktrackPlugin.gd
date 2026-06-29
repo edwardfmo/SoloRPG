@@ -13,7 +13,7 @@ func get_conditions() -> Array[String]:
 
 func get_ui_panels() -> Array[Dictionary]:
 	return [
-		{"slot": "sidebar_icon", "scene": "res://plugins/backtrack/BacktrackButton.tscn", "id": "backtrack_btn"}
+		{"slot": "sidebar_icon", "scene": resolve_path("BacktrackButton.tscn"), "id": "backtrack_btn"}
 	]
 
 

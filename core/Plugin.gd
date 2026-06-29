@@ -7,6 +7,16 @@ extends RefCounted
 ## Reference to the ModAPI, set automatically on registration.
 var api: ModAPI = null
 
+## The directory where this plugin resides (e.g. "res://plugins/dnd" or "user://plugins/dnd").
+## Set automatically by the PluginLoader. Use resolve_path() to build full paths.
+var plugin_dir: String = ""
+
+
+## Resolves a relative path against this plugin's directory.
+## e.g. resolve_path("HpBar.tscn") -> "res://plugins/dnd/HpBar.tscn"
+func resolve_path(relative_path: String) -> String:
+	return plugin_dir.path_join(relative_path)
+
 
 ## Return an array of action type strings this plugin provides.
 ## e.g. ["dnd.take_damage", "dnd.heal"]
@@ -61,6 +71,14 @@ func get_templates() -> Array[Dictionary]:
 ## Format: {template_id: [{field: value, ...}, ...]}
 func get_template_entries() -> Dictionary:
 	return {}
+
+
+## Return setting definitions this plugin provides.
+## Each entry: {path: String, label: String, type: "int"|"float"|"string"|"bool"|"enum",
+##              scope: "global"|"module", default: Variant, options?: Array[String]}
+## The plugin id is added automatically during registration.
+func get_settings() -> Array[Dictionary]:
+	return []
 
 
 ## Called when a new game starts. Override to initialize context variables.
