@@ -1,38 +1,56 @@
 {
-	"item": [
-		{
-			"id": "longsword",
-			"name": "Longsword",
-			"damage": "/r1d8",
-			"weight": 3.0,
-			"tags": ["versatile"]
-		},
-		{
-			"id": "greataxe",
-			"name": "Greataxe",
-			"damage": "/r1d12",
-			"weight": 7.0,
-			"tags": ["heavy", "two-handed"]
-		},
-		{
-			"id": "handaxe",
-			"name": "Handaxe",
-			"damage": "/r1d6",
-			"weight": 2.0,
-			"tags": ["light", "thrown"]
-		},
-		{
-			"id": "shield",
-			"name": "Shield",
-			"weight": 6.0,
-			"tags": ["armor"]
-		},
-		{
-			"id": "longbow",
-			"name": "Longbow",
-			"damage": "/r1d8",
-			"weight": 2.0,
-			"tags": ["heavy", "two-handed", "ranged"]
-		}
+	"item": [],
+	"weapon": [
+		{"id": "club", "name": "Club", "damage": "/r1d4", "damage_type": "bludgeoning", "weight": 2.0, "value": 10, "class": "simple", "range": "melee", "keywords": ["light", "mastery(slow)"], "groups": ["simple_weapons"]},
+		{"id": "dagger", "name": "Dagger", "damage": "/r1d4", "damage_type": "piercing", "weight": 1.0, "value": 200, "class": "simple", "range": "melee", "keywords": ["finesse", "light", "thrown(20/60)", "mastery(nick)"], "groups": ["simple_weapons"]},
+		{"id": "greatclub", "name": "Greatclub", "damage": "/r1d8", "damage_type": "bludgeoning", "weight": 10.0, "value": 20, "class": "simple", "range": "melee", "keywords": ["two-handed", "mastery(push)"], "groups": ["simple_weapons"]},
+		{"id": "handaxe", "name": "Handaxe", "damage": "/r1d6", "damage_type": "slashing", "weight": 2.0, "value": 500, "class": "simple", "range": "melee", "keywords": ["light", "thrown(20/60)", "mastery(vex)"], "groups": ["simple_weapons"]},
+		{"id": "javelin", "name": "Javelin", "damage": "/r1d6", "damage_type": "piercing", "weight": 2.0, "value": 50, "class": "simple", "range": "melee", "keywords": ["thrown(30/120)", "mastery(slow)"], "groups": ["simple_weapons"]},
+		{"id": "light_hammer", "name": "Light Hammer", "damage": "/r1d4", "damage_type": "bludgeoning", "weight": 2.0, "value": 200, "class": "simple", "range": "melee", "keywords": ["light", "thrown(20/60)", "mastery(nick)"], "groups": ["simple_weapons"]},
+		{"id": "mace", "name": "Mace", "damage": "/r1d6", "damage_type": "bludgeoning", "weight": 4.0, "value": 500, "class": "simple", "range": "melee", "keywords": ["mastery(sap)"], "groups": ["simple_weapons"]},
+		{"id": "quarterstaff", "name": "Quarterstaff", "damage": "/r1d6", "damage_type": "bludgeoning", "weight": 4.0, "value": 20, "class": "simple", "range": "melee", "keywords": ["versatile", "mastery(topple)"], "groups": ["simple_weapons"]},
+		{"id": "sickle", "name": "Sickle", "damage": "/r1d4", "damage_type": "slashing", "weight": 2.0, "value": 100, "class": "simple", "range": "melee", "keywords": ["light", "mastery(nick)"], "groups": ["simple_weapons"]},
+		{"id": "spear", "name": "Spear", "damage": "/r1d6", "damage_type": "piercing", "weight": 3.0, "value": 100, "class": "simple", "range": "melee", "keywords": ["thrown(20/60)", "versatile", "mastery(sap)"], "groups": ["simple_weapons"]},
+		{"id": "light_crossbow", "name": "Light Crossbow", "damage": "/r1d8", "damage_type": "piercing", "weight": 5.0, "value": 2500, "class": "simple", "range": "80/320", "keywords": ["ammunition", "loading", "two-handed", "mastery(slow)"], "groups": ["simple_weapons"]},
+		{"id": "dart", "name": "Dart", "damage": "/r1d4", "damage_type": "piercing", "weight": 0.25, "value": 5, "class": "simple", "range": "20/60", "keywords": ["finesse", "thrown(20/60)", "mastery(vex)"], "groups": ["simple_weapons"]},
+		{"id": "shortbow", "name": "Shortbow", "damage": "/r1d6", "damage_type": "piercing", "weight": 2.0, "value": 2500, "class": "simple", "range": "80/320", "keywords": ["ammunition", "two-handed", "mastery(vex)"], "groups": ["simple_weapons"]},
+		{"id": "sling", "name": "Sling", "damage": "/r1d4", "damage_type": "bludgeoning", "weight": 0.0, "value": 10, "class": "simple", "range": "30/120", "keywords": ["ammunition", "mastery(slow)"], "groups": ["simple_weapons"]},
+		{"id": "battleaxe", "name": "Battleaxe", "damage": "/r1d8", "damage_type": "slashing", "weight": 4.0, "value": 1000, "class": "martial", "range": "melee", "keywords": ["versatile", "mastery(topple)"], "groups": ["martial_weapons"]},
+		{"id": "flail", "name": "Flail", "damage": "/r1d8", "damage_type": "bludgeoning", "weight": 2.0, "value": 1000, "class": "martial", "range": "melee", "keywords": ["mastery(sap)"], "groups": ["martial_weapons"]},
+		{"id": "glaive", "name": "Glaive", "damage": "/r1d10", "damage_type": "slashing", "weight": 6.0, "value": 2000, "class": "martial", "range": "melee", "keywords": ["heavy", "reach", "two-handed", "mastery(graze)"], "groups": ["martial_weapons"]},
+		{"id": "greataxe", "name": "Greataxe", "damage": "/r1d12", "damage_type": "slashing", "weight": 7.0, "value": 3000, "class": "martial", "range": "melee", "keywords": ["heavy", "two-handed", "mastery(cleave)"], "groups": ["martial_weapons"]},
+		{"id": "greatsword", "name": "Greatsword", "damage": "/r2d6", "damage_type": "slashing", "weight": 6.0, "value": 5000, "class": "martial", "range": "melee", "keywords": ["heavy", "two-handed", "mastery(graze)"], "groups": ["martial_weapons"]},
+		{"id": "halberd", "name": "Halberd", "damage": "/r1d10", "damage_type": "slashing", "weight": 6.0, "value": 2000, "class": "martial", "range": "melee", "keywords": ["heavy", "reach", "two-handed", "mastery(cleave)"], "groups": ["martial_weapons"]},
+		{"id": "lance", "name": "Lance", "damage": "/r1d10", "damage_type": "piercing", "weight": 6.0, "value": 1000, "class": "martial", "range": "melee", "keywords": ["heavy", "reach", "mastery(topple)"], "groups": ["martial_weapons"]},
+		{"id": "longsword", "name": "Longsword", "damage": "/r1d8", "damage_type": "slashing", "weight": 3.0, "value": 1500, "class": "martial", "range": "melee", "keywords": ["versatile", "mastery(sap)"], "groups": ["martial_weapons"]},
+		{"id": "maul", "name": "Maul", "damage": "/r2d6", "damage_type": "bludgeoning", "weight": 10.0, "value": 1000, "class": "martial", "range": "melee", "keywords": ["heavy", "two-handed", "mastery(topple)"], "groups": ["martial_weapons"]},
+		{"id": "morningstar", "name": "Morningstar", "damage": "/r1d8", "damage_type": "piercing", "weight": 4.0, "value": 1500, "class": "martial", "range": "melee", "keywords": ["mastery(sap)"], "groups": ["martial_weapons"]},
+		{"id": "pike", "name": "Pike", "damage": "/r1d10", "damage_type": "piercing", "weight": 18.0, "value": 500, "class": "martial", "range": "melee", "keywords": ["heavy", "reach", "two-handed", "mastery(push)"], "groups": ["martial_weapons"]},
+		{"id": "rapier", "name": "Rapier", "damage": "/r1d8", "damage_type": "piercing", "weight": 2.0, "value": 2500, "class": "martial", "range": "melee", "keywords": ["finesse", "mastery(vex)"], "groups": ["martial_weapons"]},
+		{"id": "scimitar", "name": "Scimitar", "damage": "/r1d6", "damage_type": "slashing", "weight": 3.0, "value": 2500, "class": "martial", "range": "melee", "keywords": ["finesse", "light", "mastery(nick)"], "groups": ["martial_weapons"]},
+		{"id": "shortsword", "name": "Shortsword", "damage": "/r1d6", "damage_type": "piercing", "weight": 2.0, "value": 1000, "class": "martial", "range": "melee", "keywords": ["finesse", "light", "mastery(vex)"], "groups": ["martial_weapons"]},
+		{"id": "trident", "name": "Trident", "damage": "/r1d8", "damage_type": "piercing", "weight": 4.0, "value": 500, "class": "martial", "range": "melee", "keywords": ["thrown(20/60)", "versatile", "mastery(topple)"], "groups": ["martial_weapons"]},
+		{"id": "war_pick", "name": "War Pick", "damage": "/r1d8", "damage_type": "piercing", "weight": 2.0, "value": 500, "class": "martial", "range": "melee", "keywords": ["versatile", "mastery(sap)"], "groups": ["martial_weapons"]},
+		{"id": "warhammer", "name": "Warhammer", "damage": "/r1d8", "damage_type": "bludgeoning", "weight": 2.0, "value": 1500, "class": "martial", "range": "melee", "keywords": ["versatile", "mastery(push)"], "groups": ["martial_weapons"]},
+		{"id": "whip", "name": "Whip", "damage": "/r1d4", "damage_type": "slashing", "weight": 3.0, "value": 200, "class": "martial", "range": "melee", "keywords": ["finesse", "reach", "mastery(slow)"], "groups": ["martial_weapons"]},
+		{"id": "blowgun", "name": "Blowgun", "damage": "/r1", "damage_type": "piercing", "weight": 1.0, "value": 1000, "class": "martial", "range": "25/100", "keywords": ["ammunition", "loading", "mastery(vex)"], "groups": ["martial_weapons"]},
+		{"id": "hand_crossbow", "name": "Hand Crossbow", "damage": "/r1d6", "damage_type": "piercing", "weight": 3.0, "value": 7500, "class": "martial", "range": "30/120", "keywords": ["ammunition", "light", "loading", "mastery(vex)"], "groups": ["martial_weapons"]},
+		{"id": "heavy_crossbow", "name": "Heavy Crossbow", "damage": "/r1d10", "damage_type": "piercing", "weight": 18.0, "value": 5000, "class": "martial", "range": "100/400", "keywords": ["ammunition", "heavy", "loading", "two-handed", "mastery(push)"], "groups": ["martial_weapons"]},
+		{"id": "longbow", "name": "Longbow", "damage": "/r1d8", "damage_type": "piercing", "weight": 2.0, "value": 5000, "class": "martial", "range": "150/600", "keywords": ["ammunition", "heavy", "two-handed", "mastery(slow)"], "groups": ["martial_weapons"]}
+	],
+	"armor": [
+		{"id": "padded", "name": "Padded Armor", "weight": 8.0, "value": 500, "class": "light", "ac": 11, "stealth_disadvantage": true, "groups": ["light_armor"]},
+		{"id": "leather", "name": "Leather Armor", "weight": 10.0, "value": 1000, "class": "light", "ac": 11, "groups": ["light_armor"]},
+		{"id": "studded_leather", "name": "Studded Leather Armor", "weight": 13.0, "value": 4500, "class": "light", "ac": 12, "groups": ["light_armor"]},
+		{"id": "hide", "name": "Hide Armor", "weight": 12.0, "value": 1000, "class": "medium", "ac": 12, "groups": ["medium_armor"]},
+		{"id": "chain_shirt", "name": "Chain Shirt", "weight": 20.0, "value": 5000, "class": "medium", "ac": 13, "groups": ["medium_armor"]},
+		{"id": "scale_mail", "name": "Scale Mail", "weight": 45.0, "value": 5000, "class": "medium", "ac": 14, "stealth_disadvantage": true, "groups": ["medium_armor"]},
+		{"id": "breastplate", "name": "Breastplate", "weight": 20.0, "value": 40000, "class": "medium", "ac": 14, "groups": ["medium_armor"]},
+		{"id": "half_plate", "name": "Half Plate Armor", "weight": 40.0, "value": 75000, "class": "medium", "ac": 15, "stealth_disadvantage": true, "groups": ["medium_armor"]},
+		{"id": "ring_mail", "name": "Ring Mail", "weight": 40.0, "value": 3000, "class": "heavy", "ac": 14, "stealth_disadvantage": true, "groups": ["heavy_armor"]},
+		{"id": "chain_mail", "name": "Chain Mail", "weight": 55.0, "value": 7500, "class": "heavy", "ac": 16, "min_str": 13, "stealth_disadvantage": true, "groups": ["heavy_armor"]},
+		{"id": "splint", "name": "Splint Armor", "weight": 60.0, "value": 20000, "class": "heavy", "ac": 17, "min_str": 15, "stealth_disadvantage": true, "groups": ["heavy_armor"]},
+		{"id": "plate", "name": "Plate Armor", "weight": 65.0, "value": 150000, "class": "heavy", "ac": 18, "min_str": 15, "stealth_disadvantage": true, "groups": ["heavy_armor"]},
+		{"id": "shield", "name": "Shield", "weight": 6.0, "value": 1000, "class": "shield", "ac": 2, "groups": ["shield"]}
 	]
 }

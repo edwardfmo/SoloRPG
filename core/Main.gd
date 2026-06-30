@@ -152,7 +152,12 @@ func _continue_game():
 const PluginSelectorScene = preload("res://ui/menus/PluginSelector.tscn")
 
 func _on_module_selected(path: String):
-	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var json_path := ""
+	if DirAccess.dir_exists_absolute(path):
+		json_path = path + "/module.json"
+	else:
+		json_path = path
+	var data = JSON.parse_string(FileAccess.get_file_as_string(json_path))
 	if data == null:
 		push_warning("Failed to parse module: " + path)
 		return
@@ -220,7 +225,93 @@ func _start_game(path: String, optional_ids: Array[String] = []):
 	settings_menu.visible = false
 
 	current_module_path = path
-	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+
+	# Determine module JSON path and directory
+	var json_path := ""
+	var module_dir := ""
+	if DirAccess.dir_exists_absolute(path):
+		# Directory-based module — check for .rpgmod upgrade
+		json_path = path + "/module.json"
+		module_dir = path
+		var upgrade_path = _find_rpgmod_for_directory(path)
+		if upgrade_path != "":
+			var archive_version = _get_rpgmod_version(upgrade_path)
+			var local_data = JSON.parse_string(FileAccess.get_file_as_string(json_path))
+			var local_version = local_data.get("version", "") if local_data else ""
+			if archive_version != "" and archive_version != local_version:
+				_show_upgrade_dialog(path, upgrade_path, local_version, archive_version, optional_ids)
+				return
+	elif path.ends_with(".rpgmod"):
+		# ZIP archive — import first
+		var serializer = ModuleSerializer.new()
+		module_dir = serializer.import_from_zip(path)
+		json_path = module_dir + "/module.json"
+		current_module_path = module_dir
+	else:
+		# Legacy single .json file
+		json_path = path
+		module_dir = path.get_base_dir()
+
+	_finish_start_game(json_path, module_dir, optional_ids)
+
+
+func _show_upgrade_dialog(dir_path: String, rpgmod_path: String, local_version: String, archive_version: String, optional_ids: Array[String]):
+	var dialog = ConfirmationDialog.new()
+	dialog.title = "Module Update Available"
+	dialog.dialog_text = "A newer version of this module is available.\n\nInstalled: %s\nAvailable: %s\n\nUpgrade? (This will overwrite local changes)" % [local_version, archive_version]
+	dialog.get_ok_button().text = "Upgrade"
+	dialog.add_button("Keep Current", true, "keep")
+	add_child(dialog)
+	dialog.confirmed.connect(func():
+		dialog.queue_free()
+		var serializer = ModuleSerializer.new()
+		serializer.import_from_zip(rpgmod_path, true)
+		var json_path = dir_path + "/module.json"
+		_finish_start_game(json_path, dir_path, optional_ids))
+	dialog.custom_action.connect(func(action):
+		if action == "keep":
+			dialog.queue_free()
+			var json_path = dir_path + "/module.json"
+			_finish_start_game(json_path, dir_path, optional_ids))
+	dialog.canceled.connect(func():
+		dialog.queue_free()
+		_show_menu())
+	dialog.popup_centered()
+
+
+func _find_rpgmod_for_directory(dir_path: String) -> String:
+	# Look for a .rpgmod file in the same parent directory or modules directories
+	var module_id = dir_path.get_file()
+	var search_dirs = [SystemUtils.MODULES_DIR, SystemUtils.BUNDLED_MODULES_DIR]
+	for search_dir in search_dirs:
+		var rpgmod_path = search_dir + module_id + ".rpgmod"
+		if FileAccess.file_exists(rpgmod_path):
+			return rpgmod_path
+	return ""
+
+
+func _get_rpgmod_version(rpgmod_path: String) -> String:
+	var zip = ZIPReader.new()
+	if zip.open(rpgmod_path) != OK:
+		return ""
+	var json_data = zip.read_file("module.json")
+	zip.close()
+	if json_data.is_empty():
+		return ""
+	var data = JSON.parse_string(json_data.get_string_from_utf8())
+	if data == null:
+		return ""
+	return data.get("version", "")
+
+
+func _finish_start_game(json_path: String, module_dir: String, optional_ids: Array[String]):
+	var data = JSON.parse_string(FileAccess.get_file_as_string(json_path))
+	if data == null:
+		push_warning("Failed to parse module: " + json_path)
+		_show_menu()
+		return
+
+	game_view.set_module_dir(module_dir)
 
 	# Auto-enable required plugins for this session
 	var deps = data.get("dependencies", [])
@@ -345,11 +436,17 @@ func _load_save_file(save_path: String):
 	if path == "":
 		return
 
-	if not FileAccess.file_exists(path):
+	# Resolve JSON path — path may be a directory or a file
+	var json_path := ""
+	if DirAccess.dir_exists_absolute(path):
+		json_path = path + "/module.json"
+	else:
+		json_path = path
+	if not FileAccess.file_exists(json_path):
 		_show_load_error("Module not found:\n" + path)
 		return
 
-	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var data = JSON.parse_string(FileAccess.get_file_as_string(json_path))
 	var saved_version = save_data.get("module_version", "")
 	var current_version = data.get("version", "")
 
@@ -368,6 +465,14 @@ func _apply_load(path: String, data: Dictionary, save_data: Dictionary):
 		_load_plugins_from_snapshot(saved_plugins)
 
 	current_module_path = path
+	# Set module directory for image resolution
+	var module_dir := ""
+	if DirAccess.dir_exists_absolute(path):
+		module_dir = path
+	else:
+		module_dir = path.get_base_dir()
+	game_view.set_module_dir(module_dir)
+
 	module = Module.new()
 	module.init(data, api)
 

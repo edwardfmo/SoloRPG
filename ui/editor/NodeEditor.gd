@@ -24,7 +24,7 @@ var frames = []
 var selected_node: StoryNode = null
 
 var _api: ModAPI = null
-var _last_export_path: String = ""
+var _module_dir_path: String = ""
 var _module_entries: Dictionary = {}
 var _module_settings: Dictionary = {}
 var _module_active: bool = false
@@ -34,6 +34,8 @@ var _context_menu_position: Vector2 = Vector2.ZERO
 var _frame_manager: GraphFrameManager
 var _node_factory: GraphNodeFactory
 var _serializer: ModuleSerializer
+var _image_file_dialog: FileDialog
+var _export_images_dialog: ConfirmationDialog
 
 
 func set_api(api: ModAPI):
@@ -53,6 +55,10 @@ func get_module_id() -> String:
 	if module_id_edit.text != "":
 		return module_id_edit.text
 	return "editor_module"
+
+
+func get_module_dir_path() -> String:
+	return _module_dir_path
 
 
 func is_module_loaded() -> bool:
@@ -75,6 +81,26 @@ func _ready() -> void:
 	graph.delete_nodes_request.connect(_on_delete_nodes_request)
 	graph.gui_input.connect(_on_graph_gui_input)
 	node_inspector.visible = false
+	node_inspector.image_browse_requested.connect(_on_image_browse_requested)
+	node_inspector.image_path_set.connect(_on_image_path_set)
+
+	# Image file dialog (created in code to avoid .tscn bloat)
+	_image_file_dialog = FileDialog.new()
+	_image_file_dialog.title = "Select Image"
+	_image_file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
+	_image_file_dialog.filters = PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; Image Files"])
+	_image_file_dialog.access = FileDialog.ACCESS_FILESYSTEM
+	_image_file_dialog.size = Vector2i(600, 400)
+	_image_file_dialog.file_selected.connect(_on_image_file_selected)
+	add_child(_image_file_dialog)
+
+	# Export images confirmation dialog
+	_export_images_dialog = ConfirmationDialog.new()
+	_export_images_dialog.title = "Export Images"
+	_export_images_dialog.dialog_text = "The module contains images that are not referenced by any node.\n\nExport only referenced images?"
+	_export_images_dialog.get_ok_button().text = "Referenced Only"
+	_export_images_dialog.add_button("All Images", true, "all_images")
+	add_child(_export_images_dialog)
 
 
 func reset():
@@ -83,7 +109,7 @@ func reset():
 	module_name_edit.text = ""
 	module_version_edit.text = ""
 	module_author_edit.text = ""
-	_last_export_path = ""
+	_module_dir_path = ""
 	_module_entries = {}
 	_module_settings = {}
 	_module_active = false
@@ -169,10 +195,7 @@ func _on_delete_nodes_request(node_names: Array[StringName]):
 # --- Save / Load ---
 
 func _on_save_pressed():
-	if _last_export_path != "":
-		_validate_then_save(_last_export_path)
-	else:
-		_validate_then_pick_file()
+	_validate_then_save("")
 
 
 func _on_save_as_pressed():
@@ -196,17 +219,17 @@ func _on_settings_closed():
 
 
 func _on_file_selected(path: String):
-	_last_export_path = path
-	_do_export(path)
+	# path is the .rpgmod export target
+	_do_export_zip(path)
 
 
-func _validate_then_save(path: String):
-	_pending_save_path = path
+func _validate_then_save(_path: String):
+	_pending_save_path = "save"
 	_show_save_confirm()
 
 
 func _validate_then_pick_file():
-	_pending_save_path = ""
+	_pending_save_path = "export"
 	_show_save_confirm()
 
 
@@ -226,9 +249,10 @@ func _on_save_confirmed():
 	_module_settings = module_settings_panel.get_module_settings()
 	if module_settings_panel.cancelled_save.is_connected(_on_save_cancelled):
 		module_settings_panel.cancelled_save.disconnect(_on_save_cancelled)
-	if _pending_save_path != "":
-		_do_export(_pending_save_path)
+	if _pending_save_path == "save":
+		_do_save()
 	else:
+		# Export to .rpgmod — show file picker
 		save_file_dialog.popup_centered()
 
 
@@ -237,14 +261,69 @@ func _on_save_cancelled():
 		module_settings_panel.confirmed_save.disconnect(_on_save_confirmed)
 
 
-func _do_export(path: String):
-	var metadata = {
+## Save to the module directory (always saves; creates dir if needed).
+func _do_save():
+	_ensure_module_dir()
+	var metadata = _get_metadata()
+	_serializer.save_to_directory(_module_dir_path, metadata, _node_factory.start_node_gn, _module_entries, _module_settings)
+
+
+## Export to .rpgmod ZIP, optionally asking about unreferenced images.
+func _do_export_zip(zip_path: String):
+	_ensure_module_dir()
+	var metadata = _get_metadata()
+	# Save to directory first
+	_serializer.save_to_directory(_module_dir_path, metadata, _node_factory.start_node_gn, _module_entries, _module_settings)
+
+	# Check for unreferenced images
+	if _serializer.has_unreferenced_images(_module_dir_path):
+		_pending_save_path = zip_path
+		_show_export_images_dialog(zip_path)
+	else:
+		_serializer.export_to_zip(zip_path, _module_dir_path, metadata, _node_factory.start_node_gn, _module_entries, _module_settings, false)
+
+
+func _show_export_images_dialog(zip_path: String):
+	# Use lambdas with one-shot connections
+	var on_ok := func():
+		var m = _get_metadata()
+		_serializer.export_to_zip(zip_path, _module_dir_path, m, _node_factory.start_node_gn, _module_entries, _module_settings, true)
+	var on_all := func(action: String):
+		if action == "all_images":
+			var m = _get_metadata()
+			_serializer.export_to_zip(zip_path, _module_dir_path, m, _node_factory.start_node_gn, _module_entries, _module_settings, false)
+			_export_images_dialog.hide()
+
+	_export_images_dialog.confirmed.connect(on_ok, CONNECT_ONE_SHOT)
+	_export_images_dialog.custom_action.connect(on_all, CONNECT_ONE_SHOT)
+	_export_images_dialog.canceled.connect(func():
+		# Clean up other one-shot connections on cancel
+		if _export_images_dialog.confirmed.is_connected(on_ok):
+			_export_images_dialog.confirmed.disconnect(on_ok)
+		if _export_images_dialog.custom_action.is_connected(on_all):
+			_export_images_dialog.custom_action.disconnect(on_all)
+	, CONNECT_ONE_SHOT)
+	_export_images_dialog.popup_centered()
+
+
+func _get_metadata() -> Dictionary:
+	return {
 		"id": module_id_edit.text if module_id_edit.text != "" else "editor_module",
 		"name": module_name_edit.text,
 		"version": module_version_edit.text,
 		"author": module_author_edit.text,
 	}
-	_serializer.export_module(path, metadata, _node_factory.start_node_gn, _module_entries, _module_settings)
+
+
+func _ensure_module_dir():
+	if _module_dir_path == "":
+		var mid = module_id_edit.text if module_id_edit.text != "" else "editor_module"
+		_module_dir_path = SystemUtils.MODULES_DIR + mid
+	# Globalize res:// paths for filesystem operations
+	if _module_dir_path.begins_with("res://"):
+		_module_dir_path = ProjectSettings.globalize_path(_module_dir_path)
+	DirAccess.make_dir_recursive_absolute(_module_dir_path)
+	DirAccess.make_dir_recursive_absolute(_module_dir_path + "/images")
 
 
 # --- New / Open ---
@@ -255,7 +334,7 @@ func _on_new_pressed():
 	module_name_edit.text = ""
 	module_version_edit.text = ""
 	module_author_edit.text = ""
-	_last_export_path = ""
+	_module_dir_path = ""
 	_module_entries = {}
 	_module_settings = {}
 	_module_active = true
@@ -268,7 +347,57 @@ func _on_open_pressed():
 
 
 func _on_open_file_selected(path: String):
-	load_module(path)
+	if path.ends_with(".rpgmod"):
+		_open_rpgmod(path)
+	else:
+		load_module(path)
+
+
+func _open_rpgmod(rpgmod_path: String):
+	# Check if a directory already exists for this archive
+	var zip = ZIPReader.new()
+	if zip.open(rpgmod_path) != OK:
+		return
+	var json_data = zip.read_file("module.json")
+	zip.close()
+	if json_data.is_empty():
+		return
+	var data = JSON.parse_string(json_data.get_string_from_utf8())
+	if data == null:
+		return
+	var module_id = data.get("id", "imported_module")
+
+	# Check both user and bundled module directories
+	var existing_dir := ""
+	for search_dir in [SystemUtils.MODULES_DIR, SystemUtils.BUNDLED_MODULES_DIR + "/"]:
+		var candidate = search_dir + module_id
+		if DirAccess.dir_exists_absolute(candidate):
+			existing_dir = candidate
+			break
+
+	if existing_dir != "":
+		# Prompt user
+		var dest_dir = SystemUtils.MODULES_DIR + module_id
+		var dialog = ConfirmationDialog.new()
+		dialog.title = "Module Already Exists"
+		dialog.dialog_text = "A folder for '%s' already exists.\n\nExtract and overwrite existing content?" % module_id
+		dialog.get_ok_button().text = "Overwrite"
+		dialog.add_button("Open Existing", true, "open_existing")
+		add_child(dialog)
+		dialog.confirmed.connect(func():
+			dialog.queue_free()
+			_serializer.import_from_zip(rpgmod_path, true)
+			load_module(dest_dir))
+		dialog.custom_action.connect(func(action):
+			if action == "open_existing":
+				dialog.queue_free()
+				load_module(existing_dir))
+		dialog.canceled.connect(func():
+			dialog.queue_free())
+		dialog.popup_centered()
+	else:
+		# No existing directory — extract and open
+		load_module(rpgmod_path)
 
 
 func load_module(path: String):
@@ -284,7 +413,7 @@ func load_module(path: String):
 	module_name_edit.text = data.get("name", "")
 	module_version_edit.text = data.get("version", "")
 	module_author_edit.text = data.get("author", "")
-	_last_export_path = path
+	_module_dir_path = data.get("_dir_path", "")
 	_module_entries = data.get("entries", {})
 	_module_settings = data.get("settings", {})
 
@@ -306,6 +435,38 @@ func load_module(path: String):
 
 	# Restore frames
 	_frame_manager.restore_frames(data.get("frames", []), id_map)
+
+
+# --- Image Browsing ---
+
+func _on_image_browse_requested():
+	if not _module_active:
+		return
+	_image_file_dialog.popup_centered()
+
+
+func _on_image_file_selected(source_path: String):
+	_ensure_module_dir()
+	var rel_path = _serializer.copy_image_to_module(source_path, _module_dir_path)
+	if selected_node:
+		selected_node.data["image"] = rel_path
+		node_inspector.set_image_path(rel_path)
+
+
+func _on_image_path_set(path: String):
+	if not _module_active or path == "":
+		return
+	# If it's already a relative path (images/...) or empty, nothing to do
+	if path.begins_with("images/"):
+		return
+	# If it's an absolute filesystem path, copy it into the module
+	if path.begins_with("/") or (path.length() > 2 and path[1] == ":"):
+		if FileAccess.file_exists(path):
+			_ensure_module_dir()
+			var rel_path = _serializer.copy_image_to_module(path, _module_dir_path)
+			if selected_node:
+				selected_node.data["image"] = rel_path
+				node_inspector.set_image_path(rel_path)
 
 
 func _clear_editor():

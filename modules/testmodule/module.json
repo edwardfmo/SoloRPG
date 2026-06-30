@@ -12,7 +12,7 @@
 		{
 			"id": "srd_equipment",
 			"type": "compendium",
-			"version": "1.0.0"
+			"version": ""
 		}
 	],
 	"frames": [
@@ -28,7 +28,7 @@
 				60.0
 			],
 			"size": [
-				900.0,
+				900.000061035156,
 				590.000122070312
 			],
 			"title": "Chapter1"
@@ -160,7 +160,7 @@
 				{
 					"actions": [
 						{
-							"item": "@srd_equipment.longsword",
+							"item": "@srd.longsword",
 							"slot": "weapon",
 							"type": "dnd.equip_item"
 						}
@@ -172,7 +172,7 @@
 				}
 			],
 			"id": "start",
-			"image": "",
+			"image": "images/Gauntlet.png",
 			"offset": [
 				260.0,
 				140.0
@@ -188,7 +188,7 @@
 		}
 	},
 	"settings": {
-		"dnd.starting_level": 9
+		"dnd.starting_level": 9.0
 	},
 	"start_node": "start",
 	"version": "0.2"

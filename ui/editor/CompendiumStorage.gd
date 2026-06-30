@@ -62,6 +62,22 @@ func mark_entry_dirty(comp_id: String, template_id: String, entry_id: String):
 	_dirty_entries[comp_id + "/" + template_id + "/" + entry_id] = true
 
 
+func rename_entry_id(comp_id: String, template_id: String, old_id: String, new_id: String):
+	# Update entry_sources mapping
+	var comp_sources = _entry_sources.get(comp_id, {})
+	var tmpl_sources = comp_sources.get(template_id, {})
+	if tmpl_sources.has(old_id):
+		var file_name = tmpl_sources[old_id]
+		tmpl_sources.erase(old_id)
+		tmpl_sources[new_id] = file_name
+	# Update dirty_entries tracking
+	var old_key = comp_id + "/" + template_id + "/" + old_id
+	if _dirty_entries.has(old_key):
+		_dirty_entries.erase(old_key)
+	_dirty_entries[comp_id + "/" + template_id + "/" + new_id] = true
+	_dirty[comp_id] = true
+
+
 func get_entry_source_file(comp_id: String, template_id: String, entry_id: String) -> String:
 	var comp_sources = _entry_sources.get(comp_id, {})
 	var tmpl_sources = comp_sources.get(template_id, {})
@@ -174,6 +190,50 @@ func is_module_comp(comp_id: String) -> bool:
 	return _module_id != "" and comp_id == _module_id
 
 
+## Reorder a module entry: move it to a different template or position within a template.
+## If before_entry_id is "", appends to the end of dst_template.
+func reorder_module_entry(src_template: String, entry_id: String, dst_template: String, before_entry_id: String = "") -> String:
+	if not _module_entries.has(src_template):
+		return "Source template not found."
+	var src_list: Array = _module_entries[src_template]
+	var entry = null
+	var src_idx := -1
+	for i in src_list.size():
+		if src_list[i].get("id", "") == entry_id:
+			entry = src_list[i]
+			src_idx = i
+			break
+	if entry == null:
+		return "Entry not found in source template."
+
+	# Remove from source
+	src_list.remove_at(src_idx)
+	if src_list.is_empty():
+		_module_entries.erase(src_template)
+
+	# Ensure destination template exists
+	if not _module_entries.has(dst_template):
+		_module_entries[dst_template] = []
+	var dst_list: Array = _module_entries[dst_template]
+
+	# Insert at position
+	if before_entry_id == "":
+		dst_list.append(entry)
+	else:
+		var insert_idx := -1
+		for i in dst_list.size():
+			if dst_list[i].get("id", "") == before_entry_id:
+				insert_idx = i
+				break
+		if insert_idx == -1:
+			dst_list.append(entry)
+		else:
+			dst_list.insert(insert_idx, entry)
+
+	mark_dirty(_module_id)
+	return ""
+
+
 func is_compendium_writable(comp_id: String) -> bool:
 	if is_module_comp(comp_id):
 		return true
@@ -207,6 +267,74 @@ func find_entry(comp_id: String, template_id: String, entry_id: String):
 		if entry.get("id", "") == entry_id:
 			return entry
 	return null
+
+
+## Move an entry from the module into a compendium file.
+func move_from_module(template_id: String, entry_id: String, dst_comp_id: String, dst_file: String) -> String:
+	if not _module_entries.has(template_id):
+		return "Template not found in module."
+	var src_list: Array = _module_entries[template_id]
+	var entry = null
+	var src_idx := -1
+	for i in src_list.size():
+		if src_list[i].get("id", "") == entry_id:
+			entry = src_list[i]
+			src_idx = i
+			break
+	if entry == null:
+		return "Entry not found in module."
+	if not is_compendium_writable(dst_comp_id):
+		return "Destination compendium is not writable."
+	var dst_comp: Dictionary = get_compendium(dst_comp_id)
+	if dst_comp.is_empty():
+		return "Destination compendium not found."
+	# Remove from module
+	src_list.remove_at(src_idx)
+	if src_list.is_empty():
+		_module_entries.erase(template_id)
+	# Add to destination compendium
+	if not dst_comp.has("entries"):
+		dst_comp["entries"] = {}
+	if not dst_comp["entries"].has(template_id):
+		dst_comp["entries"][template_id] = []
+	dst_comp["entries"][template_id].append(entry)
+	set_entry_source_file(dst_comp_id, template_id, entry_id, dst_file)
+	mark_entry_dirty(dst_comp_id, template_id, entry_id)
+	mark_dirty(_module_id)
+	return ""
+
+
+## Move an entry from a compendium into the module.
+func move_to_module(src_comp_id: String, template_id: String, entry_id: String) -> String:
+	var entry = find_entry(src_comp_id, template_id, entry_id)
+	if entry == null:
+		return "Entry not found."
+	var src_comp: Dictionary = get_compendium(src_comp_id)
+	if src_comp.is_empty():
+		return "Source compendium not found."
+	# Remove from source compendium
+	var src_entries = src_comp.get("entries", {}).get(template_id, [])
+	var idx := -1
+	for i in src_entries.size():
+		if src_entries[i].get("id", "") == entry_id:
+			idx = i
+			break
+	if idx == -1:
+		return "Entry not found in source."
+	src_entries.remove_at(idx)
+	if src_entries.is_empty():
+		src_comp["entries"].erase(template_id)
+	# Remove from entry_sources
+	var src_sources = _entry_sources.get(src_comp_id, {})
+	if src_sources.has(template_id):
+		src_sources[template_id].erase(entry_id)
+	# Add to module
+	if not _module_entries.has(template_id):
+		_module_entries[template_id] = []
+	_module_entries[template_id].append(entry)
+	mark_dirty(src_comp_id)
+	mark_dirty(_module_id)
+	return ""
 
 
 ## Move an entry to a different file (same compendium) or different compendium.

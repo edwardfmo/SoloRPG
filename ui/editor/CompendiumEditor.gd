@@ -38,6 +38,7 @@ func _ready():
 	_comp_tree.setup(_tree, _storage)
 	_detail_panel.setup(_entry_fields, _header_label, _storage)
 	_detail_panel.entry_field_changed.connect(_on_entry_field_changed)
+	_detail_panel.entry_id_changed.connect(_on_entry_id_changed)
 	_detail_panel.refresh_requested.connect(_on_detail_refresh_requested)
 
 	_new_entry_btn.get_popup().id_pressed.connect(_on_new_entry_type_selected)
@@ -106,7 +107,7 @@ func _on_tree_item_selected():
 func _update_buttons():
 	var writable = _storage.is_compendium_writable(_selected_comp_id)
 	var is_module = _storage.is_module_comp(_selected_comp_id)
-	_new_entry_btn.disabled = not writable or _selected_comp_id == "" or _selected_file == ""
+	_new_entry_btn.disabled = not writable or _selected_comp_id == "" or (_selected_file == "" and not is_module)
 	_delete_btn.disabled = not writable or _selected_entry_id == ""
 	_duplicate_btn.disabled = _selected_entry_id == ""
 	_copy_btn.disabled = _selected_entry_id == ""
@@ -403,9 +404,6 @@ func _tree_get_drag_data(at_position: Vector2) -> Variant:
 	var meta = item.get_metadata(0)
 	if meta == null or meta.get("type", "") != "entry":
 		return null
-	# Don't allow dragging from module entries
-	if _storage.is_module_comp(meta.get("comp_id", "")):
-		return null
 	# Visual preview
 	var label = Label.new()
 	label.text = item.get_text(0)
@@ -425,10 +423,37 @@ func _tree_can_drop_data(at_position: Vector2, data: Variant) -> bool:
 	if drop_meta == null:
 		return false
 	var drop_type = drop_meta.get("type", "")
-	# Can drop on file or compendium nodes
+	var src_comp_id = data.get("comp_id", "")
+
+	var dst_comp_id = drop_meta.get("comp_id", drop_meta.get("id", ""))
+	var src_is_module = _storage.is_module_comp(src_comp_id)
+	var dst_is_module = _storage.is_module_comp(dst_comp_id)
+
+	# Module internal reorder: drop on template or entry within same module
+	if src_is_module and dst_is_module:
+		if drop_type == "template":
+			return true
+		if drop_type == "entry":
+			return drop_meta.get("entry_id", "") != data.get("entry_id", "")
+		return false
+
+	# Module → Compendium: allow drop on file or compendium nodes
+	if src_is_module and not dst_is_module:
+		if drop_type != "file" and drop_type != "compendium":
+			return false
+		if not _storage.is_compendium_writable(dst_comp_id):
+			return false
+		return true
+
+	# Compendium → Module: allow drop on the module compendium or template nodes
+	if not src_is_module and dst_is_module:
+		if drop_type == "compendium" or drop_type == "template":
+			return true
+		return false
+
+	# Compendium → Compendium: drop on file or compendium nodes
 	if drop_type != "file" and drop_type != "compendium":
 		return false
-	var dst_comp_id: String
 	var dst_file: String
 	if drop_type == "file":
 		dst_comp_id = drop_meta["comp_id"]
@@ -436,14 +461,8 @@ func _tree_can_drop_data(at_position: Vector2, data: Variant) -> bool:
 	else:
 		dst_comp_id = drop_meta["id"]
 		dst_file = "compendium.json"
-	# Don't allow dropping on non-writable compendiums
 	if not _storage.is_compendium_writable(dst_comp_id):
 		return false
-	# Don't allow dropping on module compendiums
-	if _storage.is_module_comp(dst_comp_id):
-		return false
-	# Don't allow dropping on same file
-	var src_comp_id = data.get("comp_id", "")
 	var src_file = data.get("file", "compendium.json")
 	if src_comp_id == dst_comp_id and src_file == dst_file:
 		return false
@@ -460,7 +479,74 @@ func _tree_drop_data(at_position: Vector2, data: Variant):
 	if drop_meta == null:
 		return
 	var drop_type = drop_meta.get("type", "")
-	var dst_comp_id: String
+	var src_comp_id: String = data["comp_id"]
+	var template_id: String = data["template"]
+	var entry_id: String = data["entry_id"]
+
+	var dst_comp_id = drop_meta.get("comp_id", drop_meta.get("id", ""))
+	var src_is_module = _storage.is_module_comp(src_comp_id)
+	var dst_is_module = _storage.is_module_comp(dst_comp_id)
+
+	# Module internal reorder
+	if src_is_module and dst_is_module:
+		var dst_template = drop_meta.get("template", "")
+		var before_entry_id = ""
+		if drop_type == "entry":
+			before_entry_id = drop_meta.get("entry_id", "")
+			dst_template = drop_meta.get("template", template_id)
+		elif drop_type == "template":
+			dst_template = drop_meta.get("template", "")
+		var err = _storage.reorder_module_entry(template_id, entry_id, dst_template, before_entry_id)
+		if err != "":
+			push_warning("[CompendiumEditor] Reorder failed: " + err)
+			return
+		_selected_comp_id = src_comp_id
+		_selected_file = ""
+		_selected_template = dst_template
+		_selected_entry_id = entry_id
+		_comp_tree.rebuild(src_comp_id, "", dst_template, entry_id)
+		_detail_panel.show_entry(src_comp_id, dst_template, entry_id)
+		_update_buttons()
+		return
+
+	# Module → Compendium
+	if src_is_module and not dst_is_module:
+		var dst_file: String
+		if drop_type == "file":
+			dst_comp_id = drop_meta["comp_id"]
+			dst_file = drop_meta["file"]
+		else:
+			dst_comp_id = drop_meta["id"]
+			dst_file = "compendium.json"
+		var err = _storage.move_from_module(template_id, entry_id, dst_comp_id, dst_file)
+		if err != "":
+			push_warning("[CompendiumEditor] Move failed: " + err)
+			return
+		_selected_comp_id = dst_comp_id
+		_selected_file = dst_file
+		_selected_template = template_id
+		_selected_entry_id = entry_id
+		_comp_tree.rebuild(dst_comp_id, dst_file, template_id, entry_id)
+		_detail_panel.show_entry(dst_comp_id, template_id, entry_id)
+		_update_buttons()
+		return
+
+	# Compendium → Module
+	if not src_is_module and dst_is_module:
+		var err = _storage.move_to_module(src_comp_id, template_id, entry_id)
+		if err != "":
+			push_warning("[CompendiumEditor] Move failed: " + err)
+			return
+		_selected_comp_id = _storage.get_module_id()
+		_selected_file = ""
+		_selected_template = template_id
+		_selected_entry_id = entry_id
+		_comp_tree.rebuild(_selected_comp_id, "", template_id, entry_id)
+		_detail_panel.show_entry(_selected_comp_id, template_id, entry_id)
+		_update_buttons()
+		return
+
+	# Compendium → Compendium
 	var dst_file: String
 	if drop_type == "file":
 		dst_comp_id = drop_meta["comp_id"]
@@ -471,16 +557,11 @@ func _tree_drop_data(at_position: Vector2, data: Variant):
 	else:
 		return
 
-	var src_comp_id: String = data["comp_id"]
-	var template_id: String = data["template"]
-	var entry_id: String = data["entry_id"]
-
 	var err = _storage.move_entry(src_comp_id, template_id, entry_id, dst_comp_id, dst_file)
 	if err != "":
 		push_warning("[CompendiumEditor] Move failed: " + err)
 		return
 
-	# Mark source dirty if cross-compendium (move_entry already did this, but ensure label update)
 	_selected_comp_id = dst_comp_id
 	_selected_file = dst_file
 	_selected_template = template_id
@@ -508,6 +589,13 @@ func _save_all_dirty():
 
 func _on_entry_field_changed(_comp_id: String, _template_id: String, _entry_id: String):
 	_comp_tree.update_labels()
+	_update_buttons()
+
+
+func _on_entry_id_changed(comp_id: String, template_id: String, _old_id: String, new_id: String):
+	_selected_entry_id = new_id
+	_comp_tree.rebuild(comp_id, _selected_file, template_id, new_id)
+	_detail_panel.show_entry(comp_id, template_id, new_id)
 	_update_buttons()
 
 

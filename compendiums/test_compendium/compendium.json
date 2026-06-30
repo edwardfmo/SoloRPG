@@ -3,8 +3,15 @@
 	"entries": {
 		"background": [
 			{
-				"id": "new_entry",
-				"name": "New Entry"
+				"id": "new_bg2",
+				"name": "New BG"
+			}
+		],
+		"skill": [
+			{
+				"ability": "",
+				"id": "newskill2",
+				"name": "New Skill2"
 			}
 		],
 		"species": [

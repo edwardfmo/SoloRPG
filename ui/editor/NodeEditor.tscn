@@ -149,15 +149,15 @@ text = "Selected Node"
 [node name="NodeInspector" parent="HBoxContainer/Panel/MarginContainer/VBoxContainer" unique_id=1828225823 instance=ExtResource("2_ninsp")]
 
 [node name="SaveFileDialog" type="FileDialog" parent="." unique_id=1032222101]
-title = "Save Module"
+title = "Export Module"
 size = Vector2i(600, 400)
-filters = PackedStringArray("*.json ; JSON Files")
+filters = PackedStringArray("*.rpgmod ; Module Package")
 
 [node name="OpenFileDialog" type="FileDialog" parent="." unique_id=1816813059]
-title = "Open a File"
+title = "Open Module"
 size = Vector2i(600, 400)
 file_mode = 0
-filters = PackedStringArray("*.json ; JSON Files")
+filters = PackedStringArray("*.json ; JSON Files", "*.rpgmod ; Module Package")
 
 [node name="ContextMenu" type="PopupMenu" parent="."]
 

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bdle7pnqio0nd" path="res://ui/editor/NodeInspector.gd" id="1_ni"]
 
-[node name="NodeInspector" type="ScrollContainer" unique_id=795922947 node_paths=PackedStringArray("id_edit", "text_edit", "image_edit", "on_enter_container", "choices_container", "add_choice_button")]
+[node name="NodeInspector" type="ScrollContainer" unique_id=795922947 node_paths=PackedStringArray("id_edit", "text_edit", "image_edit", "image_browse_btn", "on_enter_container", "choices_container", "add_choice_button")]
 offset_right = 300.0
 offset_bottom = 800.0
 size_flags_vertical = 3
@@ -10,6 +10,7 @@ script = ExtResource("1_ni")
 id_edit = NodePath("VBoxContainer/HBoxContainer/NodeIDEdit")
 text_edit = NodePath("VBoxContainer/ScrollContainer/NodeTextEdit")
 image_edit = NodePath("VBoxContainer/HBoxContainer2/ImagePathEdit")
+image_browse_btn = NodePath("VBoxContainer/HBoxContainer2/BrowseImageBtn")
 on_enter_container = NodePath("VBoxContainer/OnEnterContainer")
 choices_container = NodePath("VBoxContainer/ChoicesContainer")
 add_choice_button = NodePath("VBoxContainer/AddChoiceButton")
@@ -57,6 +58,11 @@ text = "Image Path"
 [node name="ImagePathEdit" type="LineEdit" parent="VBoxContainer/HBoxContainer2" unique_id=1910363021]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="BrowseImageBtn" type="Button" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "..."
+tooltip_text = "Browse for image"
 
 [node name="OnEnterLabel" type="Label" parent="VBoxContainer" unique_id=415197414]
 layout_mode = 2

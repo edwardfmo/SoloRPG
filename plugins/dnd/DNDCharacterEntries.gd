@@ -4,19 +4,26 @@ extends RefCounted
 func get_templates() -> Array[Dictionary]:
 	return [
 		{
+			"id": "group",
+			"name": "Group",
+			"fields": [
+				{"name": "description", "type": "string", "mandatory": false},
+			]
+		},
+		{
 			"id": "character_feature",
 			"name": "Character Feature",
 			"fields": [
 				{"name": "description", "type": "string", "mandatory": false},
 				{"name": "feature_type", "type": "string", "mandatory": false},
+				{"name": "params", "type": "array", "mandatory": false},
 			]
 		},
 		{
 			"id": "skill",
 			"name": "Skill",
-			"extends": "character_feature",
 			"fields": [
-				{"name": "ability", "type": "string", "mandatory": true},
+				{"name": "ability", "type": "string", "mandatory": true, "enum": ["str", "dex", "con", "int", "wis", "cha"]},
 			]
 		},
 		{
@@ -49,9 +56,10 @@ func get_templates() -> Array[Dictionary]:
 
 func get_template_entries() -> Dictionary:
 	return {
+		"group": [],
 		"character_feature": [],
+		"skill": [],
 		"background": [],
 		"species": [],
 		"class": [],
-		"skill": [],
 	}

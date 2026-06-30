@@ -1,8 +1,12 @@
 extends ScrollContainer
 
+signal image_browse_requested
+signal image_path_set(path: String)
+
 @export var id_edit: LineEdit
 @export var text_edit: TextEdit
 @export var image_edit: LineEdit
+@export var image_browse_btn: Button
 @export var on_enter_container: VBoxContainer
 @export var choices_container: VBoxContainer
 @export var add_choice_button: Button
@@ -34,6 +38,12 @@ func _get_entry_hints() -> Array[String]:
 
 func _ready():
 	add_choice_button.pressed.connect(_on_add_choice)
+	if image_browse_btn:
+		image_browse_btn.pressed.connect(func(): image_browse_requested.emit())
+
+
+func set_image_path(path: String):
+	image_edit.text = path
 
 
 func load_node(node: StoryNode):
@@ -65,6 +75,7 @@ func _on_text_changed():
 func _on_image_changed(new_text):
 	if selected_node:
 		selected_node.data["image"] = new_text
+		image_path_set.emit(new_text)
 
 
 func rebuild_on_enter_list():

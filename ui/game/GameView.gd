@@ -25,6 +25,11 @@ var _hud_nodes: Array[Node] = []
 var _overlay_nodes: Dictionary = {}  # id → PluginOverlay instance
 var _sidebar_nodes: Array[Node] = []
 var _last_context: Dictionary = {}
+var _module_dir_path: String = ""
+
+
+func set_module_dir(dir_path: String):
+	_module_dir_path = dir_path
 
 
 func set_api(api: ModAPI):
@@ -164,10 +169,14 @@ func display_node(node: Dictionary, module, context):
 	text.text = node.get("text", "")
 
 	# IMAGE
-	var path = node.get("image", "")
-	if path != "":
-		image.texture = load(path)
-		image.visible = true
+	var img_path = node.get("image", "")
+	if img_path != "":
+		var tex = _load_module_image(img_path)
+		if tex:
+			image.texture = tex
+			image.visible = true
+		else:
+			image.visible = false
 	else:
 		image.visible = false
 
@@ -176,6 +185,28 @@ func display_node(node: Dictionary, module, context):
 
 	# CHOICES
 	_build_choices(node, module, context)
+
+
+## Load an image from the module directory (relative path) or as a resource path.
+func _load_module_image(img_path: String) -> Texture2D:
+	# If it's already an absolute resource path, load directly
+	if img_path.begins_with("res://") or img_path.begins_with("user://"):
+		if ResourceLoader.exists(img_path):
+			return load(img_path)
+		return null
+
+	# Relative path — resolve against module directory
+	if _module_dir_path != "":
+		var full_path = _module_dir_path + "/" + img_path
+		if FileAccess.file_exists(full_path):
+			var img = Image.load_from_file(full_path)
+			if img:
+				return ImageTexture.create_from_image(img)
+
+	# Fallback: try loading as resource
+	if ResourceLoader.exists(img_path):
+		return load(img_path)
+	return null
 
 
 func _build_choices(node, module, context):

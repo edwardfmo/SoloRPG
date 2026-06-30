@@ -344,9 +344,27 @@ func get_templates() -> Array[Dictionary]:
 	return result
 
 
-## Get a template by id.
+## Get a template by id. Resolves "extends" inheritance, merging parent fields.
 func get_template(template_id: String) -> Dictionary:
-	return _templates.get(template_id, {})
+	var tmpl = _templates.get(template_id, {})
+	if tmpl.is_empty():
+		return {}
+	var parent_id = tmpl.get("extends", "")
+	if parent_id == "" or not _templates.has(parent_id):
+		return tmpl
+	var parent = get_template(parent_id)
+	var merged_fields: Array = []
+	for f in parent.get("fields", []):
+		merged_fields.append(f)
+	var parent_field_names := {}
+	for f in merged_fields:
+		parent_field_names[f["name"]] = true
+	for f in tmpl.get("fields", []):
+		if not parent_field_names.has(f["name"]):
+			merged_fields.append(f)
+	var result = tmpl.duplicate()
+	result["fields"] = merged_fields
+	return result
 
 
 ## Get all entries for a template (from plugins and compendiums).

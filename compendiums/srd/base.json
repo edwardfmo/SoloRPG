@@ -1,0 +1,46 @@
+{
+	"group": [
+		{"id": "skill", "name": "Skills"},
+		{"id": "saving_throw", "name": "Saving Throws"},
+		{"id": "simple_weapons", "name": "Simple Weapons"},
+		{"id": "martial_weapons", "name": "Martial Weapons"},
+		{"id": "light_armor", "name": "Light Armor"},
+		{"id": "medium_armor", "name": "Medium Armor"},
+		{"id": "heavy_armor", "name": "Heavy Armor"},
+		{"id": "shield", "name": "Shields"}
+	],
+	"skill": [
+		{"id": "acrobatics", "name": "Acrobatics", "ability": "dex", "groups": ["skill"]},
+		{"id": "animal_handling", "name": "Animal Handling", "ability": "wis", "groups": ["skill"]},
+		{"id": "arcana", "name": "Arcana", "ability": "int", "groups": ["skill"]},
+		{"id": "athletics", "name": "Athletics", "ability": "str", "groups": ["skill"]},
+		{"id": "deception", "name": "Deception", "ability": "cha", "groups": ["skill"]},
+		{"id": "history", "name": "History", "ability": "int", "groups": ["skill"]},
+		{"id": "insight", "name": "Insight", "ability": "wis", "groups": ["skill"]},
+		{"id": "intimidation", "name": "Intimidation", "ability": "cha", "groups": ["skill"]},
+		{"id": "investigation", "name": "Investigation", "ability": "int", "groups": ["skill"]},
+		{"id": "medicine", "name": "Medicine", "ability": "wis", "groups": ["skill"]},
+		{"id": "nature", "name": "Nature", "ability": "int", "groups": ["skill"]},
+		{"id": "perception", "name": "Perception", "ability": "wis", "groups": ["skill"]},
+		{"id": "performance", "name": "Performance", "ability": "cha", "groups": ["skill"]},
+		{"id": "persuasion", "name": "Persuasion", "ability": "cha", "groups": ["skill"]},
+		{"id": "religion", "name": "Religion", "ability": "int", "groups": ["skill"]},
+		{"id": "sleight_of_hand", "name": "Sleight of Hand", "ability": "dex", "groups": ["skill"]},
+		{"id": "stealth", "name": "Stealth", "ability": "dex", "groups": ["skill"]},
+		{"id": "survival", "name": "Survival", "ability": "wis", "groups": ["skill"]},
+		{"id": "str_save", "name": "Strength Save", "ability": "str", "groups": ["saving_throw"]},
+		{"id": "dex_save", "name": "Dexterity Save", "ability": "dex", "groups": ["saving_throw"]},
+		{"id": "con_save", "name": "Constitution Save", "ability": "con", "groups": ["saving_throw"]},
+		{"id": "int_save", "name": "Intelligence Save", "ability": "int", "groups": ["saving_throw"]},
+		{"id": "wis_save", "name": "Wisdom Save", "ability": "wis", "groups": ["saving_throw"]},
+		{"id": "cha_save", "name": "Charisma Save", "ability": "cha", "groups": ["saving_throw"]}
+	],
+	"character_feature": [
+		{"id": "proficiency", "name": "Proficiency", "feature_type": "proficiency", "params": [
+			{"name": "skill", "ref_template": "skill"},
+			{"name": "weapon", "ref_template": "weapon"},
+			{"name": "armor", "ref_template": "armor"},
+			{"name": "group", "ref_template": "group"}
+		]}
+	]
+}

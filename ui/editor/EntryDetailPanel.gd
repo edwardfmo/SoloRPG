@@ -9,6 +9,7 @@ var _field_row_scene = preload("res://ui/editor/EntryFieldRow.tscn")
 var _add_field_row_scene = preload("res://ui/editor/AddFieldRow.tscn")
 
 signal entry_field_changed(comp_id: String, template_id: String, entry_id: String)
+signal entry_id_changed(comp_id: String, template_id: String, old_id: String, new_id: String)
 signal refresh_requested()
 
 
@@ -62,22 +63,29 @@ func _clear():
 
 
 func _render_fields(entry: Dictionary, comp_id: String, template_id: String, entry_id: String, editable: bool, field_schema: Dictionary):
-	# Build ordered list of keys: id and name always first, then schema fields, then extras
+	# Build ordered list of keys: id and name always first, then schema fields, then groups, then extras
 	var ordered_keys: Array[String] = ["id", "name"]
 	var schema_order := _get_field_order(template_id)
 	for key in schema_order:
 		if key not in ordered_keys:
 			ordered_keys.append(key)
+	if "groups" not in ordered_keys:
+		ordered_keys.append("groups")
 	for key in entry:
 		if key not in ordered_keys:
 			ordered_keys.append(key)
 
 	for key in ordered_keys:
 		var schema = field_schema.get(key, {})
+		# Built-in schema for groups field
+		if key == "groups" and schema.is_empty():
+			schema = {"type": "array", "mandatory": false}
 		var ref_types = schema.get("entry_ref_types", [])
 		var is_entry_ref = schema.get("type", "") == "entry_ref"
 		var is_ref_array = ref_types.size() > 0 and schema.get("type", "") == "array"
 		var is_mandatory = schema.get("mandatory", false) or key == "id" or key == "name"
+		var is_enum = schema.has("enum")
+		var is_bool = schema.get("type", "") == "bool"
 		var has_value = entry.has(key)
 
 		var val = entry.get(key, _default_for_type(schema))
@@ -99,6 +107,42 @@ func _render_fields(entry: Dictionary, comp_id: String, template_id: String, ent
 			if editable:
 				hinted.text_changed.connect(_make_field_setter(entry, key, comp_id, template_id, entry_id, "entry_ref"))
 			val_field.replace_by(hinted)
+			val_field.queue_free()
+			_entry_fields.add_child(row)
+
+		elif is_enum:
+			# Enum field — use OptionButton
+			var enum_options: Array = schema["enum"]
+			var option_btn = OptionButton.new()
+			option_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			for opt in enum_options:
+				option_btn.add_item(str(opt))
+			# Select current value
+			var current_str = str(val) if has_value else ""
+			for i in enum_options.size():
+				if str(enum_options[i]) == current_str:
+					option_btn.selected = i
+					break
+			option_btn.disabled = not editable
+			if editable:
+				option_btn.item_selected.connect(func(idx):
+					entry[key] = str(enum_options[idx])
+					_on_field_changed(comp_id, template_id, entry_id))
+			val_field.replace_by(option_btn)
+			val_field.queue_free()
+			_entry_fields.add_child(row)
+
+		elif is_bool:
+			# Bool field — use CheckBox
+			var check = CheckBox.new()
+			check.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			check.button_pressed = val == true
+			check.disabled = not editable
+			if editable:
+				check.toggled.connect(func(pressed):
+					entry[key] = pressed
+					_on_field_changed(comp_id, template_id, entry_id))
+			val_field.replace_by(check)
 			val_field.queue_free()
 			_entry_fields.add_child(row)
 
@@ -288,6 +332,8 @@ static func _default_for_type(schema: Dictionary) -> Variant:
 			return 0.0
 		"int":
 			return 0
+		"bool":
+			return false
 		"array":
 			return []
 		_:
@@ -297,6 +343,15 @@ static func _default_for_type(schema: Dictionary) -> Variant:
 ## Create a callable that writes edited values into the entry dict.
 ## For optional fields not yet in the entry, the value is only written on first edit.
 func _make_field_setter(entry: Dictionary, key: String, comp_id: String, template_id: String, entry_id: String, type: String) -> Callable:
+	if key == "id":
+		return func(new_text: String):
+			var old_id = entry.get("id", entry_id)
+			var new_id = new_text.strip_edges()
+			if new_id == "" or new_id == old_id:
+				return
+			entry["id"] = new_id
+			_storage.rename_entry_id(comp_id, template_id, old_id, new_id)
+			entry_id_changed.emit(comp_id, template_id, old_id, new_id)
 	match type:
 		"entry_ref":
 			return func(new_text: String):
