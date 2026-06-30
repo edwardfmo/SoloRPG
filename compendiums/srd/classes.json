@@ -1,30 +1,161 @@
 {
 	"character_feature": [
-		{"id": "defense", "name": "Defense", "description": "While you are wearing armor, you gain a +1 bonus to AC.", "feature_type": "fighting_style"},
-		{"id": "dueling", "name": "Dueling", "description": "When you are wielding a melee weapon in one hand and no other weapons, you gain a +2 bonus to damage rolls with that weapon.", "feature_type": "fighting_style"},
-		{"id": "great_weapon_fighting", "name": "Great Weapon Fighting", "description": "When you roll a 1 or 2 on a damage die for an attack you make with a melee weapon that you are wielding with two hands, you can reroll the die.", "feature_type": "fighting_style"},
-		{"id": "archery", "name": "Archery", "description": "You gain a +2 bonus to attack rolls you make with ranged weapons.", "feature_type": "fighting_style"},
-		{"id": "second_wind", "name": "Second Wind", "description": "You have a limited well of stamina. On your turn, you can use a bonus action to regain hit points equal to 1d10 + your fighter level."},
-		{"id": "sneak_attack", "name": "Sneak Attack", "description": "You know how to strike subtly and exploit a foe's distraction."},
-		{"id": "thieves_tools", "name": "Thieves' Tools", "feature_type": "tool"},
-		{"id": "disguise_kit", "name": "Disguise Kit", "feature_type": "tool"}
+		{"id": "defense", "name": "Defense", "description": "While you are wearing armor, you gain a +1 bonus to AC.", "groups": ["fighting_style"]},
+		{"id": "dueling", "name": "Dueling", "description": "When you are wielding a melee weapon in one hand and no other weapons, you gain a +2 bonus to damage rolls with that weapon.", "groups": ["fighting_style"]},
+		{"id": "great_weapon_fighting", "name": "Great Weapon Fighting", "description": "When you roll a 1 or 2 on a damage die for an attack you make with a melee weapon that you are wielding with two hands, you can reroll the die.", "groups": ["fighting_style"]},
+		{"id": "archery", "name": "Archery", "description": "You gain a +2 bonus to attack rolls you make with ranged weapons.", "groups": ["fighting_style"]},
+		{"id": "two_weapon_fighting", "name": "Two-Weapon Fighting", "description": "When you engage in two-weapon fighting, you can add your ability modifier to the damage of the off-hand attack.", "groups": ["fighting_style"]},
+		{"id": "blind_fighting", "name": "Blind Fighting", "description": "You have Blindsight with a range of 10 feet.", "groups": ["fighting_style"]},
+		{"id": "thrown_weapon_fighting", "name": "Thrown Weapon Fighting", "description": "You can draw a weapon that has the Thrown property as part of the attack. When you hit with a ranged attack using a Thrown weapon, you gain a +2 bonus to the damage roll.", "groups": ["fighting_style"]},
+		{"id": "interception", "name": "Interception", "description": "When a creature you can see hits a target within 5 feet of you with an attack, you can use your reaction to reduce the damage by 1d10 + your proficiency bonus.", "groups": ["fighting_style"]},
+		{"id": "protection", "name": "Protection", "description": "When a creature you can see attacks a target other than you that is within 5 feet of you, you can use your reaction to impose disadvantage on the attack roll.", "groups": ["fighting_style"]},
+		{"id": "rage", "name": "Rage", "description": "You can enter a rage as a Bonus Action if you aren't wearing Heavy armor. While raging: you have Resistance to Bludgeoning, Piercing, and Slashing damage; you gain bonus rage damage on Strength-based attacks; you have Advantage on Strength checks and Strength saving throws."},
+		{"id": "unarmored_defense_barbarian", "name": "Unarmored Defense (Barbarian)", "description": "While not wearing armor, your base AC equals 10 + Dexterity modifier + Constitution modifier. You can use a Shield and still gain this benefit."},
+		{"id": "weapon_mastery", "name": "#TODO Weapon Mastery", "description": "Your training with weapons allows you to use the mastery properties of certain kinds of weapons of your choice. You can change choices when you finish a Long Rest."},
+		{"id": "danger_sense", "name": "Danger Sense", "description": "You have Advantage on Dexterity saving throws unless you have the Incapacitated condition."},
+		{"id": "reckless_attack", "name": "Reckless Attack", "description": "When you make your first attack roll on your turn, you can attack recklessly. Doing so gives you Advantage on attack rolls using Strength until the start of your next turn, but attack rolls against you have Advantage during that time."},
+		{"id": "bardic_inspiration", "name": "Bardic Inspiration", "description": "As a Bonus Action, you can inspire a creature within 60 feet that can see or hear you. It gains a Bardic Inspiration die (d6). Once within the next hour when it fails a D20 Test, it can roll the die and add to the d20. Uses equal Charisma modifier, regain all on Long Rest."},
+		{"id": "spellcasting_bard", "name": "#TODO Spellcasting (Bard)", "description": "You have learned to cast spells through your bardic arts. Charisma is your spellcasting ability. You can use a Musical Instrument as a focus."},
+		{"id": "expertise_bard", "name": "#TODO Expertise (Bard)", "description": "You gain Expertise in two of your skill proficiencies of your choice. At Bard level 9, you gain Expertise in two more."},
+		{"id": "jack_of_all_trades", "name": "Jack of All Trades", "description": "You can add half your Proficiency Bonus (round down) to any ability check you make that uses a skill proficiency you lack and that doesn't otherwise use your Proficiency Bonus."},
+		{"id": "spellcasting_cleric", "name": "#TODO Spellcasting (Cleric)", "description": "You have learned to cast spells through prayer and meditation. Wisdom is your spellcasting ability. You can use a Holy Symbol as a focus."},
+		{"id": "divine_order", "name": "#TODO Divine Order", "description": "You have dedicated yourself to one of two sacred roles: Protector (gain Martial weapon proficiency and Heavy armor training) or Thaumaturge (extra cantrip and bonus to Arcana/Religion checks)."},
+		{"id": "channel_divinity", "name": "#TODO Channel Divinity", "description": "You can channel divine energy. You gain Divine Spark (heal or damage) and Turn Undead options."},
+		{"id": "spellcasting_druid", "name": "#TODO Spellcasting (Druid)", "description": "You have learned to cast spells through studying the mystical forces of nature. Wisdom is your spellcasting ability. You can use a Druidic Focus."},
+		{"id": "druidic", "name": "Druidic", "description": "You know Druidic, the secret language of Druids. You also always have Speak with Animals prepared. You can leave hidden messages that others spot with DC 15 Investigation."},
+		{"id": "primal_order", "name": "#TODO Primal Order", "description": "You dedicate yourself to one of two roles: Magician (extra cantrip, bonus to Arcana/Nature checks) or Warden (Martial weapon proficiency, Medium armor training)."},
+		{"id": "wild_shape", "name": "#TODO Wild Shape", "description": "You can use your action to magically assume the shape of a beast that you have seen before."},
+		{"id": "wild_companion", "name": "#TODO Wild Companion", "description": "You can summon a spirit that assumes an animal form as an action."},
+		{"id": "second_wind", "name": "Second Wind", "description": "As a Bonus Action, you can regain Hit Points equal to 1d10 + your Fighter level. You can use this twice, regain one use on Short Rest, all on Long Rest."},
+		{"id": "action_surge", "name": "Action Surge", "description": "On your turn, you can take one additional action, except the Magic action. Once used, you must finish a Short or Long Rest before using it again."},
+		{"id": "tactical_mind", "name": "Tactical Mind", "description": "When you fail an ability check, you can expend a use of Second Wind to roll 1d10 and add it to the check, potentially turning failure into success. If the check still fails, the use is not expended."},
+		{"id": "martial_arts", "name": "#TODO Martial Arts", "description": "You can use Dexterity for attack/damage rolls with Unarmed Strikes and Monk weapons. Your Unarmed Strike damage die scales with Monk level. When you use the Attack action with an Unarmed Strike or Monk weapon, you can make one Unarmed Strike as a Bonus Action."},
+		{"id": "unarmored_defense_monk", "name": "Unarmored Defense (Monk)", "description": "While wearing no armor and not wielding a Shield, your base AC equals 10 + Dexterity modifier + Wisdom modifier."},
+		{"id": "monks_focus", "name": "#TODO Monk's Focus", "description": "You have Focus Points equal to your Monk level. You can spend them on Flurry of Blows, Patient Defense, and Step of the Wind. Regain all on Short or Long Rest."},
+		{"id": "unarmored_movement", "name": "Unarmored Movement", "description": "Your speed increases by 10 feet while you are not wearing armor or wielding a Shield."},
+		{"id": "uncanny_metabolism", "name": "#TODO Uncanny Metabolism", "description": "When you roll Initiative, you can regain all expended Focus Points. When you do, you also regain Hit Points equal to your Martial Arts die + Wisdom modifier. Once used, you must finish a Long Rest before using it again."},
+		{"id": "lay_on_hands", "name": "#TODO Lay on Hands", "description": "You have a pool of healing power equal to 5 x your Paladin level. As an action, you can touch a creature and restore Hit Points. You can also expend 5 HP from the pool to remove the Poisoned condition."},
+		{"id": "spellcasting_paladin", "name": "#TODO Spellcasting (Paladin)", "description": "You have learned to draw on divine magic through meditation and prayer. Charisma is your spellcasting ability. You can use a Holy Symbol as a focus."},
+		{"id": "paladins_smite", "name": "#TODO Paladin's Smite", "description": "You always have Divine Smite prepared. It doesn't count against your prepared spells. You can cast it without a spell slot once, regaining the ability on Long Rest."},
+		{"id": "spellcasting_ranger", "name": "#TODO Spellcasting (Ranger)", "description": "You have learned to channel the magical essence of nature. Wisdom is your spellcasting ability. You can use a Druidic Focus."},
+		{"id": "favored_enemy", "name": "#TODO Favored Enemy", "description": "You always have Hunter's Mark prepared. You can cast it without expending a spell slot a number of times equal to your proficiency bonus, regaining all uses on Long Rest."},
+		{"id": "deft_explorer", "name": "#TODO Deft Explorer", "description": "You gain Expertise in one of your skill proficiencies of your choice."},
+		{"id": "expertise_rogue", "name": "#TODO Expertise (Rogue)", "description": "You gain Expertise in two of your skill proficiencies of your choice. At Rogue level 6, you gain Expertise in two more."},
+		{"id": "sneak_attack", "name": "Sneak Attack", "description": "Once per turn, you can deal an extra 1d6 damage to one creature you hit with an attack roll if you have Advantage and the attack uses a Finesse or Ranged weapon. The extra damage scales with Rogue level."},
+		{"id": "thieves_cant", "name": "Thieves' Cant", "description": "You know Thieves' Cant and one other language of your choice."},
+		{"id": "cunning_action", "name": "Cunning Action", "description": "You can take a Bonus Action on each of your turns to take the Dash, Disengage, or Hide action."},
+		{"id": "spellcasting_sorcerer", "name": "#TODO Spellcasting (Sorcerer)", "description": "Drawing from your innate magic, you can cast spells. Charisma is your spellcasting ability. You can use an Arcane Focus."},
+		{"id": "innate_sorcery", "name": "#TODO Innate Sorcery", "description": "As a Bonus Action, you can unleash your innate magic for 1 minute: your Sorcerer spell save DC increases by 1, and you have Advantage on attack rolls of Sorcerer spells. You can use this twice per Long Rest."},
+		{"id": "font_of_magic", "name": "#TODO Font of Magic", "description": "You have Sorcery Points that you can use to create spell slots or convert spell slots to points. You can also use them to fuel Metamagic options."},
+		{"id": "metamagic", "name": "#TODO Metamagic", "description": "You gain two Metamagic options of your choice. You can spend Sorcery Points to twist spells: Careful, Distant, Empowered, Extended, Heightened, Quickened, Seeking, Subtle, Transmuted, or Twinned."},
+		{"id": "pact_magic", "name": "#TODO Pact Magic", "description": "You have formed a pact with a mysterious entity. You have Pact Magic spell slots that recover on Short or Long Rest. Charisma is your spellcasting ability. You can use an Arcane Focus."},
+		{"id": "eldritch_invocations", "name": "#TODO Eldritch Invocations", "description": "You have unearthed Eldritch Invocations—pieces of forbidden knowledge that grant abiding magical abilities or lessons. You gain invocations as you level, and can replace them on level up."},
+		{"id": "magical_cunning", "name": "#TODO Magical Cunning", "description": "You can perform an esoteric rite for 1 minute to regain expended Pact Magic spell slots (up to half maximum, round up). Once used, you must finish a Long Rest before using it again."},
+		{"id": "spellcasting_wizard", "name": "#TODO Spellcasting (Wizard)", "description": "You have a spellbook containing your spells. Intelligence is your spellcasting ability. You can use an Arcane Focus or your spellbook as a focus."},
+		{"id": "ritual_adept", "name": "Ritual Adept", "description": "You can cast any spell as a Ritual if it has the Ritual tag and is in your spellbook. You needn't have it prepared, but must read from the book."},
+		{"id": "arcane_recovery", "name": "#TODO Arcane Recovery", "description": "When you finish a Short Rest, you can recover expended spell slots with a combined level equal to no more than half your Wizard level (round up), none of which can be level 6+. Once used, must finish a Long Rest."},
+		{"id": "scholar", "name": "#TODO Scholar", "description": "You gain Expertise in one skill you have proficiency in, chosen from: Arcana, History, Investigation, Medicine, Nature, or Religion."}
 	],
 	"class": [
-		{"id": "fighter", "name": "Fighter", "description": "A master of martial combat.", "hit_die": "d10", "features": [
-			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.proficiency[skill=srd.str_save]", "@character_feature/srd.proficiency[skill=srd.con_save]"], "level": 1, "number_to_choose": 2},
-			{"feature_name": "Armor Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.light_armor]", "@character_feature/srd.proficiency[group=srd.medium_armor]", "@character_feature/srd.proficiency[group=srd.heavy_armor]", "@character_feature/srd.proficiency[group=srd.shield]"], "level": 1, "number_to_choose": 4},
-			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.simple_weapons]", "@character_feature/srd.proficiency[group=srd.martial_weapons]"], "level": 1, "number_to_choose": 2},
-			{"feature_name": "Skill Proficiencies", "entries": ["@character_feature/srd.proficiency[skill=srd.athletics]", "@character_feature/srd.proficiency[skill=srd.acrobatics]", "@character_feature/srd.proficiency[skill=srd.perception]"], "level": 1, "number_to_choose": 2},
-			{"feature_name": "Fighting Style", "types": ["fighting_style"], "level": 1, "number_to_choose": 1},
-			{"entries": ["@character_feature/srd.second_wind"], "level": 1, "number_to_choose": 1}
+		{"id": "barbarian", "name": "Barbarian", "description": "A fierce warrior powered by primal forces that manifest as a Rage.", "hit_die": "d12", "features": [
+			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.proficiency[skill=srd.str_save]", "@character_feature/srd.proficiency[skill=srd.con_save]"], "level": 1},
+			{"feature_name": "Armor Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.light_armor]", "@character_feature/srd.proficiency[group=srd.medium_armor]", "@character_feature/srd.proficiency[group=srd.shield]"], "level": 1},
+			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.simple_weapons]", "@character_feature/srd.proficiency[group=srd.martial_weapons]"], "level": 1},
+			{"feature_name": "Skill Proficiencies", "entries": ["@character_feature/srd.proficiency[skill=srd.animal_handling]", "@character_feature/srd.proficiency[skill=srd.athletics]", "@character_feature/srd.proficiency[skill=srd.intimidation]", "@character_feature/srd.proficiency[skill=srd.nature]", "@character_feature/srd.proficiency[skill=srd.perception]", "@character_feature/srd.proficiency[skill=srd.survival]"], "level": 1, "number_to_choose": 2},
+			{"entries": ["@character_feature/srd.rage", "@character_feature/srd.unarmored_defense_barbarian", "@character_feature/srd.weapon_mastery"], "level": 1},
+			{"entries": ["@character_feature/srd.danger_sense", "@character_feature/srd.reckless_attack"], "level": 2}
 		]},
-		{"id": "rogue", "name": "Rogue", "description": "A scoundrel who uses stealth and trickery.", "hit_die": "d8", "features": [
-			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.proficiency[skill=srd.dex_save]", "@character_feature/srd.proficiency[skill=srd.int_save]"], "level": 1, "number_to_choose": 2},
-			{"feature_name": "Armor Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.light_armor]"], "level": 1, "number_to_choose": 1},
-			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.simple_weapons]", "@character_feature/srd.proficiency[weapon=srd.longsword]", "@character_feature/srd.proficiency[weapon=srd.rapier]", "@character_feature/srd.proficiency[weapon=srd.shortsword]", "@character_feature/srd.proficiency[weapon=srd.hand_crossbow]"], "level": 1, "number_to_choose": 5},
-			{"feature_name": "Tool Proficiencies", "entries": ["@character_feature/srd.thieves_tools"], "level": 1, "number_to_choose": 1},
-			{"feature_name": "Skill Proficiencies", "entries": ["@character_feature/srd.proficiency[skill=srd.acrobatics]", "@character_feature/srd.proficiency[skill=srd.athletics]", "@character_feature/srd.proficiency[skill=srd.perception]"], "level": 1, "number_to_choose": 4},
-			{"entries": ["@character_feature/srd.sneak_attack"], "level": 1, "number_to_choose": 1}
+		{"id": "bard", "name": "Bard", "description": "An inspiring magician whose power echoes the music of creation.", "hit_die": "d8", "features": [
+			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.proficiency[skill=srd.dex_save]", "@character_feature/srd.proficiency[skill=srd.cha_save]"], "level": 1},
+			{"feature_name": "Armor Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.light_armor]"], "level": 1},
+			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.simple_weapons]"], "level": 1},
+			{"feature_name": "Tool Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.musical_instrument]"], "level": 1, "number_to_choose": 3},
+			{"feature_name": "Skill Proficiencies", "entries": ["@group/srd.skill"], "level": 1, "number_to_choose": 3},
+			{"entries": ["@character_feature/srd.spellcasting_bard", "@character_feature/srd.bardic_inspiration"], "level": 1},
+			{"entries": ["@character_feature/srd.expertise_bard", "@character_feature/srd.jack_of_all_trades"], "level": 2}
+		]},
+		{"id": "cleric", "name": "Cleric", "description": "A priestly champion who wields divine magic in service of a higher power.", "hit_die": "d8", "features": [
+			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.proficiency[skill=srd.wis_save]", "@character_feature/srd.proficiency[skill=srd.cha_save]"], "level": 1},
+			{"feature_name": "Armor Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.light_armor]", "@character_feature/srd.proficiency[group=srd.medium_armor]", "@character_feature/srd.proficiency[group=srd.shield]"], "level": 1},
+			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.simple_weapons]"], "level": 1},
+			{"feature_name": "Skill Proficiencies", "entries": ["@character_feature/srd.proficiency[skill=srd.history]", "@character_feature/srd.proficiency[skill=srd.insight]", "@character_feature/srd.proficiency[skill=srd.medicine]", "@character_feature/srd.proficiency[skill=srd.persuasion]", "@character_feature/srd.proficiency[skill=srd.religion]"], "level": 1, "number_to_choose": 2},
+			{"entries": ["@character_feature/srd.spellcasting_cleric", "@character_feature/srd.divine_order"], "level": 1},
+			{"entries": ["@character_feature/srd.channel_divinity"], "level": 2}
+		]},
+		{"id": "druid", "name": "Druid", "description": "A priest of the Old Faith, wielding the powers of nature.", "hit_die": "d8", "features": [
+			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.proficiency[skill=srd.int_save]", "@character_feature/srd.proficiency[skill=srd.wis_save]"], "level": 1},
+			{"feature_name": "Armor Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.light_armor]", "@character_feature/srd.proficiency[group=srd.shield]"], "level": 1},
+			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.simple_weapons]"], "level": 1},
+			{"feature_name": "Tool Proficiencies", "entries": ["@character_feature/srd.proficiency[tool=srd.herbalism_kit]"], "level": 1},
+			{"feature_name": "Skill Proficiencies", "entries": ["@character_feature/srd.proficiency[skill=srd.arcana]", "@character_feature/srd.proficiency[skill=srd.animal_handling]", "@character_feature/srd.proficiency[skill=srd.insight]", "@character_feature/srd.proficiency[skill=srd.medicine]", "@character_feature/srd.proficiency[skill=srd.nature]", "@character_feature/srd.proficiency[skill=srd.perception]", "@character_feature/srd.proficiency[skill=srd.religion]", "@character_feature/srd.proficiency[skill=srd.survival]"], "level": 1, "number_to_choose": 2},
+			{"entries": ["@character_feature/srd.spellcasting_druid", "@character_feature/srd.druidic", "@character_feature/srd.primal_order"], "level": 1},
+			{"entries": ["@character_feature/srd.wild_shape", "@character_feature/srd.wild_companion"], "level": 2}
+		]},
+		{"id": "fighter", "name": "Fighter", "description": "A master of martial combat, trained with a variety of weapons and armor.", "hit_die": "d10", "features": [
+			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.proficiency[skill=srd.str_save]", "@character_feature/srd.proficiency[skill=srd.con_save]"], "level": 1},
+			{"feature_name": "Armor Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.light_armor]", "@character_feature/srd.proficiency[group=srd.medium_armor]", "@character_feature/srd.proficiency[group=srd.heavy_armor]", "@character_feature/srd.proficiency[group=srd.shield]"], "level": 1},
+			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.simple_weapons]", "@character_feature/srd.proficiency[group=srd.martial_weapons]"], "level": 1},
+			{"feature_name": "Skill Proficiencies", "entries": ["@character_feature/srd.proficiency[skill=srd.acrobatics]", "@character_feature/srd.proficiency[skill=srd.animal_handling]", "@character_feature/srd.proficiency[skill=srd.athletics]", "@character_feature/srd.proficiency[skill=srd.history]", "@character_feature/srd.proficiency[skill=srd.insight]", "@character_feature/srd.proficiency[skill=srd.intimidation]", "@character_feature/srd.proficiency[skill=srd.perception]", "@character_feature/srd.proficiency[skill=srd.persuasion]", "@character_feature/srd.proficiency[skill=srd.survival]"], "level": 1, "number_to_choose": 2},
+			{"feature_name": "Fighting Style", "entries": ["@group/srd.fighting_style"], "level": 1, "number_to_choose": 1},
+			{"entries": ["@character_feature/srd.second_wind", "@character_feature/srd.weapon_mastery"], "level": 1},
+			{"entries": ["@character_feature/srd.action_surge", "@character_feature/srd.tactical_mind"], "level": 2}
+		]},
+		{"id": "monk", "name": "Monk", "description": "A master of martial arts, harnessing the power of the body in pursuit of perfection.", "hit_die": "d8", "features": [
+			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.proficiency[skill=srd.str_save]", "@character_feature/srd.proficiency[skill=srd.dex_save]"], "level": 1},
+			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.simple_weapons]"], "level": 1},
+			{"feature_name": "Tool Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.artisans_tools]", "@character_feature/srd.proficiency[group=srd.musical_instrument]"], "level": 1, "number_to_choose": 1},
+			{"feature_name": "Skill Proficiencies", "entries": ["@character_feature/srd.proficiency[skill=srd.acrobatics]", "@character_feature/srd.proficiency[skill=srd.athletics]", "@character_feature/srd.proficiency[skill=srd.history]", "@character_feature/srd.proficiency[skill=srd.insight]", "@character_feature/srd.proficiency[skill=srd.religion]", "@character_feature/srd.proficiency[skill=srd.stealth]"], "level": 1, "number_to_choose": 2},
+			{"entries": ["@character_feature/srd.martial_arts", "@character_feature/srd.unarmored_defense_monk"], "level": 1},
+			{"entries": ["@character_feature/srd.monks_focus", "@character_feature/srd.unarmored_movement", "@character_feature/srd.uncanny_metabolism"], "level": 2}
+		]},
+		{"id": "paladin", "name": "Paladin", "description": "A holy warrior bound to a sacred oath.", "hit_die": "d10", "features": [
+			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.proficiency[skill=srd.wis_save]", "@character_feature/srd.proficiency[skill=srd.cha_save]"], "level": 1},
+			{"feature_name": "Armor Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.light_armor]", "@character_feature/srd.proficiency[group=srd.medium_armor]", "@character_feature/srd.proficiency[group=srd.heavy_armor]", "@character_feature/srd.proficiency[group=srd.shield]"], "level": 1},
+			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.simple_weapons]", "@character_feature/srd.proficiency[group=srd.martial_weapons]"], "level": 1},
+			{"feature_name": "Skill Proficiencies", "entries": ["@character_feature/srd.proficiency[skill=srd.athletics]", "@character_feature/srd.proficiency[skill=srd.insight]", "@character_feature/srd.proficiency[skill=srd.intimidation]", "@character_feature/srd.proficiency[skill=srd.medicine]", "@character_feature/srd.proficiency[skill=srd.persuasion]", "@character_feature/srd.proficiency[skill=srd.religion]"], "level": 1, "number_to_choose": 2},
+			{"entries": ["@character_feature/srd.lay_on_hands", "@character_feature/srd.spellcasting_paladin", "@character_feature/srd.weapon_mastery"], "level": 1},
+			{"feature_name": "Fighting Style", "entries": ["@group/srd.fighting_style"], "level": 2, "number_to_choose": 1},
+			{"entries": ["@character_feature/srd.paladins_smite"], "level": 2}
+		]},
+		{"id": "ranger", "name": "Ranger", "description": "A warrior who combats threats on the edges of civilization.", "hit_die": "d10", "features": [
+			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.proficiency[skill=srd.str_save]", "@character_feature/srd.proficiency[skill=srd.dex_save]"], "level": 1},
+			{"feature_name": "Armor Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.light_armor]", "@character_feature/srd.proficiency[group=srd.medium_armor]", "@character_feature/srd.proficiency[group=srd.shield]"], "level": 1},
+			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.simple_weapons]", "@character_feature/srd.proficiency[group=srd.martial_weapons]"], "level": 1},
+			{"feature_name": "Skill Proficiencies", "entries": ["@character_feature/srd.proficiency[skill=srd.animal_handling]", "@character_feature/srd.proficiency[skill=srd.athletics]", "@character_feature/srd.proficiency[skill=srd.insight]", "@character_feature/srd.proficiency[skill=srd.investigation]", "@character_feature/srd.proficiency[skill=srd.nature]", "@character_feature/srd.proficiency[skill=srd.perception]", "@character_feature/srd.proficiency[skill=srd.stealth]", "@character_feature/srd.proficiency[skill=srd.survival]"], "level": 1, "number_to_choose": 3},
+			{"entries": ["@character_feature/srd.spellcasting_ranger", "@character_feature/srd.favored_enemy", "@character_feature/srd.weapon_mastery"], "level": 1},
+			{"feature_name": "Fighting Style", "entries": ["@group/srd.fighting_style"], "level": 2, "number_to_choose": 1},
+			{"entries": ["@character_feature/srd.deft_explorer"], "level": 2}
+		]},
+		{"id": "rogue", "name": "Rogue", "description": "A scoundrel who uses stealth and trickery to overcome obstacles.", "hit_die": "d8", "features": [
+			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.proficiency[skill=srd.dex_save]", "@character_feature/srd.proficiency[skill=srd.int_save]"], "level": 1},
+			{"feature_name": "Armor Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.light_armor]"], "level": 1},
+			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.simple_weapons]", "@character_feature/srd.proficiency[weapon=srd.longsword]", "@character_feature/srd.proficiency[weapon=srd.rapier]", "@character_feature/srd.proficiency[weapon=srd.shortsword]", "@character_feature/srd.proficiency[weapon=srd.hand_crossbow]"], "level": 1},
+			{"feature_name": "Tool Proficiencies", "entries": ["@character_feature/srd.proficiency[tool=srd.thieves_tools]"], "level": 1},
+			{"feature_name": "Skill Proficiencies", "entries": ["@character_feature/srd.proficiency[skill=srd.acrobatics]", "@character_feature/srd.proficiency[skill=srd.athletics]", "@character_feature/srd.proficiency[skill=srd.deception]", "@character_feature/srd.proficiency[skill=srd.insight]", "@character_feature/srd.proficiency[skill=srd.intimidation]", "@character_feature/srd.proficiency[skill=srd.investigation]", "@character_feature/srd.proficiency[skill=srd.perception]", "@character_feature/srd.proficiency[skill=srd.performance]", "@character_feature/srd.proficiency[skill=srd.persuasion]", "@character_feature/srd.proficiency[skill=srd.sleight_of_hand]", "@character_feature/srd.proficiency[skill=srd.stealth]"], "level": 1, "number_to_choose": 4},
+			{"entries": ["@character_feature/srd.expertise_rogue", "@character_feature/srd.sneak_attack", "@character_feature/srd.thieves_cant", "@character_feature/srd.weapon_mastery"], "level": 1},
+			{"entries": ["@character_feature/srd.cunning_action"], "level": 2}
+		]},
+		{"id": "sorcerer", "name": "Sorcerer", "description": "A spellcaster who draws on inherent magic from a gift or bloodline.", "hit_die": "d6", "features": [
+			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.proficiency[skill=srd.con_save]", "@character_feature/srd.proficiency[skill=srd.cha_save]"], "level": 1},
+			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.simple_weapons]"], "level": 1},
+			{"feature_name": "Skill Proficiencies", "entries": ["@character_feature/srd.proficiency[skill=srd.arcana]", "@character_feature/srd.proficiency[skill=srd.deception]", "@character_feature/srd.proficiency[skill=srd.insight]", "@character_feature/srd.proficiency[skill=srd.intimidation]", "@character_feature/srd.proficiency[skill=srd.persuasion]", "@character_feature/srd.proficiency[skill=srd.religion]"], "level": 1, "number_to_choose": 2},
+			{"entries": ["@character_feature/srd.spellcasting_sorcerer", "@character_feature/srd.innate_sorcery"], "level": 1},
+			{"entries": ["@character_feature/srd.font_of_magic", "@character_feature/srd.metamagic"], "level": 2}
+		]},
+		{"id": "warlock", "name": "Warlock", "description": "A wielder of magic derived from a bargain with an extraplanar entity.", "hit_die": "d8", "features": [
+			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.proficiency[skill=srd.wis_save]", "@character_feature/srd.proficiency[skill=srd.cha_save]"], "level": 1},
+			{"feature_name": "Armor Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.light_armor]"], "level": 1},
+			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.simple_weapons]"], "level": 1},
+			{"feature_name": "Skill Proficiencies", "entries": ["@character_feature/srd.proficiency[skill=srd.arcana]", "@character_feature/srd.proficiency[skill=srd.deception]", "@character_feature/srd.proficiency[skill=srd.history]", "@character_feature/srd.proficiency[skill=srd.intimidation]", "@character_feature/srd.proficiency[skill=srd.investigation]", "@character_feature/srd.proficiency[skill=srd.nature]", "@character_feature/srd.proficiency[skill=srd.religion]"], "level": 1, "number_to_choose": 2},
+			{"entries": ["@character_feature/srd.eldritch_invocations", "@character_feature/srd.pact_magic"], "level": 1},
+			{"entries": ["@character_feature/srd.magical_cunning"], "level": 2}
+		]},
+		{"id": "wizard", "name": "Wizard", "description": "A scholarly magic-user capable of manipulating the structures of reality.", "hit_die": "d6", "features": [
+			{"feature_name": "Saving Throws", "entries": ["@character_feature/srd.proficiency[skill=srd.int_save]", "@character_feature/srd.proficiency[skill=srd.wis_save]"], "level": 1},
+			{"feature_name": "Weapon Proficiencies", "entries": ["@character_feature/srd.proficiency[group=srd.simple_weapons]"], "level": 1},
+			{"feature_name": "Skill Proficiencies", "entries": ["@character_feature/srd.proficiency[skill=srd.arcana]", "@character_feature/srd.proficiency[skill=srd.history]", "@character_feature/srd.proficiency[skill=srd.insight]", "@character_feature/srd.proficiency[skill=srd.investigation]", "@character_feature/srd.proficiency[skill=srd.medicine]", "@character_feature/srd.proficiency[skill=srd.nature]", "@character_feature/srd.proficiency[skill=srd.religion]"], "level": 1, "number_to_choose": 2},
+			{"entries": ["@character_feature/srd.spellcasting_wizard", "@character_feature/srd.ritual_adept", "@character_feature/srd.arcane_recovery"], "level": 1},
+			{"entries": ["@character_feature/srd.scholar"], "level": 2}
 		]}
 	]
 }

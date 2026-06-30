@@ -5,19 +5,19 @@
 	],
 	"background": [
 		{"id": "acolyte", "name": "Acolyte", "description": "You have spent your life in service to a temple.", "features": [
-			{"feature_name": "Skills", "entries": ["@character_feature/srd.proficiency[skill=srd.athletics]", "@character_feature/srd.proficiency[skill=srd.perception]"], "level": 1, "number_to_choose": 2}
+			{"feature_name": "Skills", "entries": ["@character_feature/srd.proficiency[skill=srd.athletics]", "@character_feature/srd.proficiency[skill=srd.perception]"], "level": 1}
 		]},
 		{"id": "criminal", "name": "Criminal", "description": "You have a history of breaking the law.", "features": [
-			{"feature_name": "Skills", "entries": ["@character_feature/srd.proficiency[skill=srd.acrobatics]", "@character_feature/srd.proficiency[skill=srd.perception]"], "level": 1, "number_to_choose": 2}
+			{"feature_name": "Skills", "entries": ["@character_feature/srd.proficiency[skill=srd.acrobatics]", "@character_feature/srd.proficiency[skill=srd.perception]"], "level": 1}
 		]}
 	],
 	"species": [
 		{"id": "human", "name": "Human", "description": "Humans are the most adaptable and ambitious people.", "features": [
-			{"feature_name": "Skills", "entries": ["@character_feature/srd.proficiency[skill=srd.athletics]"], "level": 1, "number_to_choose": 1}
+			{"feature_name": "Skills", "entries": ["@character_feature/srd.proficiency[skill=srd.athletics]"], "level": 1}
 		]},
 		{"id": "elf", "name": "Elf", "description": "Elves are a magical people of otherworldly grace.", "features": [
-			{"feature_name": "Skills", "entries": ["@character_feature/srd.proficiency[skill=srd.perception]"], "level": 1, "number_to_choose": 1},
-			{"entries": ["@character_feature/srd.darkvision", "@character_feature/srd.fey_ancestry"], "level": 1, "number_to_choose": 2}
+			{"feature_name": "Skills", "entries": ["@character_feature/srd.proficiency[skill=srd.perception]"], "level": 1},
+			{"entries": ["@character_feature/srd.darkvision", "@character_feature/srd.fey_ancestry"], "level": 1}
 		]}
 	]
 }

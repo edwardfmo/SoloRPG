@@ -7,7 +7,12 @@
 		{"id": "light_armor", "name": "Light Armor"},
 		{"id": "medium_armor", "name": "Medium Armor"},
 		{"id": "heavy_armor", "name": "Heavy Armor"},
-		{"id": "shield", "name": "Shields"}
+		{"id": "shield", "name": "Shields"},
+		{"id": "fighting_style", "name": "Fighting Styles"},
+		{"id": "tool", "name": "Tools"},
+		{"id": "artisans_tools", "name": "Artisan's Tools"},
+		{"id": "musical_instrument", "name": "Musical Instruments"},
+		{"id": "gaming_set", "name": "Gaming Sets"}
 	],
 	"skill": [
 		{"id": "acrobatics", "name": "Acrobatics", "ability": "dex", "groups": ["skill"]},
@@ -36,10 +41,11 @@
 		{"id": "cha_save", "name": "Charisma Save", "ability": "cha", "groups": ["saving_throw"]}
 	],
 	"character_feature": [
-		{"id": "proficiency", "name": "Proficiency", "feature_type": "proficiency", "params": [
+		{"id": "proficiency", "name": "Proficiency", "params": [
 			{"name": "skill", "ref_template": "skill"},
 			{"name": "weapon", "ref_template": "weapon"},
 			{"name": "armor", "ref_template": "armor"},
+			{"name": "tool", "ref_template": "tool"},
 			{"name": "group", "ref_template": "group"}
 		]}
 	]

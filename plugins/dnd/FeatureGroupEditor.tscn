@@ -1,0 +1,64 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://plugins/dnd/FeatureGroupEditor.gd" id="1_fge"]
+
+[node name="FeatureGroupEditor" type="VBoxContainer" node_paths=PackedStringArray("_feature_name_edit", "_level_spin", "_choose_spin", "_entries_container", "_add_entry_btn")]
+size_flags_horizontal = 3
+script = ExtResource("1_fge")
+_feature_name_edit = NodePath("NameRow/FeatureNameEdit")
+_level_spin = NodePath("LevelRow/LevelSpin")
+_choose_spin = NodePath("ChooseRow/ChooseSpin")
+_entries_container = NodePath("EntriesContainer")
+_add_entry_btn = NodePath("AddEntryBtn")
+
+[node name="NameRow" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="NameRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(120, 0)
+text = "Feature Name"
+
+[node name="FeatureNameEdit" type="LineEdit" parent="NameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "(optional)"
+
+[node name="LevelRow" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="LevelLabel" type="Label" parent="LevelRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(120, 0)
+text = "Level"
+
+[node name="LevelSpin" type="SpinBox" parent="LevelRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 20.0
+value = 1.0
+
+[node name="ChooseRow" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="ChooseLabel" type="Label" parent="ChooseRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(120, 0)
+text = "Choose (0=all)"
+
+[node name="ChooseSpin" type="SpinBox" parent="ChooseRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 99.0
+
+[node name="EntriesLabel" type="Label" parent="."]
+layout_mode = 2
+text = "Entries"
+
+[node name="EntriesContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="AddEntryBtn" type="Button" parent="."]
+layout_mode = 2
+text = "+ Add Entry"

@@ -11,6 +11,7 @@ func get_templates() -> Array[Dictionary]:
 				{"name": "weight", "type": "float", "mandatory": false},
 				{"name": "value", "type": "int", "mandatory": false},
 				{"name": "rarity", "type": "string", "mandatory": false, "enum": ["-", "common", "uncommon", "rare", "very rare", "legendary", "artifact"]},
+				{"name": "groups", "type": "array", "mandatory": false},
 			]
 		},
 		{
@@ -36,6 +37,14 @@ func get_templates() -> Array[Dictionary]:
 				{"name": "stealth_disadvantage", "type": "bool", "mandatory": false},
 			]
 		},
+		{
+			"id": "tool",
+			"name": "Tool",
+			"extends": "item",
+			"fields": [
+				{"name": "ability", "type": "string", "mandatory": false, "enum": ["str", "dex", "con", "int", "wis", "cha"]},
+			]
+		},
 	]
 
 
@@ -47,4 +56,5 @@ func get_template_entries() -> Dictionary:
 			{"id": "shortsword", "name": "Shortsword", "weight": 2.0, "value": 1000, "rarity": "common", "damage": "/r1d6", "damage_type": "piercing", "class": "martial", "range": "melee", "keywords": ["light", "finesse"], "groups": ["martial_weapons"]},
 		],
 		"armor": [],
+		"tool": [],
 	}

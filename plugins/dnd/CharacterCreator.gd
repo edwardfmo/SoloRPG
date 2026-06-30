@@ -260,20 +260,25 @@ func _clear_features_container(container: VBoxContainer, source_type: String):
 
 func _resolve_feature_entries(group: Dictionary) -> Array:
 	var result := []
-	# Add explicit entries
-	if group.has("entries"):
-		result.append_array(group["entries"])
-	# Add entries matching types filter
-	var types: Array = group.get("types", [])
-	if not types.is_empty() and api:
-		var all_features = api._entries.get("character_feature", {})
-		for key in all_features:
-			var feat = all_features[key]
-			var feat_type = feat.get("feature_type", "")
-			if feat_type in types:
-				var ref = "@character_feature/" + key
-				if ref not in result:
-					result.append(ref)
+	var entries: Array = group.get("entries", [])
+	for entry_ref in entries:
+		if typeof(entry_ref) != TYPE_STRING:
+			continue
+		if entry_ref.begins_with("@group/") and api:
+			# Expand group ref: find all entries whose groups array contains this group id
+			var parsed = ModAPI.parse_entry_ref(entry_ref)
+			var group_id = parsed.get("entry_id", "")
+			for tmpl_id in api._entries:
+				for key in api._entries[tmpl_id]:
+					var ent = api._entries[tmpl_id][key]
+					var ent_groups: Array = ent.get("groups", [])
+					if group_id in ent_groups:
+						var ref = "@" + tmpl_id + "/" + key
+						if ref not in result:
+							result.append(ref)
+		else:
+			if entry_ref not in result:
+				result.append(entry_ref)
 	return result
 
 
@@ -289,16 +294,7 @@ func _revoke_features(source_type: String):
 func _resolve_feature_name(ref: String) -> String:
 	if not api or not ref.begins_with("@"):
 		return ref
-	# ref format: @character_feature/namespace.id
-	var parts = ref.substr(1).split("/", true, 1)
-	if parts.size() < 2:
-		return ref
-	var template_id = parts[0]
-	var entry_key = parts[1]
-	var entries = api._entries.get(template_id, {})
-	if entries.has(entry_key):
-		return entries[entry_key].get("name", ref)
-	return ref
+	return api.resolve_ref_display(ref)
 
 
 func _set_tabs_enabled(up_to: int):

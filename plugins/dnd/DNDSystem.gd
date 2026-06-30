@@ -89,6 +89,39 @@ func get_template_entries() -> Dictionary:
 	return entries
 
 
+var _feature_group_scene: PackedScene
+
+## Templates that use feature groups.
+const FEATURE_TEMPLATES := ["class", "species", "background"]
+
+
+func create_item_panel(template_id: String, field_name: String, item: Dictionary, context: Dictionary) -> Control:
+	if field_name == "features" and template_id in FEATURE_TEMPLATES:
+		if _feature_group_scene == null:
+			_feature_group_scene = load(resolve_path("FeatureGroupEditor.tscn"))
+		var panel = _feature_group_scene.instantiate()
+		panel.setup(item, context)
+		return panel
+	return null
+
+
+func get_item_summary(template_id: String, field_name: String, item: Dictionary) -> String:
+	if field_name == "features" and template_id in FEATURE_TEMPLATES:
+		var level = item.get("level", 1)
+		var name_str = item.get("feature_name", "")
+		var summary = "Lv%d" % level
+		if name_str != "":
+			summary += " - " + name_str
+		else:
+			summary += " - Feature"
+		var entries_count = item.get("entries", []).size()
+		var choose = item.get("number_to_choose", 0)
+		if choose > 0 and choose < entries_count:
+			summary += " (choose %d)" % choose
+		return summary
+	return ""
+
+
 func get_action_params(action_name: String) -> Array[Dictionary]:
 	if action_name == "take_damage":
 		return [

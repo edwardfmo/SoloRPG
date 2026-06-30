@@ -92,16 +92,41 @@ static func make_ref(entry_ref: String) -> Dictionary:
 ## Parse an entry reference string like "@template/namespace.entry_id" or "@namespace.entry_id".
 ## Returns {"template": String, "namespace": String, "entry_id": String}.
 static func parse_entry_ref(ref: String) -> Dictionary:
-	var rest = ref.substr(1)  # remove @
+	if not ref.begins_with("@"):
+		return {}
+	var s = ref.substr(1)  # remove @
 	var template := ""
-	var slash_idx = rest.find("/")
+	var slash_idx = s.find("/")
 	if slash_idx > 0:
-		template = rest.substr(0, slash_idx)
-		rest = rest.substr(slash_idx + 1)
-	var dot_idx = rest.find(".")
+		template = s.substr(0, slash_idx)
+		s = s.substr(slash_idx + 1)
+
+	# Check for params [key=value]
+	var param_key := ""
+	var param_value := ""
+	var bracket_pos = s.find("[")
+	if bracket_pos >= 0:
+		var params_str = s.substr(bracket_pos + 1).rstrip("]")
+		s = s.substr(0, bracket_pos)
+		var eq_pos = params_str.find("=")
+		if eq_pos >= 0:
+			param_key = params_str.substr(0, eq_pos)
+			param_value = params_str.substr(eq_pos + 1)
+
+	var entry_namespace := ""
+	var entry_id := ""
+	var dot_idx = s.find(".")
 	if dot_idx > 0:
-		return {"template": template, "namespace": rest.substr(0, dot_idx), "entry_id": rest.substr(dot_idx + 1)}
-	return {"template": template, "namespace": rest, "entry_id": ""}
+		entry_namespace = s.substr(0, dot_idx)
+		entry_id = s.substr(dot_idx + 1)
+	else:
+		entry_namespace = s
+
+	var result := {"template": template, "namespace": entry_namespace, "entry_id": entry_id}
+	if param_key != "":
+		result["param_key"] = param_key
+		result["param_value"] = param_value
+	return result
 
 
 ## Returns all published action types from registered plugins.
@@ -131,6 +156,30 @@ func get_ui_panels_for_slot(slot: String) -> Array[Dictionary]:
 				if panel.get("slot", "") == slot:
 					panels.append(panel)
 	return panels
+
+
+## Ask the plugin that owns a template for a custom item panel.
+## Returns null if no plugin provides one.
+func create_item_panel(template_id: String, field_name: String, item: Dictionary, context: Dictionary) -> Control:
+	var tmpl = _templates.get(template_id, {})
+	var source = tmpl.get("source_plugin", "")
+	if source != "" and plugins.has(source):
+		var plugin = plugins[source]
+		if plugin is Plugin:
+			return plugin.create_item_panel(template_id, field_name, item, context)
+	return null
+
+
+## Ask the plugin that owns a template for a custom item summary.
+## Returns "" if no plugin provides one.
+func get_item_summary(template_id: String, field_name: String, item: Dictionary) -> String:
+	var tmpl = _templates.get(template_id, {})
+	var source = tmpl.get("source_plugin", "")
+	if source != "" and plugins.has(source):
+		var plugin = plugins[source]
+		if plugin is Plugin:
+			return plugin.get_item_summary(template_id, field_name, item)
+	return ""
 
 
 ## Returns a dict mapping each action/condition type string to its provider plugin name.
@@ -409,13 +458,63 @@ func query_entries(template_id: String, filter: Dictionary) -> Array[Dictionary]
 
 ## Get entry reference hint strings for the given accepted type IDs.
 ## Returns strings like "@template_id/namespace.entry_id" for use in HintedLineEdit.
+## For entries with "params", generates parameterized hints like "@template/ns.id[param=ns.target]".
 func get_entry_ref_hints(type_ids: Array) -> Array[String]:
 	var result: Array[String] = []
 	for type_id in type_ids:
 		var map = _entries.get(type_id, {})
 		for namespaced_id in map:
-			result.append("@" + type_id + "/" + namespaced_id)
+			var entry = map[namespaced_id]
+			var params = entry.get("params", [])
+			if params is Array and params.size() > 0:
+				# Generate parameterized hints for each param × target entry
+				for param_def in params:
+					var pname = param_def.get("name", "")
+					var ref_tmpl = param_def.get("ref_template", "")
+					if pname == "" or ref_tmpl == "":
+						continue
+					var target_map = _entries.get(ref_tmpl, {})
+					for target_id in target_map:
+						result.append("@%s/%s[%s=%s]" % [type_id, namespaced_id, pname, target_id])
+			else:
+				result.append("@" + type_id + "/" + namespaced_id)
 	return result
+
+
+## Resolve a parameterized ref string to a display name.
+## E.g. "@character_feature/srd.proficiency[weapon=srd.longsword]" → "Proficiency: Longsword"
+func resolve_ref_display(ref_str: String) -> String:
+	var parsed = parse_entry_ref(ref_str)
+	if parsed.is_empty():
+		return ref_str
+	var tmpl_id = parsed["template"]
+	var ns = parsed.get("namespace", "")
+	var eid = parsed.get("entry_id", "")
+	var namespaced_id = (ns + "." + eid) if eid != "" else ns
+	var param_key = parsed.get("param_key", "")
+	var param_value = parsed.get("param_value", "")
+
+	var entry_map = _entries.get(tmpl_id, {})
+	var entry = entry_map.get(namespaced_id, {})
+	var base_name = entry.get("name", namespaced_id)
+
+	if param_key != "" and param_value != "":
+		# Resolve param target name
+		var params = entry.get("params", [])
+		var ref_tmpl = ""
+		for p in params:
+			if p.get("name", "") == param_key:
+				ref_tmpl = p.get("ref_template", "")
+				break
+		if ref_tmpl != "":
+			var target_map = _entries.get(ref_tmpl, {})
+			var target_entry = target_map.get(param_value, {})
+			var target_name = target_entry.get("name", param_value)
+			return "%s: %s" % [base_name, target_name]
+		return "%s: %s" % [base_name, param_value]
+	return base_name
+
+
 
 
 ## Get all loaded compendium ids.

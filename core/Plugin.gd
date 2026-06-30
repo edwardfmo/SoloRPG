@@ -73,6 +73,19 @@ func get_template_entries() -> Dictionary:
 	return {}
 
 
+## Return a custom Control for rendering an item_schema object in the editor.
+## Return null to use the default generic renderer.
+## context: {entry, comp_id, entry_id, editable, on_changed: Callable, ref_hints: Callable}
+func create_item_panel(template_id: String, field_name: String, item: Dictionary, context: Dictionary) -> Control:
+	return null
+
+
+## Return a custom summary string for an item_schema object header.
+## Return "" to use the default header_format or fallback.
+func get_item_summary(template_id: String, field_name: String, item: Dictionary) -> String:
+	return ""
+
+
 ## Return setting definitions this plugin provides.
 ## Each entry: {path: String, label: String, type: "int"|"float"|"string"|"bool"|"enum",
 ##              scope: "global"|"module", default: Variant, options?: Array[String]}
